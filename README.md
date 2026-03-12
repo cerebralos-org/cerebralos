@@ -8,7 +8,11 @@
 [![npm version](https://badge.fury.io/js/cerebralos.svg)](https://badge.fury.io/js/cerebralos)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+**Read in your language:**
 [English](README.md) | [日本語](i18n/README.ja.md) | [简体中文](i18n/README.zh-CN.md) | [繁體中文](i18n/README.zh-TW.md) | [한국어](i18n/README.ko.md) | [Español](i18n/README.es.md) | [Français](i18n/README.fr.md) | [Deutsch](i18n/README.de.md) | [Português](i18n/README.pt.md) | [Русский](i18n/README.ru.md) | [Italiano](i18n/README.it.md) | [हिन्दी](i18n/README.hi.md) | [العربية](i18n/README.ar.md)
+
+**Agent Integration Guides:**
+[English](docs/AGENTS.md) | [日本語](docs/AGENTS.ja.md) | [简体中文](docs/AGENTS.zh-CN.md) | [繁體中文](docs/AGENTS.zh-TW.md) | [한국어](docs/AGENTS.ko.md) | [Español](docs/AGENTS.es.md) | [Français](docs/AGENTS.fr.md) | [Deutsch](docs/AGENTS.de.md) | [Português](docs/AGENTS.pt.md) | [Русский](docs/AGENTS.ru.md) | [Italiano](docs/AGENTS.it.md) | [हिन्दी](docs/AGENTS.hi.md) | [العربية](docs/AGENTS.ar.md)
 
 ## The Problem with Perfect Memory
 
