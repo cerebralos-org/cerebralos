@@ -9,6 +9,7 @@ import { initBrain } from './init.js';
 import { runSleepJob } from './sleep.js';
 import { wakeUp } from './wake.js';
 import { recallContext } from './recall.js';
+import { exploreSpace } from './explore.js';
 import { startMcpServer } from './mcp.js';
 import { installHook } from './hook.js';
 
@@ -40,10 +41,7 @@ program
 program
   .command('explore')
   .description('Explore the space between your thoughts')
-  .action(() => {
-    console.log(chalk.cyan('Exploring the space between your thoughts...'));
-    console.log(chalk.gray('In a full implementation, this would open an interactive TUI.'));
-  });
+  .action(() => exploreSpace());
 
 program
   .command('mcp')

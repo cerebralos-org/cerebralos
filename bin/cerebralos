@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+// Suppress dotenv verbose tips output (must be set before any imports)
+process.env.DOTENV_CONFIG_QUIET = 'true';
+
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
