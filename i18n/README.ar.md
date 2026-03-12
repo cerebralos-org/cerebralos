@@ -64,7 +64,7 @@
 
 ### Installation
 ```bash
-npm install -g cerebralos
+npx github:cerebralos-org/cerebralos init
 ```
 
 ### Initialization

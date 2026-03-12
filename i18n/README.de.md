@@ -64,7 +64,7 @@ Während Sie schlafen, verschmilzt CerebraLOS Ihre direkten Interaktionen (Core 
 
 ### Installation
 ```bash
-npm install -g cerebralos
+npx github:cerebralos-org/cerebralos init
 ```
 
 ### Initialisierung

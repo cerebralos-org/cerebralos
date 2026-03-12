@@ -64,7 +64,7 @@ Enquanto você dorme, o CerebraLOS mescla suas interações diretas (Core Memory
 
 ### Instalação
 ```bash
-npm install -g cerebralos
+npx github:cerebralos-org/cerebralos init
 ```
 
 ### Inicialização

@@ -64,7 +64,7 @@ CerebraLOS建立在認知科學和日本哲學（禪）的三大支柱之上：
 
 ### 安裝
 ```bash
-npm install -g cerebralos
+npx github:cerebralos-org/cerebralos init
 ```
 
 ### 初始化
