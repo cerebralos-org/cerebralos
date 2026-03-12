@@ -5,7 +5,7 @@
   "main": "src/cli.js",
   "type": "module",
   "bin": {
-    "cerebralos": "./src/cli.js"
+    "cerebralos": "./bin/cerebralos"
   },
   "scripts": {
     "start": "node src/cli.js",
@@ -30,12 +30,15 @@
   },
   "homepage": "https://github.com/ryonihonyanagi-cloud/cerebralos#readme",
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.1",
     "chalk": "^5.6.2",
     "chokidar": "^5.0.0",
     "commander": "^11.1.0",
-    "dotenv": "^17.3.1",
+    "glob": "^13.0.6",
     "inquirer": "^9.3.8",
+    "natural": "^8.1.1",
     "node-cron": "^4.2.1",
-    "simple-git": "^3.33.0"
+    "simple-git": "^3.33.0",
+    "stopword": "^3.1.5"
   }
 }
