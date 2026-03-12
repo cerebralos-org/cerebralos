@@ -17,6 +17,13 @@
 [閱讀宣言](#manifesto) • [快速入門](#quickstart) • [架構](#architecture) • [憲法](#constitution)
 
 </div>
+
+**Read in your language:**
+[English](../README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [Italiano](README.it.md) | [हिन्दी](README.hi.md) | [العربية](README.ar.md)
+
+**Agent Integration Guides:**
+[English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
+
 ---
 
 ## 🌌 宣言：為何PKM已死
@@ -99,6 +106,22 @@ CerebraLOS在嚴格的憲法下運作。
 3. **優雅勝於詳盡**：呈現一個完美的連結勝過十個平庸的連結。
 ---
 
+
+## 📚 Documentation
+
+### Core Philosophy & Architecture
+- [CONSTITUTION](../docs/CONSTITUTION.md): The 4 fundamental laws of CerebraLOS.
+- [ARCHITECTURE](../docs/ARCHITECTURE.md): Deep dive into the Triune Brain model.
+- [ZERO_UI](../docs/ZERO_UI.md): How we achieve invisible automation.
+
+### User Guides & Manuals
+- **Onboarding Guide**: How to create your AI brain and connect agents.
+  - [English](../docs/GITHUB_WORKFLOW.md) | [日本語](../docs/GITHUB_WORKFLOW.ja.md)
+- **Connector Architecture**: How the "building blocks" work (Local-sync vs GitHub-connector).
+  - [English](../docs/CONNECTORS.md) | [日本語](../docs/CONNECTORS.ja.md)
+- **Agent Integration Guide**: Specific setup instructions for Claude Code, OpenClaw, Manus, etc.
+  - [English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
+
 ## 🤝 貢獻
 我們正在為大腦聯邦——一個由相互連接、富有同理心的AI代理組成的網路——奠定基礎。加入我們。
 詳情請參閱 [CONTRIBUTING.md](CONTRIBUTING.md)。
@@ -108,3 +131,9 @@ CerebraLOS不只是您AI的工具。它是一個共享的神經系統。您與AI
 <div align="center">
   <i>「主人在客人到來之前準備好一切，卻從不說『看看我為您做了什麼。』」— 千利休</i>
 </div>
+
+**Read in your language:**
+[English](../README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [Italiano](README.it.md) | [हिन्दी](README.hi.md) | [العربية](README.ar.md)
+
+**Agent Integration Guides:**
+[English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)

@@ -17,6 +17,13 @@
 [اقرأ البيان](#manifesto) • [بدء سريع](#quickstart) • [الهندسة المعمارية](#architecture) • [الدستور](#constitution)
 
 </div>
+
+**Read in your language:**
+[English](../README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [Italiano](README.it.md) | [हिन्दी](README.hi.md) | [العربية](README.ar.md)
+
+**Agent Integration Guides:**
+[English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
+
 ---
 
 ## 🌌 البيان: لماذا ماتت إدارة المعرفة الشخصية (PKM)
@@ -99,6 +106,22 @@ cerebralos init
 3. **الأناقة فوق الشمولية**: من الأفضل إظهار اتصال واحد مثالي بدلاً من عشرة اتصالات متوسطة.
 ---
 
+
+## 📚 Documentation
+
+### Core Philosophy & Architecture
+- [CONSTITUTION](../docs/CONSTITUTION.md): The 4 fundamental laws of CerebraLOS.
+- [ARCHITECTURE](../docs/ARCHITECTURE.md): Deep dive into the Triune Brain model.
+- [ZERO_UI](../docs/ZERO_UI.md): How we achieve invisible automation.
+
+### User Guides & Manuals
+- **Onboarding Guide**: How to create your AI brain and connect agents.
+  - [English](../docs/GITHUB_WORKFLOW.md) | [日本語](../docs/GITHUB_WORKFLOW.ja.md)
+- **Connector Architecture**: How the "building blocks" work (Local-sync vs GitHub-connector).
+  - [English](../docs/CONNECTORS.md) | [日本語](../docs/CONNECTORS.ja.md)
+- **Agent Integration Guide**: Specific setup instructions for Claude Code, OpenClaw, Manus, etc.
+  - [English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
+
 ## 🤝 Contributing
 نحن نبني الأساس لاتحاد الدماغ—شبكة من وكلاء الذكاء الاصطناعي المترابطين والمتعاطفين. انضم إلينا.
 انظر [CONTRIBUTING.md](CONTRIBUTING.md) للحصول على التفاصيل.
@@ -108,3 +131,10 @@ CerebraLOS ليس مجرد أداة لذكائك الاصطناعي. إنه نظ
 <div align="center">
   <i>"يجهز المضيف كل شيء قبل وصول الضيف، ومع ذلك لا يقول أبدًا 'انظر ما فعلته من أجلك'." — Sen no Rikyu</i>
 </div>
+
+**Read in your language:**
+[English](../README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [Italiano](README.it.md) | [हिन्दी](README.hi.md) | [العربية](README.ar.md)
+
+**Agent Integration Guides:**
+[English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
+

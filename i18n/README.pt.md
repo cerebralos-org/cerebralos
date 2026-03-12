@@ -17,6 +17,13 @@ Um sistema de memória Git-nativo, agnóstico a LLM, que cura a "solidão" das i
 [Leia o Manifesto](#manifesto) • [Início Rápido](#quickstart) • [Arquitetura](#architecture) • [Constituição](#constitution)
 
 </div>
+
+**Read in your language:**
+[English](../README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [Italiano](README.it.md) | [हिन्दी](README.hi.md) | [العربية](README.ar.md)
+
+**Agent Integration Guides:**
+[English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
+
 ---
 
 ## 🌌 Manifesto: Por que o PKM está Morto
@@ -99,6 +106,22 @@ CerebraLOS opera sob uma Constituição rigorosa.
 3. **Elegância sobre Exaustividade**: Melhor mostrar uma conexão perfeita do que dez medíocres.
 ---
 
+
+## 📚 Documentation
+
+### Core Philosophy & Architecture
+- [CONSTITUTION](../docs/CONSTITUTION.md): The 4 fundamental laws of CerebraLOS.
+- [ARCHITECTURE](../docs/ARCHITECTURE.md): Deep dive into the Triune Brain model.
+- [ZERO_UI](../docs/ZERO_UI.md): How we achieve invisible automation.
+
+### User Guides & Manuals
+- **Onboarding Guide**: How to create your AI brain and connect agents.
+  - [English](../docs/GITHUB_WORKFLOW.md) | [日本語](../docs/GITHUB_WORKFLOW.ja.md)
+- **Connector Architecture**: How the "building blocks" work (Local-sync vs GitHub-connector).
+  - [English](../docs/CONNECTORS.md) | [日本語](../docs/CONNECTORS.ja.md)
+- **Agent Integration Guide**: Specific setup instructions for Claude Code, OpenClaw, Manus, etc.
+  - [English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
+
 ## 🤝 Contribuindo
 Estamos construindo a fundação para a Federação Cerebral — uma rede de agentes de IA interconectados e empáticos. Junte-se a nós.
 Veja [CONTRIBUTING.md](CONTRIBUTING.md) para detalhes.
@@ -108,3 +131,9 @@ CerebraLOS não é apenas uma ferramenta para sua IA. É um sistema nervoso comp
 <div align="center">
   <i>"O anfitrião prepara tudo antes da chegada do convidado, mas nunca diz 'Veja o que fiz por você.'" — Sen no Rikyu</i>
 </div>
+
+**Read in your language:**
+[English](../README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [Italiano](README.it.md) | [हिन्दी](README.hi.md) | [العربية](README.ar.md)
+
+**Agent Integration Guides:**
+[English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
