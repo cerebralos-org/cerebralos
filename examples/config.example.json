@@ -1,0 +1,32 @@
+{
+  "version": "1.0.0",
+  "user": {
+    "name": "Your Name",
+    "timezone": "Asia/Tokyo"
+  },
+  "sleep_job": {
+    "enabled": true,
+    "schedule": "0 3 * * *",
+    "max_insights_per_night": 1
+  },
+  "active_forgetting": {
+    "enabled": true,
+    "decay_threshold_days": 30,
+    "protected_tags": ["pinned", "project"]
+  },
+  "integrations": {
+    "micro_mcp": {
+      "enabled": true,
+      "port": 3210,
+      "max_tools": 2
+    },
+    "shell_hook": {
+      "enabled": true,
+      "trigger": "terminal_open"
+    }
+  },
+  "llm": {
+    "provider": "any",
+    "note": "CerebraLOS is LLM-agnostic. Configure your preferred provider here."
+  }
+}

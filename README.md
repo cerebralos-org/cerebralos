@@ -1,107 +1,135 @@
 <div align="center">
-  <h1>🧠 CerebraLOS</h1>
-  <p><b>The Cognitive OS for Human-AI Symbiosis.</b></p>
-  <p><i>Your knowledge is not a database. It is a living entity.</i></p>
 
-  <p>
-    <a href="https://github.com/ryonihonyanagi-cloud/cerebralos/stargazers"><img src="https://img.shields.io/github/stars/ryonihonyanagi-cloud/cerebralos?style=for-the-badge&color=yellow" alt="Stars"></a>
-    <a href="https://github.com/ryonihonyanagi-cloud/cerebralos/network/members"><img src="https://img.shields.io/github/forks/ryonihonyanagi-cloud/cerebralos?style=for-the-badge&color=blue" alt="Forks"></a>
-    <a href="https://github.com/ryonihonyanagi-cloud/cerebralos/issues"><img src="https://img.shields.io/github/issues/ryonihonyanagi-cloud/cerebralos?style=for-the-badge&color=red" alt="Issues"></a>
-    <a href="https://github.com/ryonihonyanagi-cloud/cerebralos/blob/main/LICENSE"><img src="https://img.shields.io/github/license/ryonihonyanagi-cloud/cerebralos?style=for-the-badge" alt="License"></a>
-  </p>
+# CerebraLOS
+
+**Stop saving. Start remembering.**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub stars](https://img.shields.io/github/stars/ryonihonyanagi-cloud/cerebralos?style=social)](https://github.com/ryonihonyanagi-cloud/cerebralos/stargazers)
+[![Discord](https://img.shields.io/discord/1234567890?color=7289da&label=Discord&logo=discord&logoColor=ffffff)](https://discord.gg/cerebralos)
+
+The most elegant Cognitive OS for AI Agents.  
+A Git-native, LLM-agnostic memory system that cures the "loneliness" of AI interactions.
+
+[Read the Manifesto](#manifesto) • [Quickstart](#quickstart) • [Architecture](#architecture) • [Constitution](#constitution)
+
 </div>
 
 ---
 
-## 🌌 The Manifesto: Is Your Knowledge Alive?
+## 🌌 Manifesto: Why PKM is Dead
 
-Look at your current tools. Obsidian, Notion, Mem0, LangChain. They are brilliant, but they all share a fundamental flaw: **They treat knowledge as static data.** You put information in, and it sits there, waiting to be retrieved. It decays. It becomes noise.
+We have spent the last decade building Personal Knowledge Management (PKM) tools. We saved everything. We tagged everything. We linked everything.
 
-**CerebraLOS is different. It is a Cognitive Operating System.**
+And yet, we remember nothing.
 
-Inspired by human cognitive science, CerebraLOS doesn't just store knowledge; it *metabolizes* it. It uses AI not just to search, but to **sleep, dream, and forget**. 
+Existing systems are dead storage. They require you to actively search, retrieve, and organize. When you interact with AI agents today, they suffer from the same flaw: they forget you. They lose context. They make you feel *lonely*.
 
-When you go to sleep, CerebraLOS wakes up. Its **Sleep Job** runs autonomously, cross-breeding your chaotic daily notes, pruning the irrelevant (Active Forgetting), and synthesizing profound new insights into your long-term memory.
+**CerebraLOS is not a database. It is a nervous system.**
 
-You wake up, and your Second Brain has a new idea waiting for you.
-
----
-
-## ✨ Why CerebraLOS? (The Paradigm Shift)
-
-| Feature | Traditional Tools (PKM/RAG) | CerebraLOS (Cognitive OS) |
-| :--- | :--- | :--- |
-| **State of Knowledge** | Static (Stored in DB/Files) | **Dynamic (Living & Evolving)** |
-| **Maintenance** | Manual Organization | **Autonomous (Sleep Jobs)** |
-| **Noise Control** | Passive Decay (Clutter) | **Active Forgetting (Algorithmic Pruning)** |
-| **Architecture** | Heavy (Vector DBs, Cloud) | **Zen-Simple (Git + Markdown + JSON)** |
-| **Evolution** | Feature Updates | **Self-Transcendence via `Constitution.md`** |
+It doesn't just store information; it *remembers* it. It uses the principles of human neuroscience—pattern completion, active forgetting, and sleep consolidation—to bring the right context to the right moment, without you ever asking for it.
 
 ---
 
-## 🧠 The Triune Brain Architecture
+## ✨ The Magic (Zero UI)
 
-CerebraLOS operates on a three-layer architecture, mirroring human cognition, entirely without databases.
+You do nothing.
+At 3:00 AM, CerebraLOS silently runs a Sleep Job.
+It dreams. It connects your thoughts. It forgets the noise.
 
-1. **🔴 Amygdala (Short-term / Emotional)**: Captures raw inputs, scoring them for novelty and emotional valence.
-2. **🟡 Hippocampus (Mid-term / Episodic)**: Tracks sessions and context, holding knowledge in the `draft` state.
-3. **🔵 Neocortex (Long-term / Semantic)**: The stable, interconnected graph of your synthesized knowledge (`stable` state).
-
----
-
-## 🚀 Quick Start (5 Minutes to a Living Brain)
-
-CerebraLOS requires **no databases**. If you have Git and Node.js, you have a brain.
-
-### 1. Initialize
+When you open your terminal in the morning:
 ```bash
-npx cerebralos init my-brain
-cd my-brain
+☀ Good morning. While you were sleeping, I read the world for you.
+I found one thing that connects to your thought yesterday.
+→ cerebralos explore
+```
+That's it. No tagging. No organizing. Just remembering.
+
+---
+
+## 🧠 Core Architecture
+
+CerebraLOS is built on three pillars of cognitive science and Japanese philosophy (Zen):
+
+### 1. Contextual Recall (Pattern Completion)
+Like the smell of coffee bringing back a childhood memory, CerebraLOS uses sensory triggers to reconstruct full contexts from partial inputs.
+
+### 2. Active Forgetting (Ma / 間)
+Perfect memory is a curse. CerebraLOS actively forgets (archives) noise, leaving "Ma" (negative space) for imagination and new connections.
+
+### 3. Sleep Job (Dream Consolidation)
+While you sleep, CerebraLOS merges your direct interactions (Core Memory) with what your AI agents learned autonomously (Peripheral Memory), presenting you with a single, beautiful insight in the morning.
+
+---
+
+## 🚀 Quickstart
+
+### Installation
+
+```bash
+npm install -g cerebralos
 ```
 
-### 2. Feed the Brain (Drafting)
-```bash
-cerebral add "I just learned about Active Forgetting. It's the idea that pruning knowledge increases signal-to-noise ratio."
-```
+### Initialization
 
-### 3. Let it Sleep (The Magic)
-Run the Sleep Job manually (or set it as a nightly cron job):
 ```bash
-cerebral sleep
+cerebralos init
 ```
-*Watch as the AI autonomously evaluates your drafts, archives the noise, and promotes the profound into your Neocortex.*
+This creates the `~/.cerebralos/` directory, your new Git-native brain.
+
+### Integration (Micro-MCP)
+
+CerebraLOS exposes a minimal MCP (Model Context Protocol) server. Connect it to Claude, Cursor, or Devin.
+
+```json
+{
+  "mcpServers": {
+    "cerebralos": {
+      "command": "cerebralos",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+*Note: CerebraLOS is designed to be extremely token-efficient. It only exposes two tools: `search_memory` and `recall_context`.*
 
 ---
 
-## 🔌 The Plugin Ecosystem (Darwinian Evolution)
+## 📂 Directory Structure
 
-CerebraLOS is designed to be infinitely extensible. The core is just Markdown and JSON. You can write plugins to change how your brain dreams:
+Your brain is just files. No lock-in. No hidden databases.
 
-- **Sleep Plugins**: Change the synthesis algorithm (e.g., `cerebral-plugin-socratic-dream`).
-- **Recall Plugins**: Change how knowledge is retrieved for your AI agents.
-- **Federation (Coming Soon)**: Connect your `stable` Neocortex with other users' brains via IPFS/GitHub.
+```text
+~/.cerebralos/
+├── core/           # Your direct interactions and explicit thoughts
+├── peripheral/     # Autonomous agent memories (Web, Slack, etc.)
+├── dreams/         # Insights generated during Sleep Jobs
+└── archive/        # Actively forgotten memories (Git history preserves them)
+```
 
 ---
 
 ## 📜 The Constitution
 
-Every CerebraLOS instance is governed by a `Constitution.md`. This file dictates the core values and rules of your specific brain. When the AI encounters a conflict it cannot resolve, it proposes an amendment to the Constitution. **Your OS evolves its own rules.**
+CerebraLOS operates under a strict Constitution.
+1. **Memory Sovereignty**: Your memory belongs to you. It lives locally.
+2. **The Right to Forget**: The system must actively curate and forget.
+3. **Elegance over Exhaustiveness**: Better to show one perfect connection than ten mediocre ones.
 
 ---
 
 ## 🤝 Contributing
 
-We are building a new category of software. Whether you are a neuroscientist, a philosopher, or a TypeScript wizard, we need you.
+We are building the foundation for the Brain Federation—a network of interconnected, empathetic AI agents. Join us.
 
-Please read our [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+---
+
+CerebraLOS is not just a tool for your AI. It is a shared nervous system. Where you end, and the AI begins, will beautifully blur.
 
 ---
 
-## 📄 License
-
-MIT License. See [LICENSE](LICENSE) for details.
-
----
 <div align="center">
-  <i>"The mind is not a vessel to be filled, but a fire to be kindled." — Plutarch</i>
+  <i>"The host prepares everything before the guest arrives, yet never says 'Look what I have done for you.'" — Sen no Rikyu</i>
 </div>
