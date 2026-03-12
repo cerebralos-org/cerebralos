@@ -4,6 +4,10 @@
 
 **Stop saving. Start remembering.**
 
+**Read in your language:**
+
+[🇯🇵 日本語](i18n/README.ja.md) • [🇨🇳 中文（简体）](i18n/README.zh-CN.md) • [🇹🇼 中文（繁體）](i18n/README.zh-TW.md) • [🇰🇷 한국어](i18n/README.ko.md) • [🇪🇸 Español](i18n/README.es.md) • [🇫🇷 Français](i18n/README.fr.md) • [🇩🇪 Deutsch](i18n/README.de.md) • [🇧🇷 Português](i18n/README.pt.md) • [🇷🇺 Русский](i18n/README.ru.md) • [🇮🇹 Italiano](i18n/README.it.md) • [🇮🇳 हिन्दी](i18n/README.hi.md) • [🇸🇦 العربية](i18n/README.ar.md)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub stars](https://img.shields.io/github/stars/ryonihonyanagi-cloud/cerebralos?style=social)](https://github.com/ryonihonyanagi-cloud/cerebralos/stargazers)
 [![Discord](https://img.shields.io/discord/1234567890?color=7289da&label=Discord&logo=discord&logoColor=ffffff)](https://discord.gg/cerebralos)
