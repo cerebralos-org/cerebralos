@@ -9,7 +9,10 @@
   },
   "scripts": {
     "start": "node src/cli.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "release": "./scripts/release.sh",
+    "release:minor": "./scripts/release.sh minor",
+    "release:major": "./scripts/release.sh major"
   },
   "repository": {
     "type": "git",
