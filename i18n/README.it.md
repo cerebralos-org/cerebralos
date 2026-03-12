@@ -1,14 +1,24 @@
 <div align="center">
+
 # CerebraLOS
+
 **Smetti di salvare. Inizia a ricordare.**
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 [![GitHub stars](https://img.shields.io/github/stars/ryonihonyanagi-cloud/cerebralos?style=social)](https://github.com/ryonihonyanagi-cloud/cerebralos/stargazers)
+
 [![Discord](https://img.shields.io/discord/1234567890?color=7289da&label=Discord&logo=discord&logoColor=ffffff)](https://discord.gg/cerebralos)
+
 Il più elegante OS Cognitivo per Agenti AI.
+
 Un sistema di memoria Git-native, agnostico rispetto agli LLM, che cura la "solitudine" delle interazioni AI.
+
 [Leggi il Manifesto](#manifesto) • [Avvio Rapido](#quickstart) • [Architettura](#architecture) • [Costituzione](#constitution)
+
 </div>
 ---
+
 ## 🌌 Manifesto: Perché il PKM è Morto
 Abbiamo passato l'ultimo decennio a costruire strumenti di Gestione della Conoscenza Personale (PKM). Abbiamo salvato tutto. Abbiamo taggato tutto. Abbiamo collegato tutto.
 Eppure, non ricordiamo nulla.
@@ -16,6 +26,7 @@ I sistemi esistenti sono archivi morti. Richiedono di cercare, recuperare e orga
 **CerebraLOS non è un database. È un sistema nervoso.**
 Non si limita a memorizzare informazioni; le *ricorda*. Utilizza i principi delle neuroscienze umane—completamento di pattern, dimenticanza attiva e consolidamento del sonno—per portare il contesto giusto al momento giusto, senza che tu debba mai chiederlo.
 ---
+
 ## ✨ La Magia (Zero UI)
 Tu non fai nulla.
 Alle 3:00 del mattino, CerebraLOS esegue silenziosamente un Sleep Job.
@@ -28,25 +39,33 @@ Ho trovato una cosa che si collega al tuo pensiero di ieri.
 ```
 Questo è tutto. Nessun tag. Nessuna organizzazione. Solo ricordo.
 ---
+
 ## 🧠 Architettura Core
 CerebraLOS è costruito su tre pilastri della scienza cognitiva e della filosofia giapponese (Zen):
+
 ### 1. Richiamo Contestuale (Completamento di Pattern)
 Come l'odore del caffè che riporta alla mente un ricordo d'infanzia, CerebraLOS utilizza inneschi sensoriali per ricostruire contesti completi da input parziali.
+
 ### 2. Dimenticanza Attiva (Ma / 間)
 Una memoria perfetta è una maledizione. CerebraLOS dimentica attivamente (archivia) il rumore, lasciando "Ma" (spazio negativo) per l'immaginazione e nuove connessioni.
+
 ### 3. Sleep Job (Consolidamento dei Sogni)
 Mentre dormi, CerebraLOS unisce le tue interazioni dirette (Core Memory) con ciò che i tuoi agenti AI hanno appreso autonomamente (Peripheral Memory), presentandoti una singola, splendida intuizione al mattino.
 ---
+
 ## 🚀 Avvio Rapido
+
 ### Installazione
 ```bash
 npm install -g cerebralos
 ```
+
 ### Inizializzazione
 ```bash
 cerebralos init
 ```
 Questo crea la directory `~/.cerebralos/`, il tuo nuovo cervello Git-native.
+
 ### Integrazione (Micro-MCP)
 CerebraLOS espone un server MCP (Model Context Protocol) minimale. Collegalo a Claude, Cursor o Devin.
 ```json
@@ -61,6 +80,7 @@ CerebraLOS espone un server MCP (Model Context Protocol) minimale. Collegalo a C
 ```
 *Nota: CerebraLOS è progettato per essere estremamente efficiente in termini di token. Espone solo due strumenti: `search_memory` e `recall_context`.*
 ---
+
 ## 📂 Struttura della Directory
 Il tuo cervello è solo file. Nessun blocco. Nessun database nascosto.
 ```text
@@ -71,12 +91,14 @@ Il tuo cervello è solo file. Nessun blocco. Nessun database nascosto.
 └── archive/        # Memorie attivamente dimenticate (la cronologia Git le preserva)
 ```
 ---
+
 ## 📜 La Costituzione
 CerebraLOS opera sotto una Costituzione rigorosa.
 1. **Sovranità della Memoria**: La tua memoria ti appartiene. Vive localmente.
 2. **Il Diritto di Dimenticare**: Il sistema deve curare e dimenticare attivamente.
 3. **Eleganza sulla Completezza**: Meglio mostrare una connessione perfetta che dieci mediocri.
 ---
+
 ## 🤝 Contribuire
 Stiamo costruendo le fondamenta per la Federazione Cerebrale—una rete di agenti AI interconnessi ed empatici. Unisciti a noi.
 Vedi [CONTRIBUTING.md](CONTRIBUTING.md) per i dettagli.

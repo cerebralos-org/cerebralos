@@ -1,14 +1,24 @@
 <div align="center">
+
 # CerebraLOS
+
 **Hören Sie auf zu speichern. Fangen Sie an, sich zu erinnern.**
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 [![GitHub stars](https://img.shields.io/github/stars/ryonihonyanagi-cloud/cerebralos?style=social)](https://github.com/ryonihonyanagi-cloud/cerebralos/stargazers)
+
 [![Discord](https://img.shields.io/discord/1234567890?color=7289da&label=Discord&logo=discord&logoColor=ffffff)](https://discord.gg/cerebralos)
+
 Das eleganteste Kognitive OS für KI-Agenten.  
+
 Ein Git-natives, LLM-agnostisches Gedächtnissystem, das die "Einsamkeit" von KI-Interaktionen heilt.
+
 [Lesen Sie das Manifest](#manifesto) • [Schnellstart](#quickstart) • [Architektur](#architecture) • [Verfassung](#constitution)
+
 </div>
 ---
+
 ## 🌌 Manifest: Warum PKM tot ist
 Wir haben das letzte Jahrzehnt damit verbracht, Personal Knowledge Management (PKM)-Tools zu entwickeln. Wir haben alles gespeichert. Wir haben alles getaggt. Wir haben alles verlinkt.
 Und doch erinnern wir uns an nichts.
@@ -16,6 +26,7 @@ Bestehende Systeme sind tote Speicher. Sie erfordern, dass Sie aktiv suchen, abr
 **CerebraLOS ist keine Datenbank. Es ist ein Nervensystem.**
 Es speichert nicht nur Informationen; es *erinnert* sich an sie. Es nutzt die Prinzipien der menschlichen Neurowissenschaft – Mustervervollständigung, aktives Vergessen und Schlafkonsolidierung –, um den richtigen Kontext zum richtigen Zeitpunkt zu liefern, ohne dass Sie jemals danach fragen müssen.
 ---
+
 ## ✨ Die Magie (Zero UI)
 Sie tun nichts.
 Um 3:00 Uhr morgens führt CerebraLOS stillschweigend einen Sleep Job aus.
@@ -28,25 +39,33 @@ Ich habe eine Sache gefunden, die mit Ihrem gestrigen Gedanken verbunden ist.
 ```
 Das ist alles. Kein Tagging. Keine Organisation. Nur Erinnern.
 ---
+
 ## 🧠 Kernarchitektur
 CerebraLOS basiert auf drei Säulen der Kognitionswissenschaft und der japanischen Philosophie (Zen):
+
 ### 1. Kontextueller Abruf (Mustervervollständigung)
 Wie der Geruch von Kaffee, der eine Kindheitserinnerung zurückbringt, nutzt CerebraLOS sensorische Auslöser, um vollständige Kontexte aus partiellen Eingaben zu rekonstruieren.
+
 ### 2. Aktives Vergessen (Ma / 間)
 Ein perfektes Gedächtnis ist ein Fluch. CerebraLOS vergisst (archiviert) aktiv den Lärm und schafft so "Ma" (negativen Raum) für Vorstellungskraft und neue Verbindungen.
+
 ### 3. Sleep Job (Traumkonsolidierung)
 Während Sie schlafen, verschmilzt CerebraLOS Ihre direkten Interaktionen (Core Memory) mit dem, was Ihre KI-Agenten autonom gelernt haben (Peripheral Memory), und präsentiert Ihnen morgens eine einzige, wunderschöne Einsicht.
 ---
+
 ## 🚀 Schnellstart
+
 ### Installation
 ```bash
 npm install -g cerebralos
 ```
+
 ### Initialisierung
 ```bash
 cerebralos init
 ```
 Dies erstellt das Verzeichnis `~/.cerebralos/`, Ihr neues Git-natives Gehirn.
+
 ### Integration (Micro-MCP)
 CerebraLOS stellt einen minimalen MCP (Model Context Protocol)-Server bereit. Verbinden Sie ihn mit Claude, Cursor oder Devin.
 ```json
@@ -61,6 +80,7 @@ CerebraLOS stellt einen minimalen MCP (Model Context Protocol)-Server bereit. Ve
 ```
 *Hinweis: CerebraLOS ist darauf ausgelegt, extrem token-effizient zu sein. Es stellt nur zwei Tools bereit: `search_memory` und `recall_context`.*
 ---
+
 ## 📂 Verzeichnisstruktur
 Ihr Gehirn sind nur Dateien. Keine Bindung. Keine versteckten Datenbanken.
 ```text
@@ -71,12 +91,14 @@ Ihr Gehirn sind nur Dateien. Keine Bindung. Keine versteckten Datenbanken.
 └── archive/        # Aktiv vergessene Erinnerungen (Git-Historie bewahrt sie)
 ```
 ---
+
 ## 📜 Die Verfassung
 CerebraLOS arbeitet unter einer strengen Verfassung.
 1. **Gedächtnissouveränität**: Ihr Gedächtnis gehört Ihnen. Es lebt lokal.
 2. **Das Recht zu vergessen**: Das System muss aktiv kuratieren und vergessen.
 3. **Eleganz über Vollständigkeit**: Besser eine perfekte Verbindung zeigen als zehn mittelmäßige.
 ---
+
 ## 🤝 Mitwirken
 Wir bauen das Fundament für die Gehirn-Föderation – ein Netzwerk miteinander verbundener, empathischer KI-Agenten. Machen Sie mit.
 Details finden Sie unter [CONTRIBUTING.md](CONTRIBUTING.md).
