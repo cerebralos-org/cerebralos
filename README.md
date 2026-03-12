@@ -1,4 +1,3 @@
-# CerebraLOS
 
 > **Your AI remembers everything. That's why it doesn't understand you.**
 > **Built to forget. Designed to dream.**
@@ -9,10 +8,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Read in your language:**
-[English](README.md) | [日本語](i18n/README.ja.md) | [简体中文](i18n/README.zh-CN.md) | [繁體中文](i18n/README.zh-TW.md) | [한국어](i18n/README.ko.md) | [Español](i18n/README.es.md) | [Français](i18n/README.fr.md) | [Deutsch](i18n/README.de.md) | [Português](i18n/README.pt.md) | [Русский](i18n/README.ru.md) | [Italiano](i18n/README.it.md) | [हिन्दी](i18n/README.hi.md) | [العربية](i18n/README.ar.md)
+[English](README.md) | [日本語](docs/ja/README.md) | [简体中文](docs/zh-CN/README.md) | [繁體中文](docs/zh-TW/README.md) | [한국어](docs/ko/README.md) | [Español](docs/es/README.md) | [Français](docs/fr/README.md) | [Deutsch](docs/de/README.md) | [Português](docs/pt/README.md) | [Русский](docs/ru/README.md) | [Italiano](docs/it/README.md) | [हिन्दी](docs/hi/README.md) | [العربية](docs/ar/README.md)
 
 **Agent Integration Guides:**
-[English](docs/AGENTS.md) | [日本語](docs/AGENTS.ja.md) | [简体中文](docs/AGENTS.zh-CN.md) | [繁體中文](docs/AGENTS.zh-TW.md) | [한국어](docs/AGENTS.ko.md) | [Español](docs/AGENTS.es.md) | [Français](docs/AGENTS.fr.md) | [Deutsch](docs/AGENTS.de.md) | [Português](docs/AGENTS.pt.md) | [Русский](docs/AGENTS.ru.md) | [Italiano](docs/AGENTS.it.md) | [हिन्दी](docs/AGENTS.hi.md) | [العربية](docs/AGENTS.ar.md)
+[English](docs/en/AGENTS.md) | [日本語](docs/ja/AGENTS.md) | [简体中文](docs/zh-CN/AGENTS.md) | [繁體中文](docs/zh-TW/AGENTS.md) | [한국어](docs/ko/AGENTS.md) | [Español](docs/es/AGENTS.md) | [Français](docs/fr/AGENTS.md) | [Deutsch](docs/de/AGENTS.md) | [Português](docs/pt/AGENTS.md) | [Русский](docs/ru/AGENTS.md) | [Italiano](docs/it/AGENTS.md) | [हिन्दी](docs/hi/AGENTS.md) | [العربية](docs/ar/AGENTS.md)
 
 ## The Problem with Perfect Memory
 
@@ -53,17 +52,19 @@ CerebraLOS mirrors the human brain's architecture:
 ## Documentation
 
 ### Core Philosophy & Architecture
-- [CONSTITUTION](docs/CONSTITUTION.md): The 4 fundamental laws of CerebraLOS.
-- [ARCHITECTURE](docs/ARCHITECTURE.md): Deep dive into the Triune Brain model.
-- [ZERO_UI](docs/ZERO_UI.md): How we achieve invisible automation.
+- [CONSTITUTION](docs/en/CONSTITUTION.md): The 4 fundamental laws of CerebraLOS.
+- [ARCHITECTURE](docs/en/ARCHITECTURE.md): Deep dive into the Triune Brain model.
+- [ZERO_UI](docs/en/ZERO_UI.md): How we achieve invisible automation.
 
 ### User Guides & Manuals
 - **Onboarding Guide**: How to create your AI brain and connect agents.
-  - [English](docs/GITHUB_WORKFLOW.md) | [日本語](docs/GITHUB_WORKFLOW.ja.md)
+  - [English](docs/en/GITHUB_WORKFLOW.md) | [日本語](docs/ja/GITHUB_WORKFLOW.md) | [简体中文](docs/zh-CN/GITHUB_WORKFLOW.md) | [한국어](docs/ko/GITHUB_WORKFLOW.md) | [Español](docs/es/GITHUB_WORKFLOW.md) | [Français](docs/fr/GITHUB_WORKFLOW.md) | [Deutsch](docs/de/GITHUB_WORKFLOW.md)
 - **Connector Architecture**: How the "building blocks" work (Local-sync vs GitHub-connector).
-  - [English](docs/CONNECTORS.md) | [日本語](docs/CONNECTORS.ja.md)
+  - [English](docs/en/CONNECTORS.md) | [日本語](docs/ja/CONNECTORS.md) | [简体中文](docs/zh-CN/CONNECTORS.md) | [한국어](docs/ko/CONNECTORS.md) | [Español](docs/es/CONNECTORS.md) | [Français](docs/fr/CONNECTORS.md) | [Deutsch](docs/de/CONNECTORS.md)
 - **Agent Integration Guide**: Specific setup instructions for Claude Code, OpenClaw, Manus, etc.
-  - [English](docs/AGENTS.md) | [日本語](docs/AGENTS.ja.md) | [简体中文](docs/AGENTS.zh-CN.md) | [繁體中文](docs/AGENTS.zh-TW.md) | [한국어](docs/AGENTS.ko.md) | [Español](docs/AGENTS.es.md) | [Français](docs/AGENTS.fr.md) | [Deutsch](docs/AGENTS.de.md) | [Português](docs/AGENTS.pt.md) | [Русский](docs/AGENTS.ru.md) | [Italiano](docs/AGENTS.it.md) | [हिन्दी](docs/AGENTS.hi.md) | [العربية](docs/AGENTS.ar.md)
+  - [English](docs/en/AGENTS.md) | [日本語](docs/ja/AGENTS.md) | [简体中文](docs/zh-CN/AGENTS.md) | [繁體中文](docs/zh-TW/AGENTS.md) | [한국어](docs/ko/AGENTS.md) | [Español](docs/es/AGENTS.md) | [Français](docs/fr/AGENTS.md) | [Deutsch](docs/de/AGENTS.md) | [Português](docs/pt/AGENTS.md) | [Русский](docs/ru/AGENTS.md) | [Italiano](docs/it/AGENTS.md) | [हिन्दी](docs/hi/AGENTS.md) | [العربية](docs/ar/AGENTS.md)
+- **Memory Migration**: Import memories from ChatGPT, Claude, Obsidian, and more.
+  - [English](docs/en/MIGRATION.md) | [日本語](docs/ja/MIGRATION.md) | [简体中文](docs/zh-CN/MIGRATION.md) | [한국어](docs/ko/MIGRATION.md) | [Español](docs/es/MIGRATION.md) | [Français](docs/fr/MIGRATION.md) | [Deutsch](docs/de/MIGRATION.md)
 
 ## License
 
