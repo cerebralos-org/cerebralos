@@ -8,7 +8,7 @@
 [![npm version](https://badge.fury.io/js/cerebralos.svg)](https://badge.fury.io/js/cerebralos)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[English](README.md) | [日本語](i18n/ja.md) | [简体中文](i18n/zh-CN.md) | [繁體中文](i18n/zh-TW.md) | [한국어](i18n/ko.md) | [Español](i18n/es.md) | [Français](i18n/fr.md) | [Deutsch](i18n/de.md) | [Português](i18n/pt.md) | [Русский](i18n/ru.md) | [Italiano](i18n/it.md) | [हिन्दी](i18n/hi.md) | [العربية](i18n/ar.md)
+[English](README.md) | [日本語](i18n/README.ja.md) | [简体中文](i18n/README.zh-CN.md) | [繁體中文](i18n/README.zh-TW.md) | [한국어](i18n/README.ko.md) | [Español](i18n/README.es.md) | [Français](i18n/README.fr.md) | [Deutsch](i18n/README.de.md) | [Português](i18n/README.pt.md) | [Русский](i18n/README.ru.md) | [Italiano](i18n/README.it.md) | [हिन्दी](i18n/README.hi.md) | [العربية](i18n/README.ar.md)
 
 ## The Problem with Perfect Memory
 
