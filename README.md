@@ -32,7 +32,14 @@ We believe that for AI to truly understand us, it must learn how to forget.
 ## Quick Start
 
 ```bash
+# 1. Initialize your brain
 npx github:cerebralos-org/cerebralos init
+
+# 2. Run your first sleep to generate dreams
+cerebralos sleep
+
+# 3. Explore your thoughts
+cerebralos explore
 ```
 
 ## Architecture: The Triune Brain

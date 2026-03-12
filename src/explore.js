@@ -6,6 +6,18 @@ import readline from 'readline';
 
 const CEREBRALOS_DIR = path.join(os.homedir(), '.cerebralos');
 
+// Known agent names mapped from filename patterns
+const AGENT_DISPLAY_NAMES = {
+  'claude': 'Claude Code',
+  'manus': 'Manus',
+  'openclaw': 'OpenClaw',
+  'chatgpt': 'ChatGPT',
+  'gemini': 'Gemini',
+  'cursor': 'Cursor',
+  'copilot': 'GitHub Copilot',
+  'aider': 'Aider',
+};
+
 function readMarkdownFile(filePath) {
   try {
     return fs.readFileSync(filePath, 'utf-8');
@@ -23,16 +35,86 @@ function getLatestDream() {
   return { name: latest, content: readMarkdownFile(path.join(dreamsDir, latest)) };
 }
 
+function getConnectedAgents() {
+  const peripheralDir = path.join(CEREBRALOS_DIR, 'peripheral');
+  if (!fs.existsSync(peripheralDir)) return [];
+
+  const agents = [];
+  const scanDir = (dir, depth = 0) => {
+    if (depth > 2) return;
+    try {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          scanDir(fullPath, depth + 1);
+        } else if (entry.name.endsWith('.md')) {
+          const stat = fs.statSync(fullPath);
+          const baseName = entry.name.replace('.md', '').toLowerCase();
+          // Match against known agent names
+          let displayName = null;
+          for (const [key, name] of Object.entries(AGENT_DISPLAY_NAMES)) {
+            if (baseName.includes(key)) {
+              displayName = name;
+              break;
+            }
+          }
+          if (!displayName) {
+            // Capitalize unknown agents
+            displayName = baseName.charAt(0).toUpperCase() + baseName.slice(1);
+          }
+          agents.push({
+            name: displayName,
+            file: path.relative(peripheralDir, fullPath),
+            lastModified: stat.mtime,
+          });
+        }
+      }
+    } catch { /* ignore */ }
+  };
+  scanDir(peripheralDir);
+  return agents.sort((a, b) => b.lastModified - a.lastModified);
+}
+
 function getPeripheralMemories() {
   const peripheralDir = path.join(CEREBRALOS_DIR, 'peripheral');
   if (!fs.existsSync(peripheralDir)) return [];
-  return fs.readdirSync(peripheralDir)
-    .filter(f => f.endsWith('.md'))
-    .map(f => ({
-      name: f,
-      content: readMarkdownFile(path.join(peripheralDir, f))
-    }))
-    .filter(f => f.content);
+
+  const memories = [];
+  const scanDir = (dir, depth = 0) => {
+    if (depth > 2) return;
+    try {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          scanDir(fullPath, depth + 1);
+        } else if (entry.name.endsWith('.md')) {
+          const content = readMarkdownFile(fullPath);
+          if (content) {
+            memories.push({
+              name: path.relative(peripheralDir, fullPath),
+              content,
+            });
+          }
+        }
+      }
+    } catch { /* ignore */ }
+  };
+  scanDir(peripheralDir);
+  return memories;
+}
+
+function formatRelativeTime(date) {
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHour = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHour / 24);
+  if (diffMin < 1) return 'just now';
+  if (diffMin < 60) return `${diffMin}m ago`;
+  if (diffHour < 24) return `${diffHour}h ago`;
+  return `${diffDay}d ago`;
 }
 
 function renderDivider() {
@@ -40,10 +122,23 @@ function renderDivider() {
   console.log(chalk.dim('─'.repeat(width)));
 }
 
-function renderHeader() {
+function renderHeader(agents) {
   console.clear();
   renderDivider();
   console.log(chalk.bold.cyan('  ✦ CerebraLOS Explorer  ') + chalk.dim('— The space between your thoughts'));
+  renderDivider();
+
+  // Connected Agents section
+  if (agents.length === 0) {
+    console.log(chalk.dim('  No agents connected yet. Add memories to ~/.cerebralos/peripheral/'));
+  } else {
+    console.log(chalk.bold('  Connected Agents') + chalk.dim(` (${agents.length})`));
+    agents.forEach(agent => {
+      const dot = chalk.green('●');
+      const time = chalk.dim(formatRelativeTime(agent.lastModified));
+      console.log(`  ${dot} ${chalk.white(agent.name.padEnd(20))} ${time}`);
+    });
+  }
   renderDivider();
 }
 
@@ -56,14 +151,16 @@ function renderMenu(items, selected) {
 }
 
 function renderContent(title, content) {
-  renderHeader();
+  console.clear();
+  renderDivider();
+  console.log(chalk.bold.cyan('  ✦ CerebraLOS Explorer  ') + chalk.dim('— The space between your thoughts'));
+  renderDivider();
   console.log(chalk.bold.yellow(`\n  ${title}\n`));
   renderDivider();
   if (!content) {
     console.log(chalk.dim('\n  (No content yet. Run `cerebralos sleep` to generate dreams.)\n'));
   } else {
-    // Simple markdown rendering: bold headers, dim body
-    const lines = content.split('\n').slice(0, 30); // Show first 30 lines
+    const lines = content.split('\n').slice(0, 30);
     lines.forEach(line => {
       if (line.startsWith('# ')) {
         console.log(chalk.bold.cyan('  ' + line.replace(/^# /, '')));
@@ -82,7 +179,7 @@ function renderContent(title, content) {
     }
   }
   renderDivider();
-  console.log(chalk.dim('\n  [↑↓] Navigate  [Enter] Select  [q] Quit\n'));
+  console.log(chalk.dim('\n  [any key] Back  [q] Quit\n'));
 }
 
 export async function exploreSpace() {
@@ -92,11 +189,12 @@ export async function exploreSpace() {
   }
 
   const dream = getLatestDream();
+  const agents = getConnectedAgents();
   const memories = getPeripheralMemories();
 
   const menuItems = [
     {
-      label: `✦ Latest Dream  ${dream ? chalk.dim('(' + dream.name + ')') : chalk.dim('(none yet)')}`,
+      label: `✦ Latest Dream  ${dream ? chalk.dim('(' + dream.name + ')') : chalk.dim('(none yet — run cerebralos sleep first)')}`,
       content: dream?.content,
       title: 'Latest Dream'
     },
@@ -115,9 +213,8 @@ export async function exploreSpace() {
   let selected = 0;
   let viewing = false;
 
-  // Render initial menu
   const renderMainMenu = () => {
-    renderHeader();
+    renderHeader(agents);
     console.log(chalk.bold.yellow('\n  What would you like to explore?\n'));
     renderMenu(menuItems, selected);
     renderDivider();
@@ -126,7 +223,6 @@ export async function exploreSpace() {
 
   renderMainMenu();
 
-  // Setup readline for keypress
   readline.emitKeypressEvents(process.stdin);
   if (process.stdin.isTTY) process.stdin.setRawMode(true);
 
@@ -144,7 +240,6 @@ export async function exploreSpace() {
       }
 
       if (viewing) {
-        // Any key returns to menu
         viewing = false;
         renderMainMenu();
         return;

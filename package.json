@@ -5,7 +5,7 @@
   "main": "src/cli.js",
   "type": "module",
   "bin": {
-    "cerebralos": "./bin/cerebralos.js"
+    "cerebralos": "./bin/cerebralos"
   },
   "scripts": {
     "start": "node src/cli.js",
