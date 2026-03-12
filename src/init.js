@@ -4,13 +4,29 @@ import os from 'os';
 import chalk from 'chalk';
 import simpleGit from 'simple-git';
 
-const CEREBRALOS_DIR = path.join(os.homedir(), '.cerebralos');
+const GLOBAL_DIR = path.join(os.homedir(), '.cerebralos');
 
-export async function initBrain() {
+function getBrainDir(options = {}) {
+  if (options.local) {
+    return path.join(process.cwd(), '.cerebralos');
+  }
+  return GLOBAL_DIR;
+}
+
+export async function initBrain(options = {}) {
+  const brainDir = getBrainDir(options);
+  const isLocal = options.local;
+
   console.log(chalk.green('Initializing CerebraLOS...'));
 
-  if (fs.existsSync(CEREBRALOS_DIR)) {
-    console.log(chalk.yellow(`Brain already exists at ${CEREBRALOS_DIR}`));
+  if (isLocal) {
+    console.log(chalk.gray(`Mode: local (${brainDir})`));
+  } else {
+    console.log(chalk.gray(`Mode: global (${brainDir})`));
+  }
+
+  if (fs.existsSync(brainDir)) {
+    console.log(chalk.yellow(`Brain already exists at ${brainDir}`));
     return;
   }
 
@@ -26,12 +42,13 @@ export async function initBrain() {
   ];
 
   dirs.forEach(dir => {
-    fs.mkdirSync(path.join(CEREBRALOS_DIR, dir), { recursive: true });
+    fs.mkdirSync(path.join(brainDir, dir), { recursive: true });
   });
 
   // Create default config
   const defaultConfig = {
-    version: "1.0.0",
+    version: "1.0.4",
+    mode: isLocal ? "local" : "global",
     user: {
       name: os.userInfo().username,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -49,19 +66,33 @@ export async function initBrain() {
   };
 
   fs.writeFileSync(
-    path.join(CEREBRALOS_DIR, '.brain/config.json'),
+    path.join(brainDir, '.brain/config.json'),
     JSON.stringify(defaultConfig, null, 2)
   );
 
   // Initialize Git repository
-  const git = simpleGit(CEREBRALOS_DIR);
+  const git = simpleGit(brainDir);
   await git.init();
-  
-  fs.writeFileSync(path.join(CEREBRALOS_DIR, '.gitignore'), 'node_modules/\n.env\n');
-  
+
+  // Add .gitignore (for local mode, also ignore the brain dir from parent git)
+  fs.writeFileSync(path.join(brainDir, '.gitignore'), 'node_modules/\n.env\n');
+
+  if (isLocal) {
+    // Add .cerebralos to parent .gitignore if it exists
+    const parentGitignore = path.join(process.cwd(), '.gitignore');
+    if (fs.existsSync(parentGitignore)) {
+      const content = fs.readFileSync(parentGitignore, 'utf8');
+      if (!content.includes('.cerebralos')) {
+        fs.appendFileSync(parentGitignore, '\n# CerebraLOS local brain\n.cerebralos/\n');
+        console.log(chalk.gray('Added .cerebralos/ to .gitignore'));
+      }
+    }
+  }
+
   await git.add('.');
   await git.commit('Initial commit: Birth of a new brain');
 
   console.log(chalk.gray('Created core/, peripheral/, dreams/, and archive/ directories.'));
-  console.log(chalk.cyan('Your brain is ready. Stop saving. Start remembering.'));
+  console.log(chalk.cyan(`Your brain is ready at ${brainDir}`));
+  console.log(chalk.cyan('Stop saving. Start remembering.'));
 }

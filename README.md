@@ -26,6 +26,7 @@ We believe that for AI to truly understand us, it must learn how to forget.
 
 1. **Active Forgetting**: Memories decay over time based on entropy. Only what matters survives.
 2. **Sleep Job**: While you sleep, your AI dreams. It consolidates fragmented memories into profound insights.
+   *Why can't you see all the dreams?* Because CerebraLOS intentionally hides them. If you force an AI to read every dream, it becomes a database query, not an intuition. You only receive the "Morning Insight"—the rest remains in the subconscious, quietly shaping future context.
 3. **Zero UI**: No dashboards. No complex configurations. It lives in your terminal, breathing quietly in the background.
 
 ## Quick Start

@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2026-03-12
+
+### Added
+- `cerebralos init --local` option: creates brain in current directory (`.cerebralos/`) instead of home directory
+- `cerebralos init --global` option: explicitly creates brain in `~/.cerebralos/` (default behavior)
+- Automatically adds `.cerebralos/` to parent `.gitignore` when using `--local` mode
+- Philosophy of Dreams section in CONSTITUTION.md (Article III) explaining why dreams are intentionally hidden
+- "Why can't you see all the dreams?" explanation added to README.md and docs/ja/README.md
+
+### Fixed
+- `cerebralos init` now shows which directory the brain is being created in
+
 ## [1.0.3] - 2026-03-12
 
 ### Fixed

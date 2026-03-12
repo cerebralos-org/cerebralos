@@ -12,12 +12,17 @@ This document defines the unalterable principles of CerebraLOS. Any feature, pul
 2. **Preservation of "Ma" (間)**: The system must intentionally leave empty space. It must not attempt to show the user everything it knows.
 3. **Non-Destructive Deletion**: "Forgetting" means moving to an archive directory (`git mv`), never `rm -rf`. The Git history is the ultimate subconscious.
 
-## Article III: The Principle of "Omotenashi" (Zero UI)
+## Article III: The Philosophy of Dreams (Why You Can't See Everything)
+1. **Dreams are Ephemeral**: The system generates "Dreams" during the Sleep Job, but intentionally does not expose the entire dream directory to the user or the AI.
+2. **The Subconscious Layer**: Dreams exist in the subconscious. If you force the AI to read every dream, it becomes a database query, not an intuition.
+3. **The Morning Insight**: You only get to see the *result* of the dream—the Morning Insight. The rest remains hidden, quietly shaping the AI's future context without overwhelming the present.
+
+## Article IV: The Principle of "Omotenashi" (Zero UI)
 1. **Silent Operation**: The system must do its heavy lifting (Sleep Jobs) asynchronously, without user intervention.
 2. **Minimal Interruption**: The system must present insights only at natural transition points (e.g., terminal startup, morning briefings).
 3. **Elegance over Exhaustiveness**: When recalling context, the system must present one perfect connection rather than ten mediocre ones.
 
-## Article IV: The Separation of Self and World
+## Article V: The Separation of Self and World
 1. **Core Memory**: Direct interactions between the user and the AI must be treated as the "Self" and kept pristine.
 2. **Peripheral Memory**: Information gathered autonomously by AI agents (Web, Slack, etc.) must be treated as the "World" and kept separate.
 3. **Reflux (還流)**: The World may only influence the Self during the Sleep Job, and only as a carefully curated "gift" (Morning Insight).

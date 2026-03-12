@@ -26,7 +26,9 @@ program
 program
   .command('init')
   .description('Initialize your Git-native brain')
-  .action(initBrain);
+  .option('--local', 'Create brain in current directory (.cerebralos/) instead of home directory')
+  .option('--global', 'Create brain in home directory ~/.cerebralos/ (default)')
+  .action((options) => initBrain(options));
 
 program
   .command('sleep')
