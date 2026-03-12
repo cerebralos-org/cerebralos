@@ -64,7 +64,7 @@
 
 ### Installation
 ```bash
-npx github:cerebralos-org/cerebralos init
+npx cerebralos init
 ```
 
 ### Initialization

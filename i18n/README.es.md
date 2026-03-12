@@ -64,7 +64,7 @@ Mientras duermes, CerebraLOS fusiona tus interacciones directas (Core Memory) co
 
 ### Instalación
 ```bash
-npx github:cerebralos-org/cerebralos init
+npx cerebralos init
 ```
 
 ### Inicialización

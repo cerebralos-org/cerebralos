@@ -64,7 +64,7 @@ CerebraLOS संज्ञानात्मक विज्ञान और ज
 
 ### स्थापना
 ```bash
-npx github:cerebralos-org/cerebralos init
+npx cerebralos init
 ```
 
 ### आरंभीकरण

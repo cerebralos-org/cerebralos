@@ -64,7 +64,7 @@ CerebraLOSは、認知科学と日本の哲学（禅）の3つの柱に基づい
 
 ### インストール
 ```bash
-npx github:cerebralos-org/cerebralos init
+npx cerebralos init
 ```
 
 これにより、`~/.cerebralos/` ディレクトリ、あなたの新しいGitネイティブな脳が作成されます。

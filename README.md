@@ -33,7 +33,7 @@ We believe that for AI to truly understand us, it must learn how to forget.
 
 ```bash
 # 1. Initialize your brain
-npx github:cerebralos-org/cerebralos init
+npx cerebralos init
 
 # 2. Run your first sleep to generate dreams
 cerebralos sleep
