@@ -12,6 +12,7 @@ import { recallContext } from './recall.js';
 import { exploreSpace } from './explore.js';
 import { startMcpServer } from './mcp.js';
 import { installHook } from './hook.js';
+import { importMemory } from './import.js';
 
 program
   .name('cerebralos')
@@ -52,5 +53,12 @@ program
   .command('hook')
   .description('Install the Zero UI shell hook (.zshrc/.bashrc)')
   .action(installHook);
+
+program
+  .command('import')
+  .description('Import memories from ChatGPT, Obsidian, or any Markdown file')
+  .option('--from <path>', 'Source file or folder to import from')
+  .option('--type <type>', 'Import type: markdown, ai_export, folder, chatgpt (default: auto)')
+  .action((options) => importMemory(options));
 
 program.parse();
