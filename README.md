@@ -32,7 +32,7 @@ We believe that for AI to truly understand us, it must learn how to forget.
 ## Quick Start
 
 ```bash
-npx cerebralos init
+npx github:cerebralos-org/cerebralos init
 ```
 
 ## Architecture: The Triune Brain
