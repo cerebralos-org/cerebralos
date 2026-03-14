@@ -70,3 +70,9 @@ CerebraLOS mirrors the human brain's architecture:
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
+
+---
+
+<a href="https://orynth.dev/projects/cerebralos" target="_blank" rel="noopener">
+  <img src="https://orynth.dev/api/badge/cerebralos?theme=light&style=default" alt="Featured on Orynth" width="260" height="80" />
+</a>
