@@ -1,0 +1,10 @@
+# 画像・マーケティング素材（npmパッケージには不要）
+assets/
+marketing/
+
+# 開発用
+scripts/
+.github/
+
+# ログ・一時ファイル
+*.log
