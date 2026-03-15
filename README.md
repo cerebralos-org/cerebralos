@@ -42,6 +42,52 @@ cerebralos sleep
 cerebralos explore
 ```
 
+## LLM Setup — Teach Your Brain to Dream
+
+By default, `cerebralos sleep` runs without an LLM (a quiet night with no dreams).
+To generate real AI-powered insights, configure your LLM in `~/.cerebralos/.brain/config.json`:
+
+```json
+{
+  "llm": {
+    "provider": "claude",
+    "model": "claude-opus-4-6",
+    "api_key_env": "ANTHROPIC_API_KEY"
+  }
+}
+```
+
+**Supported providers:**
+
+| Provider | `provider` value | Requires |
+|----------|-----------------|----------|
+| Anthropic Claude | `claude` | `@anthropic-ai/sdk` + `ANTHROPIC_API_KEY` |
+| OpenAI | `openai` | `openai` + `OPENAI_API_KEY` |
+| Manus / Cursor / any tool with scheduling | `github-actions` | GitHub private repo |
+| Offline (no LLM) | `none` | nothing |
+
+### GitHub Actions Mode — Let Your Tool Dream for You
+
+If you use Manus, Cursor, or any agent with a scheduled task feature,
+you don't need a local API key. Just push your brain to a **private GitHub repo** and let Actions do the dreaming.
+
+1. Push your brain to GitHub:
+   ```bash
+   cd ~/.cerebralos
+   git remote add origin git@github.com:YOUR_USERNAME/my-brain.git
+   git push -u origin main
+   ```
+
+2. Copy the workflow template to your brain repo:
+   ```bash
+   cp $(npm root -g)/cerebralos/templates/cerebralos-sleep.yml \
+      ~/.cerebralos/.github/workflows/cerebralos-sleep.yml
+   ```
+
+3. Add your LLM API key to GitHub Secrets (`ANTHROPIC_API_KEY` or `OPENAI_API_KEY`).
+
+4. Set your config to `"provider": "github-actions"` — `cerebralos sleep` will push and let Actions generate the dream automatically.
+
 ## Architecture: The Triune Brain
 
 CerebraLOS mirrors the human brain's architecture:
