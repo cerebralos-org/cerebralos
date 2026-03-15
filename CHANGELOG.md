@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5] - 2026-03-16
+
+### Added
+- **LLM Integration**: `cerebralos sleep` now generates real AI-powered dreams via configurable LLM providers
+  - `claude` provider: direct Anthropic API call (`@anthropic-ai/sdk`)
+  - `openai` provider: direct OpenAI API call (`openai` SDK)
+  - `github-actions` provider: pushes memories to GitHub and lets Actions run the LLM (supports Manus, Cursor, and any tool with scheduled tasks)
+  - `none` (default): fallback template dream, fully offline
+- **`dreams/latest.md`**: automatically created/updated after every sleep — fixes the critical "6 places reference this but it never gets created" gap
+- **`templates/cerebralos-sleep.yml`**: GitHub Actions workflow template — copy to brain repo's `.github/workflows/` to enable automated cloud dreams
+- **`protected_tags` enforcement**: files tagged with `#pinned` or `#project` are now actually skipped during Active Forgetting (was defined in config but never implemented)
+- **`llm` config section** in `.brain/config.json`: `provider`, `model`, `api_key_env`
+- **`github` config section** in `.brain/config.json`: `repo`, `private`, `auto_push`
+
+### Changed
+- `cerebralos sleep` output now clearly indicates which provider is being used and where to configure it
+- Active Forgetting log now shows both archived count and protected count
+
 ## [1.0.4] - 2026-03-12
 
 ### Added

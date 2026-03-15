@@ -5,8 +5,149 @@ import chalk from 'chalk';
 import simpleGit from 'simple-git';
 import { globSync } from 'glob';
 import { recallContext } from './recall.js';
+import { generateDream } from './llm.js';
 
 const CEREBRALOS_DIR = path.join(os.homedir(), '.cerebralos');
+
+/**
+ * ファイルがprotected_tagsを含むか判定
+ * タグ形式: ファイル内に #pinned や #project などが含まれている場合
+ */
+function isProtected(filePath, protectedTags) {
+  if (!protectedTags || protectedTags.length === 0) return false;
+  try {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    return protectedTags.some(tag => content.includes(`#${tag}`));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * github-actionsモード: 記憶をGitHubにpushして終了
+ * 実際のLLM呼び出しはGitHub Actions側で行われる
+ */
+async function sleepViaGitHubActions(brainDir, config) {
+  const github = config.github || {};
+  const git = simpleGit(brainDir);
+
+  // リモートが設定されていなければ案内して終了
+  const remotes = await git.getRemotes(true);
+  if (remotes.length === 0) {
+    console.log(chalk.yellow('No remote configured. Add your GitHub repo first:'));
+    console.log(chalk.gray('  cd ~/.cerebralos && git remote add origin git@github.com:USERNAME/REPO.git'));
+    console.log(chalk.gray('  cerebralos sleep'));
+    return;
+  }
+
+  console.log(chalk.gray('GitHub Actions mode: pushing memories to trigger dream generation...'));
+  await git.add('.');
+
+  const hasChanges = (await git.status()).files.length > 0;
+  if (hasChanges) {
+    await git.commit(`[Sleep Trigger] ${new Date().toISOString().split('T')[0]}`);
+  }
+
+  await git.push('origin', 'main').catch(() => git.push('origin', 'master'));
+  console.log(chalk.green('Pushed to GitHub. Your AI will dream tonight.'));
+  console.log(chalk.gray('The dream will be committed back automatically by GitHub Actions.'));
+}
+
+/**
+ * APIモード: ローカルからLLMを直接呼び出してDreamを生成
+ */
+async function sleepViaApi(brainDir, config, date) {
+  console.log(chalk.gray('Recalling memories for dream synthesis...'));
+
+  // コアメモリと周辺メモリから素材を集める（TF-IDFで全体検索）
+  const allFiles = [
+    ...globSync(path.join(brainDir, 'core/**/*.md')),
+    ...globSync(path.join(brainDir, 'peripheral/**/*.md')),
+  ];
+
+  if (allFiles.length === 0) {
+    console.log(chalk.yellow('No memories found. Add some memories first.'));
+    return null;
+  }
+
+  // 上位5件をDream生成の素材として使う
+  const memories = allFiles
+    .map(f => {
+      try {
+        return {
+          relativePath: path.relative(brainDir, f),
+          content: fs.readFileSync(f, 'utf-8'),
+          mtime: fs.statSync(f).mtime,
+        };
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.mtime - a.mtime)
+    .slice(0, 5);
+
+  console.log(chalk.gray(`Synthesizing ${memories.length} memories via ${config.llm?.provider || 'unknown'}...`));
+
+  try {
+    const dreamContent = await generateDream(memories, config);
+    return dreamContent;
+  } catch (e) {
+    console.log(chalk.red(`LLM error: ${e.message}`));
+    return null;
+  }
+}
+
+/**
+ * フォールバックDream: LLMなしのシンプルな夢
+ */
+function buildFallbackDream(date) {
+  return `# Dream Log — ${date}
+
+## Morning Insight
+
+The brain rested quietly tonight. Space was created.
+No new connections were forced.
+
+> To enable AI-powered dreams, configure your LLM in ~/.cerebralos/.brain/config.json
+> See: cerebralos --help
+
+---
+*Generated during Sleep Job at ${new Date().toLocaleTimeString()}.*
+`;
+}
+
+/**
+ * DreamファイルをMarkdown形式でラップして保存
+ */
+function writeDreamFile(dreamsDir, date, rawContent) {
+  const wrapped = `# Dream Log — ${date}
+
+${rawContent}
+
+---
+*Generated during Sleep Job at ${new Date().toLocaleTimeString()}.*
+`;
+  const dreamPath = path.join(dreamsDir, `${date}.md`);
+  fs.writeFileSync(dreamPath, wrapped);
+  return dreamPath;
+}
+
+/**
+ * latest.md を更新（常に最新のDreamを指す）
+ */
+function updateLatest(dreamsDir, date, content) {
+  const latestContent = `# Latest Dream
+
+> Last updated: ${date}
+> Full log: [${date}.md](./${date}.md)
+
+---
+
+${content}
+`;
+  fs.writeFileSync(path.join(dreamsDir, 'latest.md'), latestContent);
+}
 
 export async function runSleepJob() {
   if (!fs.existsSync(CEREBRALOS_DIR)) {
@@ -15,118 +156,110 @@ export async function runSleepJob() {
   }
 
   console.log(chalk.blue('Good night. Your brain is now dreaming...'));
-  
-  const git = simpleGit(CEREBRALOS_DIR);
 
-  // 1. Active Forgetting (Ma / 間)
-  console.log(chalk.gray('Running Active Forgetting (Entropy Management)...'));
-  
+  const git = simpleGit(CEREBRALOS_DIR);
   const configPath = path.join(CEREBRALOS_DIR, '.brain/config.json');
-  let decayThresholdDays = 30;
-  if (fs.existsSync(configPath)) {
-    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-    decayThresholdDays = config.active_forgetting?.decay_threshold_days || 30;
-  }
+  const config = fs.existsSync(configPath)
+    ? JSON.parse(fs.readFileSync(configPath, 'utf-8'))
+    : {};
+
+  const forgettingConfig = config.active_forgetting || {};
+  const decayThresholdDays = forgettingConfig.decay_threshold_days || 30;
+  const protectedTags = forgettingConfig.protected_tags || ['pinned', 'project'];
+
+  // 1. Active Forgetting（保護タグ対応）
+  console.log(chalk.gray('Running Active Forgetting (Entropy Management)...'));
 
   const now = new Date();
-  const thresholdDate = new Date(now.getTime() - (decayThresholdDays * 24 * 60 * 60 * 1000));
-  
+  const thresholdDate = new Date(now.getTime() - decayThresholdDays * 24 * 60 * 60 * 1000);
+
   const searchPaths = [
     path.join(CEREBRALOS_DIR, 'core/**/*.md'),
-    path.join(CEREBRALOS_DIR, 'peripheral/**/*.md')
+    path.join(CEREBRALOS_DIR, 'peripheral/**/*.md'),
   ];
-  
+
   const files = searchPaths.flatMap(pattern => globSync(pattern));
   let archivedCount = 0;
+  let protectedCount = 0;
 
   for (const file of files) {
     const stats = fs.statSync(file);
     if (stats.mtime < thresholdDate) {
-      // Move to archive
+      // protected_tags があるファイルはアーカイブしない
+      if (isProtected(file, protectedTags)) {
+        protectedCount++;
+        continue;
+      }
+
       const relativePath = path.relative(CEREBRALOS_DIR, file);
       const archivePath = path.join(CEREBRALOS_DIR, 'archive', relativePath);
-      
       fs.mkdirSync(path.dirname(archivePath), { recursive: true });
-      
-      // Use git mv if possible, otherwise regular mv
+
       try {
         await git.mv(file, archivePath);
-      } catch (e) {
+      } catch {
         fs.renameSync(file, archivePath);
       }
       archivedCount++;
     }
   }
 
-  console.log(chalk.gray(`Archived ${archivedCount} memories to create space.`));
+  console.log(chalk.gray(`Archived ${archivedCount} memories. Protected ${protectedCount} memories from forgetting.`));
 
-  // 2. Dream Consolidation (Reflux)
-  console.log(chalk.gray('Synthesizing Core and Peripheral memories...'));
-  
-  // Find the most recent core memory
-  const coreFiles = globSync(path.join(CEREBRALOS_DIR, 'core/**/*.md'))
-    .map(f => ({ path: f, mtime: fs.statSync(f).mtime }))
-    .sort((a, b) => b.mtime - a.mtime);
+  // 2. Dream Consolidation
+  console.log(chalk.gray('Synthesizing memories...'));
 
-  let dreamContent = '';
   const date = new Date().toISOString().split('T')[0];
+  const dreamsDir = path.join(CEREBRALOS_DIR, 'dreams');
+  const provider = config.llm?.provider || 'none';
 
-  if (coreFiles.length > 0) {
-    const latestCore = coreFiles[0];
-    const coreContent = fs.readFileSync(latestCore.path, 'utf-8');
-    
-    // Extract a keyword from the latest core memory (simplified)
-    const words = coreContent.split(/\s+/).filter(w => w.length > 5);
-    const keyword = words.length > 0 ? words[0] : 'memory';
-
-    // Find related peripheral memories
-    const related = await recallContext(keyword, { topK: 2, silent: true });
-    const peripheralMatch = related.find(r => r.relativePath.startsWith('peripheral/'));
-
-    if (peripheralMatch) {
-      dreamContent = `# Dream Log — ${date}
-
-## Morning Insight
-
-While reviewing your recent thought in \`${path.relative(CEREBRALOS_DIR, latestCore.path)}\`,
-I noticed a connection with a memory from the world: \`${peripheralMatch.relativePath}\`.
-
-**The Connection:**
-Both touch upon the concept of "${keyword}". 
-The world memory states: "${peripheralMatch.content.substring(0, 100).replace(/\n/g, ' ')}..."
-
-→ \`cerebralos explore\` to read the full context.
-
----
-*This insight was generated during the Sleep Job at ${new Date().toLocaleTimeString()}.*
-`;
-    }
+  // github-actionsモード
+  if (provider === 'github-actions') {
+    await sleepViaGitHubActions(CEREBRALOS_DIR, config);
+    return;
   }
 
-  // Fallback dream if no connection found
-  if (!dreamContent) {
-    dreamContent = `# Dream Log — ${date}
-
-## Morning Insight
-
-The brain rested quietly tonight. Space was created.
-No new connections were forced.
-
----
-*This insight was generated during the Sleep Job at ${new Date().toLocaleTimeString()}.*
-`;
+  // APIモード or フォールバック
+  let dreamRaw = null;
+  if (provider !== 'none') {
+    dreamRaw = await sleepViaApi(CEREBRALOS_DIR, config, date);
   }
 
-  const dreamPath = path.join(CEREBRALOS_DIR, `dreams/${date}.md`);
-  fs.writeFileSync(dreamPath, dreamContent);
-  
-  // Commit the dream
+  const dreamContent = dreamRaw
+    ? writeDreamFile(dreamsDir, date, dreamRaw)
+    : (() => {
+        const fallback = buildFallbackDream(date);
+        const dreamPath = path.join(dreamsDir, `${date}.md`);
+        fs.writeFileSync(dreamPath, fallback);
+        return dreamPath;
+      })();
+
+  // latest.md を更新
+  const finalContent = fs.readFileSync(dreamContent, 'utf-8');
+  updateLatest(dreamsDir, date, finalContent);
+
+  // Gitにコミット
   try {
     await git.add('.');
     await git.commit(`[Sleep Job] Dream consolidation for ${date}`);
-  } catch (e) {
-    // Ignore git errors if nothing to commit
+  } catch {
+    // 差分なしの場合はスキップ
   }
 
-  console.log(chalk.green('Sleep Job complete. A new Morning Insight is ready.'));
+  // GitHub auto_push
+  if (config.github?.auto_push) {
+    try {
+      await git.push('origin', 'main').catch(() => git.push('origin', 'master'));
+      console.log(chalk.gray('Pushed to GitHub.'));
+    } catch {
+      // リモートなしの場合はスキップ
+    }
+  }
+
+  console.log(chalk.green(`Sleep Job complete. Dream saved to dreams/${date}.md`));
+  if (dreamRaw) {
+    console.log(chalk.cyan('Run `cerebralos wake` to read your Morning Insight.'));
+  } else {
+    console.log(chalk.yellow('No LLM configured — dreams are empty. Set up llm in ~/.cerebralos/.brain/config.json'));
+  }
 }

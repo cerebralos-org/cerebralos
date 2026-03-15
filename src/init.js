@@ -47,7 +47,7 @@ export async function initBrain(options = {}) {
 
   // Create default config
   const defaultConfig = {
-    version: "1.0.4",
+    version: "1.0.5",
     mode: isLocal ? "local" : "global",
     user: {
       name: os.userInfo().username,
@@ -62,6 +62,22 @@ export async function initBrain(options = {}) {
       enabled: true,
       decay_threshold_days: 30,
       protected_tags: ["pinned", "project"]
+    },
+    llm: {
+      // 使用するLLMプロバイダー: claude | openai | github-actions | none
+      // claude/openai: ローカルからAPIを直接呼び出してDreamを生成
+      // github-actions: git pushしてGitHub Actions経由でLLMが夢を見る
+      // none: LLMなし（テンプレートDreamのみ）
+      provider: "none",
+      model: "",
+      api_key_env: ""
+    },
+    github: {
+      // git@github.com:username/repo.git 形式 or https形式
+      repo: "",
+      private: true,
+      // sleep後に自動でgit pushするか（github-actionsモード時は強制true）
+      auto_push: false
     }
   };
 
