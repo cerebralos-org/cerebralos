@@ -60,7 +60,8 @@ export async function initBrain(options = {}) {
     },
     active_forgetting: {
       enabled: true,
-      decay_threshold_days: 30,
+      compress_threshold_days: 30,
+      freeze_threshold_days: 90,
       protected_tags: ["pinned", "project"]
     },
     llm: {

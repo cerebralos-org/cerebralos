@@ -105,6 +105,31 @@ async function generateWithOpenAI(prompt, llmConfig) {
 }
 
 /**
+ * 記憶ファイルを「圧縮」するプロンプトを組み立てる
+ * 解像度を落としながら gist を保存する——細部はぼやけ、核心は残る
+ */
+export function buildCompressPrompt(filePath, content) {
+  return `You are compressing an old memory. The detail fades, but the essence remains.
+
+## Memory File
+Path: ${filePath}
+
+## Content
+${content.substring(0, 2000)}
+
+## Instructions
+- Write a compressed version of this memory (max 150 words)
+- Preserve: the core insight, key decisions, important names/concepts
+- Let fade: specific details, timestamps, verbose explanations
+- Format: plain prose or minimal bullet points — no headers
+- Write in the same language as the original
+
+This compressed memory will be stored in archive/compressed/ and may resurface later when triggered by related context.
+
+Respond with only the compressed memory, no preamble.`;
+}
+
+/**
  * Dream生成のメインエントリーポイント
  *
  * @param {Array} memories - recallContextの結果配列（relativePath, content）
@@ -124,4 +149,26 @@ export async function generateDream(memories, config) {
   if (provider === 'openai') return await generateWithOpenAI(prompt, llmConfig);
 
   throw new Error(`Unknown LLM provider: "${provider}". Use: claude | openai | github-actions | none`);
+}
+
+/**
+ * 記憶圧縮のエントリーポイント
+ *
+ * @param {string} filePath  - 圧縮対象ファイルの相対パス
+ * @param {string} content   - ファイルの内容
+ * @param {Object} config    - .brain/config.json の内容
+ * @returns {string|null}    - 圧縮されたテキスト、またはnull（LLM未設定時）
+ */
+export async function compressMemory(filePath, content, config) {
+  const llmConfig = config.llm || {};
+  const provider = llmConfig.provider || 'none';
+
+  if (provider === 'none' || provider === 'github-actions') return null;
+
+  const prompt = buildCompressPrompt(filePath, content);
+
+  if (provider === 'claude') return await generateWithClaude(prompt, llmConfig);
+  if (provider === 'openai') return await generateWithOpenAI(prompt, llmConfig);
+
+  return null;
 }

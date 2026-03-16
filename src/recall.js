@@ -8,21 +8,60 @@ import { globSync } from 'glob';
 const TfIdf = natural.TfIdf;
 const CEREBRALOS_DIR = path.join(os.homedir(), '.cerebralos');
 
+/**
+ * 記憶の「古さ」を人間的な言葉で返す
+ * 「思い出す」体験には、いつの記憶かという感覚が伴う
+ */
+function formatMemoryAge(mtime) {
+  const now = new Date();
+  const diffDays = Math.floor((now - mtime) / (1000 * 60 * 60 * 24));
+  if (diffDays === 0) return 'today';
+  if (diffDays === 1) return 'yesterday';
+  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+  return `${Math.floor(diffDays / 365)} years ago`;
+}
+
+/**
+ * 記憶の層を判定する（active / compressed / frozen）
+ */
+function getMemoryLayer(relativePath) {
+  if (relativePath.startsWith('archive/frozen')) return 'frozen';
+  if (relativePath.startsWith('archive/compressed')) return 'compressed';
+  if (relativePath.startsWith('archive')) return 'archived';
+  return 'active';
+}
+
+/**
+ * 圧縮済み記憶のスニペットは短めに——細部はぼやけている
+ */
+function extractSnippet(content, layer) {
+  const clean = content
+    .replace(/<!--.*?-->/gs, '')  // HTMLコメント（圧縮メタデータ）除去
+    .replace(/\n/g, ' ')
+    .trim();
+  const maxLen = layer === 'active' ? 200 : 120;
+  return clean.substring(0, maxLen) + (clean.length > maxLen ? '...' : '');
+}
+
 export async function recallContext(query, options = { topK: 3, silent: false }) {
   if (!fs.existsSync(CEREBRALOS_DIR)) {
     if (!options.silent) console.log(chalk.red('Brain not found. Run `cerebralos init` first.'));
     return [];
   }
 
-  if (!options.silent) console.log(chalk.gray(`Recalling context for: "${query}"...`));
+  if (!options.silent) console.log(chalk.gray(`Recalling: "${query}"...`));
 
   const tfidf = new TfIdf();
   const documents = [];
 
-  // Read all markdown files from core/ and peripheral/
+  // active記憶（core/ peripheral/）+ 圧縮済み記憶（archive/compressed/）を検索対象に
+  // frozen（archive/frozen/）は通常の想起対象外——完全凍結状態
   const searchPaths = [
     path.join(CEREBRALOS_DIR, 'core/**/*.md'),
-    path.join(CEREBRALOS_DIR, 'peripheral/**/*.md')
+    path.join(CEREBRALOS_DIR, 'peripheral/**/*.md'),
+    path.join(CEREBRALOS_DIR, 'archive/compressed/**/*.md'),
   ];
 
   const files = searchPaths.flatMap(pattern => globSync(pattern));
@@ -32,55 +71,65 @@ export async function recallContext(query, options = { topK: 3, silent: false })
     return [];
   }
 
-  // Add documents to TF-IDF
+  // TF-IDFにドキュメントを追加
   files.forEach((file, index) => {
     try {
       const content = fs.readFileSync(file, 'utf-8');
       tfidf.addDocument(content);
+      const relativePath = path.relative(CEREBRALOS_DIR, file);
       documents.push({
         id: index,
         path: file,
-        relativePath: path.relative(CEREBRALOS_DIR, file),
-        content: content,
-        stats: fs.statSync(file)
+        relativePath,
+        content,
+        stats: fs.statSync(file),
+        layer: getMemoryLayer(relativePath),
       });
-    } catch (e) {
-      // Skip unreadable files
+    } catch {
+      // 読めないファイルはスキップ
     }
   });
 
-  // Calculate scores
+  // スコア計算
   const results = [];
   tfidf.tfidfs(query, (i, measure) => {
     if (measure > 0) {
-      results.push({
-        ...documents[i],
-        score: measure
-      });
+      results.push({ ...documents[i], score: measure });
     }
   });
 
-  // Sort by score descending
-  results.sort((a, b) => b.score - a.score);
+  // active記憶を優先しつつスコア順に並べ、上位を返す
+  results.sort((a, b) => {
+    // active > compressed の層優先（同スコア帯では active が上に来る）
+    const layerBonus = (r) => r.layer === 'active' ? 0.1 : 0;
+    return (b.score + layerBonus(b)) - (a.score + layerBonus(a));
+  });
   const topResults = results.slice(0, options.topK);
 
   if (!options.silent) {
     if (topResults.length === 0) {
-      console.log(chalk.yellow('No relevant memories found for this query.'));
+      console.log(chalk.yellow('Nothing surfaced. The memory may be frozen or never stored.'));
     } else {
-      console.log(chalk.cyan('\n[Pattern Completed]'));
-      console.log(chalk.white(`Found ${topResults.length} relevant memories:`));
-      
+      console.log(chalk.cyan('\n  ✦ Something surfaced.'));
+      console.log('');
+
       topResults.forEach((res, i) => {
-        console.log(chalk.gray('---'));
-        console.log(chalk.white(`Memory ${i + 1}: ${res.relativePath}`));
-        console.log(chalk.gray(`Score: ${res.score.toFixed(4)} | Last modified: ${res.stats.mtime.toISOString().split('T')[0]}`));
-        
-        // Extract a snippet around the matched terms (simplified)
-        const snippet = res.content.substring(0, 200).replace(/\n/g, ' ') + '...';
-        console.log(chalk.white(`Context: ${snippet}`));
+        const age = formatMemoryAge(res.stats.mtime);
+        const isCompressed = res.layer === 'compressed';
+        const snippet = extractSnippet(res.content, res.layer);
+
+        // 圧縮済み記憶は少し朧げに表示
+        const nameColor = isCompressed ? chalk.dim : chalk.white;
+        const snippetColor = isCompressed ? chalk.dim : chalk.gray;
+        const ageLabel = isCompressed
+          ? chalk.dim(`  ◌ ${age} — faded`)
+          : chalk.dim(`  ● ${age}`);
+
+        console.log(nameColor(`  ${i + 1}. ${res.relativePath}`));
+        console.log(ageLabel);
+        console.log(snippetColor(`     ${snippet}`));
+        console.log('');
       });
-      console.log(chalk.gray('---'));
     }
   }
 

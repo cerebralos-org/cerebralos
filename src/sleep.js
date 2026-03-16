@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import simpleGit from 'simple-git';
 import { globSync } from 'glob';
 import { recallContext } from './recall.js';
-import { generateDream } from './llm.js';
+import { generateDream, compressMemory } from './llm.js';
 
 const CEREBRALOS_DIR = path.join(os.homedir(), '.cerebralos');
 
@@ -164,47 +164,75 @@ export async function runSleepJob() {
     : {};
 
   const forgettingConfig = config.active_forgetting || {};
-  const decayThresholdDays = forgettingConfig.decay_threshold_days || 30;
+  const compressThresholdDays = forgettingConfig.compress_threshold_days || 30;
+  const freezeThresholdDays = forgettingConfig.freeze_threshold_days || 90;
   const protectedTags = forgettingConfig.protected_tags || ['pinned', 'project'];
 
-  // 1. Active Forgetting（保護タグ対応）
-  console.log(chalk.gray('Running Active Forgetting (Entropy Management)...'));
+  // 1. Active Forgetting — 2段階（圧縮 → 凍結）
+  // 設計思想: 細部はぼやける。でも gist は残る。
+  // Phase 1 (30日): LLMで要約して archive/compressed/ へ（解像度ダウン）
+  // Phase 2 (90日): compressed を archive/frozen/ へ移動（完全凍結）
+  console.log(chalk.gray('Running Active Forgetting (compress → freeze)...'));
 
   const now = new Date();
-  const thresholdDate = new Date(now.getTime() - decayThresholdDays * 24 * 60 * 60 * 1000);
+  const compressThreshold = new Date(now.getTime() - compressThresholdDays * 24 * 60 * 60 * 1000);
+  const freezeThreshold = new Date(now.getTime() - freezeThresholdDays * 24 * 60 * 60 * 1000);
 
+  // Phase 2: archive/compressed/ の古いファイルを frozen/ へ
+  const compressedFiles = globSync(path.join(CEREBRALOS_DIR, 'archive/compressed/**/*.md'));
+  let frozenCount = 0;
+  for (const file of compressedFiles) {
+    const stats = fs.statSync(file);
+    if (stats.mtime < freezeThreshold) {
+      const rel = path.relative(path.join(CEREBRALOS_DIR, 'archive/compressed'), file);
+      const frozenPath = path.join(CEREBRALOS_DIR, 'archive/frozen', rel);
+      fs.mkdirSync(path.dirname(frozenPath), { recursive: true });
+      try { await git.mv(file, frozenPath); } catch { fs.renameSync(file, frozenPath); }
+      frozenCount++;
+    }
+  }
+
+  // Phase 1: core/ peripheral/ の古いファイルを compressed/ へ（LLMで要約）
   const searchPaths = [
     path.join(CEREBRALOS_DIR, 'core/**/*.md'),
     path.join(CEREBRALOS_DIR, 'peripheral/**/*.md'),
   ];
-
   const files = searchPaths.flatMap(pattern => globSync(pattern));
-  let archivedCount = 0;
+  let compressedCount = 0;
   let protectedCount = 0;
 
   for (const file of files) {
     const stats = fs.statSync(file);
-    if (stats.mtime < thresholdDate) {
-      // protected_tags があるファイルはアーカイブしない
+    if (stats.mtime < compressThreshold) {
       if (isProtected(file, protectedTags)) {
         protectedCount++;
         continue;
       }
 
       const relativePath = path.relative(CEREBRALOS_DIR, file);
-      const archivePath = path.join(CEREBRALOS_DIR, 'archive', relativePath);
-      fs.mkdirSync(path.dirname(archivePath), { recursive: true });
+      const compressedPath = path.join(CEREBRALOS_DIR, 'archive/compressed', relativePath);
+      fs.mkdirSync(path.dirname(compressedPath), { recursive: true });
 
+      // LLMで圧縮（設定がある場合）、なければそのまま移動
       try {
-        await git.mv(file, archivePath);
+        const originalContent = fs.readFileSync(file, 'utf-8');
+        const compressed = await compressMemory(relativePath, originalContent, config);
+        if (compressed) {
+          const header = `<!-- compressed from: ${relativePath} on ${now.toISOString().split('T')[0]} -->\n\n`;
+          fs.writeFileSync(compressedPath, header + compressed);
+          try { await git.rm(file); } catch { fs.unlinkSync(file); }
+        } else {
+          // LLM未設定: そのまま移動
+          try { await git.mv(file, compressedPath); } catch { fs.renameSync(file, compressedPath); }
+        }
       } catch {
-        fs.renameSync(file, archivePath);
+        try { await git.mv(file, compressedPath); } catch { fs.renameSync(file, compressedPath); }
       }
-      archivedCount++;
+      compressedCount++;
     }
   }
 
-  console.log(chalk.gray(`Archived ${archivedCount} memories. Protected ${protectedCount} memories from forgetting.`));
+  console.log(chalk.gray(`Compressed ${compressedCount} memories. Frozen ${frozenCount}. Protected ${protectedCount}.`));
 
   // 2. Dream Consolidation
   console.log(chalk.gray('Synthesizing memories...'));
