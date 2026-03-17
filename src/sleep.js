@@ -150,6 +150,19 @@ ${content}
   fs.writeFileSync(path.join(dreamsDir, 'latest.md'), latestContent);
 }
 
+/**
+ * state.json を書き込む — serve コマンドが参照するステート管理
+ */
+function writeState(state, extra = {}) {
+  const statePath = path.join(CEREBRALOS_DIR, '.brain/state.json');
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, JSON.stringify({
+    state,
+    since: new Date().toISOString(),
+    ...extra,
+  }, null, 2));
+}
+
 export async function runSleepJob() {
   if (!fs.existsSync(CEREBRALOS_DIR)) {
     console.log(chalk.red(t('sleep.no_brain')));
@@ -157,6 +170,7 @@ export async function runSleepJob() {
   }
 
   console.log(chalk.blue(t('sleep.start')));
+  writeState('sleeping');
 
   const git = simpleGit(CEREBRALOS_DIR);
   const configPath = path.join(CEREBRALOS_DIR, '.brain/config.json');
@@ -237,6 +251,7 @@ export async function runSleepJob() {
 
   // 2. Dream Consolidation
   console.log(chalk.gray(t('sleep.synthesizing')));
+  writeState('dreaming');
 
   const date = new Date().toISOString().split('T')[0];
   const dreamsDir = path.join(CEREBRALOS_DIR, 'dreams');
@@ -284,6 +299,16 @@ export async function runSleepJob() {
       // リモートなしの場合はスキップ
     }
   }
+
+  // 完了ステートを書き込む（Morning Insight の先頭文を添付）
+  const latestPath = path.join(CEREBRALOS_DIR, 'dreams/latest.md');
+  let insight = null;
+  if (fs.existsSync(latestPath)) {
+    const raw = fs.readFileSync(latestPath, 'utf-8');
+    const m = raw.match(/\*\*The Connection\*\*[:\s]*([\s\S]*?)(?:\n\n|\n\*\*|$)/);
+    if (m) insight = m[1].trim().split('\n')[0];
+  }
+  writeState('awake', { date, insight });
 
   console.log(chalk.green(t('sleep.complete', { date })));
   if (dreamRaw) {

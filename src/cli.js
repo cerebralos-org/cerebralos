@@ -15,6 +15,7 @@ import { startMcpServer } from './mcp.js';
 import { installHook } from './hook.js';
 import { importMemory } from './import.js';
 import { runSetup } from './setup.js';
+import { startServeServer } from './serve.js';
 
 const require = createRequire(import.meta.url);
 const { version } = require('../package.json');
@@ -204,6 +205,29 @@ Examples:
   $ cerebralos setup --agent cursor    # Target Cursor only
   $ cerebralos setup --agent claude-code --auto`)
   .action((options) => runSetup(options));
+
+program
+  .command('serve')
+  .description('Start the CerebraLOS State API (for iOS app / dashboards)')
+  .option('-p, --port <number>', 'Port to listen on', '4444')
+  .addHelpText('after', `
+Starts a lightweight HTTP server exposing brain state.
+Used by the CerebraLOS iOS companion app.
+
+Endpoints:
+  GET /state   → { state, since, date, insight, hasDream }
+  GET /dream   → { title, insight, implication, date }
+  GET /health  → { ok, name, version }
+
+States: sleeping | dreaming | awake
+
+Run behind Tailscale to access from anywhere:
+  $ cerebralos serve --port 4444
+
+Examples:
+  $ cerebralos serve
+  $ cerebralos serve --port 8080`)
+  .action((options) => startServeServer(parseInt(options.port, 10)));
 
 program
   .command('import')
