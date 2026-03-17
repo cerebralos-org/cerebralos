@@ -3,6 +3,7 @@ import path from 'path';
 import os from 'os';
 import chalk from 'chalk';
 import readline from 'readline';
+import { t } from './i18n.js';
 
 const CEREBRALOS_DIR = path.join(os.homedir(), '.cerebralos');
 
@@ -125,14 +126,14 @@ function renderDivider() {
 function renderHeader(agents) {
   console.clear();
   renderDivider();
-  console.log(chalk.bold.cyan('  ✦ CerebraLOS Explorer  ') + chalk.dim('— The space between your thoughts'));
+  console.log(chalk.bold.cyan('  ' + t('explore.title')));
   renderDivider();
 
   // Connected Agents section
   if (agents.length === 0) {
-    console.log(chalk.dim('  No agents connected yet. Add memories to ~/.cerebralos/peripheral/'));
+    console.log(chalk.dim('  ' + t('explore.no_agents')));
   } else {
-    console.log(chalk.bold('  Connected Agents') + chalk.dim(` (${agents.length})`));
+    console.log(chalk.bold('  ' + t('explore.connected_agents')) + chalk.dim(` (${agents.length})`));
     agents.forEach(agent => {
       const dot = chalk.green('●');
       const time = chalk.dim(formatRelativeTime(agent.lastModified));
@@ -153,12 +154,12 @@ function renderMenu(items, selected) {
 function renderContent(title, content) {
   console.clear();
   renderDivider();
-  console.log(chalk.bold.cyan('  ✦ CerebraLOS Explorer  ') + chalk.dim('— The space between your thoughts'));
+  console.log(chalk.bold.cyan('  ' + t('explore.title')));
   renderDivider();
   console.log(chalk.bold.yellow(`\n  ${title}\n`));
   renderDivider();
   if (!content) {
-    console.log(chalk.dim('\n  (No content yet. Run `cerebralos sleep` to generate dreams.)\n'));
+    console.log(chalk.dim('\n  ' + t('explore.no_content') + '\n'));
   } else {
     const lines = content.split('\n').slice(0, 30);
     lines.forEach(line => {
@@ -179,12 +180,12 @@ function renderContent(title, content) {
     }
   }
   renderDivider();
-  console.log(chalk.dim('\n  [any key] Back  [q] Quit\n'));
+  console.log(chalk.dim('\n  ' + t('explore.back_hint') + '\n'));
 }
 
 export async function exploreSpace() {
   if (!fs.existsSync(CEREBRALOS_DIR)) {
-    console.log(chalk.red('Brain not initialized. Run `cerebralos init` first.'));
+    console.log(chalk.red(t('recall.no_brain')));
     return;
   }
 
@@ -194,7 +195,7 @@ export async function exploreSpace() {
 
   const menuItems = [
     {
-      label: `✦ Latest Dream  ${dream ? chalk.dim('(' + dream.name + ')') : chalk.dim('(none yet — run cerebralos sleep first)')}`,
+      label: t('explore.latest_dream') + '  ' + (dream ? chalk.dim('(' + dream.name + ')') : chalk.dim('(' + t('explore.no_dream_yet') + ')')),
       content: dream?.content,
       title: 'Latest Dream'
     },
@@ -204,7 +205,7 @@ export async function exploreSpace() {
       title: `Memory: ${m.name}`
     })),
     {
-      label: '↩ Exit',
+      label: t('explore.exit'),
       content: null,
       title: 'exit'
     }
@@ -215,10 +216,10 @@ export async function exploreSpace() {
 
   const renderMainMenu = () => {
     renderHeader(agents);
-    console.log(chalk.bold.yellow('\n  What would you like to explore?\n'));
+    console.log(chalk.bold.yellow('\n  ' + t('explore.prompt') + '\n'));
     renderMenu(menuItems, selected);
     renderDivider();
-    console.log(chalk.dim('\n  [↑↓] Navigate  [Enter] Select  [q] Quit\n'));
+    console.log(chalk.dim('\n  ' + t('explore.nav_hint') + '\n'));
   };
 
   renderMainMenu();
@@ -233,7 +234,7 @@ export async function exploreSpace() {
       if (key.name === 'q' || (key.ctrl && key.name === 'c')) {
         if (process.stdin.isTTY) process.stdin.setRawMode(false);
         console.clear();
-        console.log(chalk.dim('Goodbye. Your thoughts remain.'));
+        console.log(chalk.dim(t('explore.goodbye')));
         process.stdin.removeAllListeners('keypress');
         resolve();
         return;
@@ -256,7 +257,7 @@ export async function exploreSpace() {
         if (item.title === 'exit') {
           if (process.stdin.isTTY) process.stdin.setRawMode(false);
           console.clear();
-          console.log(chalk.dim('Goodbye. Your thoughts remain.'));
+          console.log(chalk.dim(t('explore.goodbye')));
           process.stdin.removeAllListeners('keypress');
           resolve();
           return;

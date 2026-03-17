@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import chalk from 'chalk';
+import { t } from './i18n.js';
 import simpleGit from 'simple-git';
 import { globSync } from 'glob';
 import { recallContext } from './recall.js';
@@ -57,7 +58,7 @@ async function sleepViaGitHubActions(brainDir, config) {
  * APIモード: ローカルからLLMを直接呼び出してDreamを生成
  */
 async function sleepViaApi(brainDir, config, date) {
-  console.log(chalk.gray('Recalling memories for dream synthesis...'));
+  console.log(chalk.gray(t('sleep.recalling')));
 
   // コアメモリと周辺メモリから素材を集める（TF-IDFで全体検索）
   const allFiles = [
@@ -87,7 +88,7 @@ async function sleepViaApi(brainDir, config, date) {
     .sort((a, b) => b.mtime - a.mtime)
     .slice(0, 5);
 
-  console.log(chalk.gray(`Synthesizing ${memories.length} memories via ${config.llm?.provider || 'unknown'}...`));
+  console.log(chalk.gray(t('sleep.synthesizing_via', { count: memories.length, provider: config.llm?.provider || 'unknown' })));
 
   try {
     const dreamContent = await generateDream(memories, config);
@@ -151,11 +152,11 @@ ${content}
 
 export async function runSleepJob() {
   if (!fs.existsSync(CEREBRALOS_DIR)) {
-    console.log(chalk.red('Brain not found. Run `cerebralos init` first.'));
+    console.log(chalk.red(t('sleep.no_brain')));
     return;
   }
 
-  console.log(chalk.blue('Good night. Your brain is now dreaming...'));
+  console.log(chalk.blue(t('sleep.start')));
 
   const git = simpleGit(CEREBRALOS_DIR);
   const configPath = path.join(CEREBRALOS_DIR, '.brain/config.json');
@@ -172,7 +173,7 @@ export async function runSleepJob() {
   // 設計思想: 細部はぼやける。でも gist は残る。
   // Phase 1 (30日): LLMで要約して archive/compressed/ へ（解像度ダウン）
   // Phase 2 (90日): compressed を archive/frozen/ へ移動（完全凍結）
-  console.log(chalk.gray('Running Active Forgetting (compress → freeze)...'));
+  console.log(chalk.gray(t('sleep.forgetting')));
 
   const now = new Date();
   const compressThreshold = new Date(now.getTime() - compressThresholdDays * 24 * 60 * 60 * 1000);
@@ -232,10 +233,10 @@ export async function runSleepJob() {
     }
   }
 
-  console.log(chalk.gray(`Compressed ${compressedCount} memories. Frozen ${frozenCount}. Protected ${protectedCount}.`));
+  console.log(chalk.gray(t('sleep.forgetting_done', { compressed: compressedCount, frozen: frozenCount, protected: protectedCount })));
 
   // 2. Dream Consolidation
-  console.log(chalk.gray('Synthesizing memories...'));
+  console.log(chalk.gray(t('sleep.synthesizing')));
 
   const date = new Date().toISOString().split('T')[0];
   const dreamsDir = path.join(CEREBRALOS_DIR, 'dreams');
@@ -284,10 +285,10 @@ export async function runSleepJob() {
     }
   }
 
-  console.log(chalk.green(`Sleep Job complete. Dream saved to dreams/${date}.md`));
+  console.log(chalk.green(t('sleep.complete', { date })));
   if (dreamRaw) {
-    console.log(chalk.cyan('Run `cerebralos wake` to read your Morning Insight.'));
+    console.log(chalk.cyan(t('sleep.hint_wake')));
   } else {
-    console.log(chalk.yellow('No LLM configured — dreams are empty. Set up llm in ~/.cerebralos/.brain/config.json'));
+    console.log(chalk.yellow(t('sleep.no_llm')));
   }
 }

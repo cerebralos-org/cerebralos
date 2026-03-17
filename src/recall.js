@@ -4,14 +4,11 @@ import os from 'os';
 import chalk from 'chalk';
 import natural from 'natural';
 import { globSync } from 'glob';
+import { t } from './i18n.js';
 
 const TfIdf = natural.TfIdf;
 const CEREBRALOS_DIR = path.join(os.homedir(), '.cerebralos');
 
-/**
- * 記憶の「古さ」を人間的な言葉で返す
- * 「思い出す」体験には、いつの記憶かという感覚が伴う
- */
 function formatMemoryAge(mtime) {
   const now = new Date();
   const diffDays = Math.floor((now - mtime) / (1000 * 60 * 60 * 24));
@@ -23,9 +20,6 @@ function formatMemoryAge(mtime) {
   return `${Math.floor(diffDays / 365)} years ago`;
 }
 
-/**
- * 記憶の層を判定する（active / compressed / frozen）
- */
 function getMemoryLayer(relativePath) {
   if (relativePath.startsWith('archive/frozen')) return 'frozen';
   if (relativePath.startsWith('archive/compressed')) return 'compressed';
@@ -33,12 +27,9 @@ function getMemoryLayer(relativePath) {
   return 'active';
 }
 
-/**
- * 圧縮済み記憶のスニペットは短めに——細部はぼやけている
- */
 function extractSnippet(content, layer) {
   const clean = content
-    .replace(/<!--.*?-->/gs, '')  // HTMLコメント（圧縮メタデータ）除去
+    .replace(/<!--.*?-->/gs, '')
     .replace(/\n/g, ' ')
     .trim();
   const maxLen = layer === 'active' ? 200 : 120;
@@ -47,17 +38,15 @@ function extractSnippet(content, layer) {
 
 export async function recallContext(query, options = { topK: 3, silent: false }) {
   if (!fs.existsSync(CEREBRALOS_DIR)) {
-    if (!options.silent) console.log(chalk.red('Brain not found. Run `cerebralos init` first.'));
+    if (!options.silent) console.log(chalk.red(t('recall.no_brain')));
     return [];
   }
 
-  if (!options.silent) console.log(chalk.gray(`Recalling: "${query}"...`));
+  if (!options.silent) console.log(chalk.gray(t('recall.recalling', { query })));
 
   const tfidf = new TfIdf();
   const documents = [];
 
-  // active記憶（core/ peripheral/）+ 圧縮済み記憶（archive/compressed/）を検索対象に
-  // frozen（archive/frozen/）は通常の想起対象外——完全凍結状態
   const searchPaths = [
     path.join(CEREBRALOS_DIR, 'core/**/*.md'),
     path.join(CEREBRALOS_DIR, 'peripheral/**/*.md'),
@@ -67,11 +56,10 @@ export async function recallContext(query, options = { topK: 3, silent: false })
   const files = searchPaths.flatMap(pattern => globSync(pattern));
 
   if (files.length === 0) {
-    if (!options.silent) console.log(chalk.yellow('No memories found in the brain yet.'));
+    if (!options.silent) console.log(chalk.yellow(t('recall.no_memories')));
     return [];
   }
 
-  // TF-IDFにドキュメントを追加
   files.forEach((file, index) => {
     try {
       const content = fs.readFileSync(file, 'utf-8');
@@ -85,22 +73,15 @@ export async function recallContext(query, options = { topK: 3, silent: false })
         stats: fs.statSync(file),
         layer: getMemoryLayer(relativePath),
       });
-    } catch {
-      // 読めないファイルはスキップ
-    }
+    } catch {}
   });
 
-  // スコア計算
   const results = [];
   tfidf.tfidfs(query, (i, measure) => {
-    if (measure > 0) {
-      results.push({ ...documents[i], score: measure });
-    }
+    if (measure > 0) results.push({ ...documents[i], score: measure });
   });
 
-  // active記憶を優先しつつスコア順に並べ、上位を返す
   results.sort((a, b) => {
-    // active > compressed の層優先（同スコア帯では active が上に来る）
     const layerBonus = (r) => r.layer === 'active' ? 0.1 : 0;
     return (b.score + layerBonus(b)) - (a.score + layerBonus(a));
   });
@@ -108,9 +89,9 @@ export async function recallContext(query, options = { topK: 3, silent: false })
 
   if (!options.silent) {
     if (topResults.length === 0) {
-      console.log(chalk.yellow('Nothing surfaced. The memory may be frozen or never stored.'));
+      console.log(chalk.yellow(t('recall.nothing')));
     } else {
-      console.log(chalk.cyan('\n  ✦ Something surfaced.'));
+      console.log(chalk.cyan('\n  ' + t('recall.surfaced')));
       console.log('');
 
       topResults.forEach((res, i) => {
@@ -118,11 +99,10 @@ export async function recallContext(query, options = { topK: 3, silent: false })
         const isCompressed = res.layer === 'compressed';
         const snippet = extractSnippet(res.content, res.layer);
 
-        // 圧縮済み記憶は少し朧げに表示
         const nameColor = isCompressed ? chalk.dim : chalk.white;
         const snippetColor = isCompressed ? chalk.dim : chalk.gray;
         const ageLabel = isCompressed
-          ? chalk.dim(`  ◌ ${age} — faded`)
+          ? chalk.dim(`  ◌ ${age} — ${t('recall.faded')}`)
           : chalk.dim(`  ● ${age}`);
 
         console.log(nameColor(`  ${i + 1}. ${res.relativePath}`));

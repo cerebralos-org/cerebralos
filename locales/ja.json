@@ -1,0 +1,92 @@
+{
+  "wake": {
+    "greeting": "おはようございます。眠っている間に、一つのことを思い出しました。",
+    "from_date": "({{date}} の夢 — `cerebralos sleep` を実行してまた夢を見ましょう)"
+  },
+  "recall": {
+    "recalling": "想起中: \"{{query}}\"...",
+    "surfaced": "✦ 何かが浮かびました。",
+    "nothing": "何も浮かびませんでした。記憶が凍結されているか、まだ保存されていない可能性があります。",
+    "no_memories": "ブレインにまだ記憶がありません。",
+    "no_brain": "ブレインが見つかりません。まず `cerebralos init` を実行してください。",
+    "faded": "薄れた記憶"
+  },
+  "sleep": {
+    "start": "おやすみなさい。ブレインが夢を見ています...",
+    "forgetting": "Active Forgetting（圧縮 → 凍結）を実行中...",
+    "forgetting_done": "{{compressed}} 件の記憶を圧縮。{{frozen}} 件を凍結。{{protected}} 件を保護。",
+    "synthesizing": "記憶を統合中...",
+    "recalling": "夢の素材となる記憶を想起中...",
+    "synthesizing_via": "{{provider}} で {{count}} 件の記憶を統合中...",
+    "complete": "Sleep Job 完了。夢を dreams/{{date}}.md に保存しました。",
+    "hint_wake": "`cerebralos wake` で Morning Insight を読みましょう。",
+    "no_llm": "LLM が設定されていません — 夢が生成されませんでした。~/.cerebralos/.brain/config.json で LLM を設定してください。",
+    "no_brain": "ブレインが見つかりません。まず `cerebralos init` を実行してください。",
+    "no_memories": "記憶が見つかりません。まず記憶を追加してください。",
+    "llm_error": "LLM エラー: {{message}}",
+    "pushed": "GitHub にプッシュしました。",
+    "github_actions_mode": "GitHub Actions モード: 夢の生成をトリガーするため記憶をプッシュ中...",
+    "github_pushed": "GitHub にプッシュしました。今夜、あなたの AI が夢を見ます。",
+    "github_hint": "夢は GitHub Actions によって自動的にコミットされます。",
+    "no_remote": "リモートが設定されていません。まず GitHub リポジトリを追加してください:"
+  },
+  "setup": {
+    "title": "cerebralos setup",
+    "subtitle": "AIエージェントをブレインに接続します。",
+    "detected": "検出されたエージェント: {{agents}}",
+    "no_agents": "対応するエージェントが見つかりませんでした。",
+    "supported": "対応: claude-code, cursor, windsurf",
+    "run_with_agent": "実行: cerebralos setup --agent claude-code",
+    "add_to": "追加先: {{path}}",
+    "auto_written": "✓ {{agent}} — {{path}} に書き込みました",
+    "auto_failed": "✗ {{agent}} — 自動書き込みできませんでした",
+    "hint_auto": "すべての検出済みエージェントに自動書き込みするには:",
+    "hint_mcp": "MCP対応エージェントの場合、MCP設定に追加してください:",
+    "no_brain": "ブレインが見つかりません。まず `cerebralos init` を実行してください。"
+  },
+  "import": {
+    "header": "[CerebraLOS インポート]",
+    "source": "ソース: {{path}}",
+    "type": "タイプ: {{type}}",
+    "imported_file": "✓ インポート完了: {{filename}}",
+    "imported_folder": "✓ フォルダから {{count}} 件のファイルをインポートしました。",
+    "imported_chatgpt": "✓ ChatGPT の会話 {{count}} 件をインポートしました。",
+    "result": "{{count}} 件を ~/.cerebralos/peripheral/imported/ にインポートしました。",
+    "next": "次のステップ: `cerebralos sleep` を実行して記憶をブレインに統合してください。",
+    "no_brain": "ブレインが見つかりません。まず `cerebralos init` を実行してください。",
+    "no_from": "--from <パス> でソースを指定してください。",
+    "not_found_file": "ファイルが見つかりません: {{path}}",
+    "not_found_folder": "フォルダが見つかりません: {{path}}",
+    "no_md": "指定フォルダに Markdown ファイルが見つかりませんでした。",
+    "json_error": "JSON ファイルの解析に失敗しました。正しい ChatGPT エクスポート形式か確認してください。",
+    "unknown_type": "不明なタイプ: {{type}}"
+  },
+  "init": {
+    "start": "CerebraLOS を初期化中...",
+    "mode_global": "モード: グローバル ({{path}})",
+    "mode_local": "モード: ローカル ({{path}})",
+    "already_exists": "ブレインはすでに存在します: {{path}}",
+    "created": "core/, peripheral/, dreams/, archive/ ディレクトリを作成しました。",
+    "ready": "ブレインの準備が整いました: {{path}}",
+    "tagline": "記録するな。記憶せよ。"
+  },
+  "hook": {
+    "installed": "Zero UI フックを {{path}} にインストールしました。",
+    "already_exists": "Zero UI フックはすでに {{path}} に存在します。",
+    "created": "{{path}} を作成し、Zero UI フックをインストールしました。",
+    "unsupported_shell": "未対応のシェルです。`cerebralos wake` をシェルプロファイルに手動で追加してください。"
+  },
+  "explore": {
+    "title": "✦ CerebraLOS Explorer  — 思考の間（ま）",
+    "no_agents": "まだエージェントが接続されていません。~/.cerebralos/peripheral/ に記憶を追加してください。",
+    "connected_agents": "接続中のエージェント",
+    "no_content": "（コンテンツがありません。`cerebralos sleep` を実行してドリームを生成してください。）",
+    "back_hint": "[任意のキー] 戻る  [q] 終了",
+    "prompt": "何を探しますか？",
+    "latest_dream": "✦ 最新のドリーム (latest.md)",
+    "no_dream_yet": "まだありません — cerebralos sleep を実行してください",
+    "exit": "↩ 終了",
+    "nav_hint": "[↑↓] 移動  [Enter] 選択  [q] 終了",
+    "goodbye": "さようなら。あなたの思考はここに残ります。"
+  }
+}

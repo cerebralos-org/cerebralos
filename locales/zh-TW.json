@@ -1,0 +1,92 @@
+{
+  "wake": {
+    "greeting": "早上好。在你睡覺的時候，我記起了一些事情。",
+    "from_date": "(從 {{date}} 起 — 執行 `cerebralos sleep` 再次進入夢鄉)"
+  },
+  "recall": {
+    "recalling": "回想中：「{{query}}」...",
+    "surfaced": "✦ 有東西浮現了。",
+    "nothing": "沒有東西浮現。該記憶可能已被凍結或從未儲存。",
+    "no_memories": "大腦中尚未找到任何記憶。",
+    "no_brain": "未找到大腦。請先執行 `cerebralos init`。",
+    "faded": "已淡出"
+  },
+  "sleep": {
+    "start": "晚安。你的大腦現在正在夢境中...",
+    "forgetting": "正在執行主動遺忘（壓縮 → 凍結）...",
+    "forgetting_done": "已壓縮 {{compressed}} 條記憶。已凍結 {{frozen}} 條。已保護 {{protected}} 條。",
+    "synthesizing": "正在合成記憶...",
+    "recalling": "正在回想記憶以合成夢境...",
+    "synthesizing_via": "透過 {{provider}} 合成 {{count}} 條記憶...",
+    "complete": "睡眠任務完成。夢境已儲存至 dreams/{{date}}.md",
+    "hint_wake": "執行 `cerebralos wake` 即可閱讀你的早晨洞察。",
+    "no_llm": "未配置大型語言模型 (LLM) — 夢境為空。請在 ~/.cerebralos/.brain/config.json 中設定 LLM。",
+    "no_brain": "未找到大腦。請先執行 `cerebralos init`。",
+    "no_memories": "未找到記憶。請先添加一些記憶。",
+    "llm_error": "大型語言模型 (LLM) 錯誤：{{message}}",
+    "pushed": "已推送到 GitHub。",
+    "github_actions_mode": "GitHub Actions 模式：正在推送記憶以觸發夢境生成...",
+    "github_pushed": "已推送到 GitHub。你的 AI 將在今晚做夢。",
+    "github_hint": "夢境將由 GitHub Actions 自動提交回去。",
+    "no_remote": "未配置遠端倉庫。請先添加你的 GitHub 倉庫："
+  },
+  "setup": {
+    "title": "cerebralos 設定",
+    "subtitle": "將你的大腦連接到 AI 代理。",
+    "detected": "偵測到的代理：{{agents}}",
+    "no_agents": "未偵測到支援的代理。",
+    "supported": "支援：claude-code, cursor, windsurf",
+    "run_with_agent": "執行：cerebralos setup --agent claude-code",
+    "add_to": "添加到：{{path}}",
+    "auto_written": "✓ {{agent}} — 已寫入至 {{path}}",
+    "auto_failed": "✗ {{agent}} — 無法自動寫入",
+    "hint_auto": "若要自動寫入至所有偵測到的代理：",
+    "hint_mcp": "對於基於 MCP 的代理，請添加到你的 MCP 配置：",
+    "no_brain": "未找到大腦。請先執行 `cerebralos init`。"
+  },
+  "import": {
+    "header": "[CerebraLOS 匯入]",
+    "source": "來源：{{path}}",
+    "type": "類型：{{type}}",
+    "imported_file": "✓ 已匯入：{{filename}}",
+    "imported_folder": "✓ 已從資料夾匯入 {{count}} 個檔案。",
+    "imported_chatgpt": "✓ 已匯入 {{count}} 個 ChatGPT 對話。",
+    "result": "{{count}} 個檔案已匯入至：~/.cerebralos/peripheral/imported/",
+    "next": "下一步：執行 `cerebralos sleep` 將這些記憶整合到你的大腦中。",
+    "no_brain": "未找到大腦。請先執行 `cerebralos init`。",
+    "no_from": "請使用 --from <路徑> 指定來源。",
+    "not_found_file": "找不到檔案：{{path}}",
+    "not_found_folder": "找不到資料夾：{{path}}",
+    "no_md": "在指定資料夾中未找到 Markdown 檔案。",
+    "json_error": "解析 JSON 檔案失敗。請確認它是有效的 ChatGPT 匯出檔案。",
+    "unknown_type": "未知類型：{{type}}"
+  },
+  "init": {
+    "start": "正在初始化 CerebraLOS...",
+    "mode_global": "模式：全域 ({{path}})",
+    "mode_local": "模式：本地 ({{path}})",
+    "already_exists": "大腦已存在於 {{path}}",
+    "created": "已創建 core/, peripheral/, dreams/ 和 archive/ 目錄。",
+    "ready": "你的大腦已就緒於 {{path}}",
+    "tagline": "別再儲存。開始記憶。"
+  },
+  "hook": {
+    "installed": "已成功在 {{path}} 安裝 Zero UI 鉤子。",
+    "already_exists": "Zero UI 鉤子已存在於 {{path}}",
+    "created": "已建立 {{path}} 並安裝了 Zero UI 鉤子",
+    "unsupported_shell": "不支援的 Shell。請手動將 `cerebralos wake` 加入您的 Shell 設定檔。"
+  },
+  "explore": {
+    "title": "✦ CerebraLOS 探索器 — 你的思緒之間的空間",
+    "no_agents": "尚未連接任何代理。請將記憶添加到 ~/.cerebralos/peripheral/",
+    "prompt": "你想探索什麼？",
+    "latest_dream": "✦ 最新夢境 (latest.md)",
+    "exit": "↩ 離開",
+    "nav_hint": "[↑↓] 導航  [Enter] 選擇  [q] 退出",
+    "connected_agents": "已連接的代理程式",
+    "no_content": "(尚未有任何內容。執行 `cerebralos sleep` 以產生夢境。)",
+    "back_hint": "[任意鍵] 返回  [q] 結束",
+    "no_dream_yet": "尚無夢境 — 請先執行 cerebralos sleep",
+    "goodbye": "再見。您的思緒仍在。"
+  }
+}

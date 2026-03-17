@@ -3,6 +3,7 @@ import path from 'path';
 import os from 'os';
 import chalk from 'chalk';
 import simpleGit from 'simple-git';
+import { t } from './i18n.js';
 
 const GLOBAL_DIR = path.join(os.homedir(), '.cerebralos');
 
@@ -17,16 +18,16 @@ export async function initBrain(options = {}) {
   const brainDir = getBrainDir(options);
   const isLocal = options.local;
 
-  console.log(chalk.green('Initializing CerebraLOS...'));
+  console.log(chalk.green(t('init.start')));
 
   if (isLocal) {
-    console.log(chalk.gray(`Mode: local (${brainDir})`));
+    console.log(chalk.gray(t('init.mode_local', { path: brainDir })));
   } else {
-    console.log(chalk.gray(`Mode: global (${brainDir})`));
+    console.log(chalk.gray(t('init.mode_global', { path: brainDir })));
   }
 
   if (fs.existsSync(brainDir)) {
-    console.log(chalk.yellow(`Brain already exists at ${brainDir}`));
+    console.log(chalk.yellow(t('init.already_exists', { path: brainDir })));
     return;
   }
 
@@ -109,7 +110,7 @@ export async function initBrain(options = {}) {
   await git.add('.');
   await git.commit('Initial commit: Birth of a new brain');
 
-  console.log(chalk.gray('Created core/, peripheral/, dreams/, and archive/ directories.'));
-  console.log(chalk.cyan(`Your brain is ready at ${brainDir}`));
-  console.log(chalk.cyan('Stop saving. Start remembering.'));
+  console.log(chalk.gray(t('init.created')));
+  console.log(chalk.cyan(t('init.ready', { path: brainDir })));
+  console.log(chalk.cyan(t('init.tagline')));
 }

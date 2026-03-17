@@ -112,6 +112,8 @@ CerebraLOS mirrors the human brain's architecture:
   - [English](docs/en/AGENTS.md) | [日本語](docs/ja/AGENTS.md) | [简体中文](docs/zh-CN/AGENTS.md) | [繁體中文](docs/zh-TW/AGENTS.md) | [한국어](docs/ko/AGENTS.md) | [Español](docs/es/AGENTS.md) | [Français](docs/fr/AGENTS.md) | [Deutsch](docs/de/AGENTS.md) | [Português](docs/pt/AGENTS.md) | [Русский](docs/ru/AGENTS.md) | [Italiano](docs/it/AGENTS.md) | [हिन्दी](docs/hi/AGENTS.md) | [العربية](docs/ar/AGENTS.md)
 - **Memory Migration**: Import memories from ChatGPT, Claude, Obsidian, and more.
   - [English](docs/en/MIGRATION.md) | [日本語](docs/ja/MIGRATION.md) | [简体中文](docs/zh-CN/MIGRATION.md) | [한국어](docs/ko/MIGRATION.md) | [Español](docs/es/MIGRATION.md) | [Français](docs/fr/MIGRATION.md) | [Deutsch](docs/de/MIGRATION.md)
+- **Command Reference**: Every `cerebralos` command, option, and example in one place.
+  - [English](docs/en/REFERENCE.md) | [日本語](docs/ja/REFERENCE.md) | [简体中文](docs/zh-CN/REFERENCE.md) | [繁體中文](docs/zh-TW/REFERENCE.md) | [한국어](docs/ko/REFERENCE.md) | [Español](docs/es/REFERENCE.md) | [Français](docs/fr/REFERENCE.md) | [Deutsch](docs/de/REFERENCE.md) | [Português](docs/pt/REFERENCE.md) | [Русский](docs/ru/REFERENCE.md) | [Italiano](docs/it/REFERENCE.md) | [हिन्दी](docs/hi/REFERENCE.md) | [العربية](docs/ar/REFERENCE.md)
 
 ## License
 

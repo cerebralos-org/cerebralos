@@ -1,0 +1,92 @@
+{
+  "wake": {
+    "greeting": "早上好。在你睡觉的时候，我记起了一些事情。",
+    "from_date": "（自 {{date}} — 运行 `cerebralos sleep` 再次做梦）"
+  },
+  "recall": {
+    "recalling": "回忆中：“{{query}}”...",
+    "surfaced": "✦ 有东西浮现了。",
+    "nothing": "没有东西浮现。该记忆可能已被冻结或从未存储。",
+    "no_memories": "大脑中尚未找到任何记忆。",
+    "no_brain": "未找到大脑。请先运行 `cerebralos init`。",
+    "faded": "已淡化"
+  },
+  "sleep": {
+    "start": "晚安。你的大脑现在正在做梦...",
+    "forgetting": "正在运行主动遗忘（压缩 → 冻结）...",
+    "forgetting_done": "已压缩 {{compressed}} 条记忆。已冻结 {{frozen}} 条。已保护 {{protected}} 条。",
+    "synthesizing": "正在合成记忆...",
+    "recalling": "正在回忆记忆以进行梦境合成...",
+    "synthesizing_via": "正在通过 {{provider}} 合成 {{count}} 条记忆...",
+    "complete": "睡眠任务完成。梦境已保存到 dreams/{{date}}.md",
+    "hint_wake": "运行 `cerebralos wake` 以阅读你的晨间洞察。",
+    "no_llm": "未配置 LLM — 梦境为空。请在 ~/.cerebralos/.brain/config.json 中设置 LLM。",
+    "no_brain": "未找到大脑。请先运行 `cerebralos init`。",
+    "no_memories": "未找到记忆。请先添加一些记忆。",
+    "llm_error": "LLM 错误：{{message}}",
+    "pushed": "已推送到 GitHub。",
+    "github_actions_mode": "GitHub Actions 模式：正在推送记忆以触发梦境生成...",
+    "github_pushed": "已推送到 GitHub。你的 AI 将在今晚做梦。",
+    "github_hint": "梦境将由 GitHub Actions 自动提交回去。",
+    "no_remote": "未配置远程仓库。请先添加你的 GitHub 仓库："
+  },
+  "setup": {
+    "title": "cerebralos 设置",
+    "subtitle": "将你的大脑连接到 AI 代理。",
+    "detected": "检测到的代理：{{agents}}",
+    "no_agents": "未检测到任何受支持的代理。",
+    "supported": "支持：claude-code, cursor, windsurf",
+    "run_with_agent": "运行：cerebralos setup --agent claude-code",
+    "add_to": "添加到：{{path}}",
+    "auto_written": "✓ {{agent}} — 已写入 {{path}}",
+    "auto_failed": "✗ {{agent}} — 无法自动写入",
+    "hint_auto": "要自动写入所有检测到的代理：",
+    "hint_mcp": "对于基于 MCP 的代理，请添加到你的 MCP 配置中：",
+    "no_brain": "未找到大脑。请先运行 `cerebralos init`。"
+  },
+  "import": {
+    "header": "[CerebraLOS 导入]",
+    "source": "来源：{{path}}",
+    "type": "类型：{{type}}",
+    "imported_file": "✓ 已导入：{{filename}}",
+    "imported_folder": "✓ 已从文件夹导入 {{count}} 个文件。",
+    "imported_chatgpt": "✓ 已导入 {{count}} 个 ChatGPT 对话。",
+    "result": "{{count}} 个文件已导入到：~/.cerebralos/peripheral/imported/",
+    "next": "下一步：运行 `cerebralos sleep` 将这些记忆整合到你的大脑中。",
+    "no_brain": "未找到大脑。请先运行 `cerebralos init`。",
+    "no_from": "请使用 --from <路径> 指定来源",
+    "not_found_file": "文件未找到：{{path}}",
+    "not_found_folder": "文件夹未找到：{{path}}",
+    "no_md": "在指定文件夹中未找到 Markdown 文件。",
+    "json_error": "解析 JSON 文件失败。请确保它是有效的 ChatGPT 导出文件。",
+    "unknown_type": "未知类型：{{type}}"
+  },
+  "init": {
+    "start": "正在初始化 CerebraLOS...",
+    "mode_global": "模式：全局 ({{path}})",
+    "mode_local": "模式：本地 ({{path}})",
+    "already_exists": "大脑已存在于 {{path}}",
+    "created": "已创建 core/, peripheral/, dreams/ 和 archive/ 目录。",
+    "ready": "你的大脑已准备就绪，位于 {{path}}",
+    "tagline": "停止保存。开始记忆。"
+  },
+  "hook": {
+    "installed": "已成功在 {{path}} 安装 Zero UI 钩子",
+    "already_exists": "Zero UI hook 已存在于 {{path}} 中",
+    "created": "已创建 {{path}} 并安装了 Zero UI hook",
+    "unsupported_shell": "不支持的 shell。请手动将 `cerebralos wake` 添加到您的 shell 配置文件中。"
+  },
+  "explore": {
+    "title": "✦ CerebraLOS 探索器 — 思维之间的空间",
+    "no_agents": "尚未连接任何代理。请将记忆添加到 ~/.cerebralos/peripheral/",
+    "prompt": "你想探索什么？",
+    "latest_dream": "✦ 最新梦境 (latest.md)",
+    "exit": "↩ 退出",
+    "nav_hint": "[↑↓] 导航  [Enter] 选择  [q] 退出",
+    "connected_agents": "已连接的代理",
+    "no_content": "(暂无内容。运行 `cerebralos sleep` 以生成梦境。)",
+    "back_hint": "[任意键] 返回  [q] 退出",
+    "no_dream_yet": "暂无 — 请先运行 cerebralos sleep",
+    "goodbye": "再见。您的思想永存。"
+  }
+}

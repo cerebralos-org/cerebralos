@@ -1,0 +1,92 @@
+{
+  "wake": {
+    "greeting": "सुप्रभात। जब आप सो रहे थे, मुझे कुछ याद आया।",
+    "from_date": "({{date}} से — फिर से सपने देखने के लिए `cerebralos sleep` चलाएँ)"
+  },
+  "recall": {
+    "recalling": "याद कर रहा हूँ: \"{{query}}\"...",
+    "surfaced": "✦ कुछ सामने आया।",
+    "nothing": "कुछ भी सामने नहीं आया। स्मृति जमी हुई हो सकती है या कभी संग्रहीत नहीं की गई।",
+    "no_memories": "दिमाग में अभी तक कोई यादें नहीं मिलीं।",
+    "no_brain": "दिमाग नहीं मिला। पहले `cerebralos init` चलाएँ।",
+    "faded": "फीकी पड़ गई"
+  },
+  "sleep": {
+    "start": "शुभ रात्रि। आपका दिमाग अब सपने देख रहा है...",
+    "forgetting": "सक्रिय विस्मरण चल रहा है (संपीड़ित करें → फ्रीज करें)...",
+    "forgetting_done": "{{compressed}} यादें संपीड़ित की गईं। {{frozen}} जमी हुई। {{protected}} संरक्षित।",
+    "synthesizing": "यादों का संश्लेषण हो रहा है...",
+    "recalling": "स्वप्न संश्लेषण के लिए यादें याद कर रहा हूँ...",
+    "synthesizing_via": "{{provider}} के माध्यम से {{count}} यादों का संश्लेषण हो रहा है...",
+    "complete": "नींद का कार्य पूरा हुआ। सपना dreams/{{date}}.md में सहेजा गया।",
+    "hint_wake": "अपनी सुबह की अंतर्दृष्टि पढ़ने के लिए `cerebralos wake` चलाएँ।",
+    "no_llm": "कोई LLM कॉन्फ़िगर नहीं किया गया है — सपने खाली हैं। ~/.cerebralos/.brain/config.json में llm सेट करें।",
+    "no_brain": "दिमाग नहीं मिला। पहले `cerebralos init` चलाएँ।",
+    "no_memories": "कोई यादें नहीं मिलीं। पहले कुछ यादें जोड़ें।",
+    "llm_error": "LLM त्रुटि: {{message}}",
+    "pushed": "गिटहब पर धकेल दिया गया।",
+    "github_actions_mode": "गिटहब एक्शन्स मोड: सपने उत्पन्न करने के लिए यादें धकेली जा रही हैं...",
+    "github_pushed": "गिटहब पर धकेल दिया गया। आपकी AI आज रात सपना देखेगी।",
+    "github_hint": "सपना गिटहब एक्शन्स द्वारा स्वचालित रूप से वापस प्रतिबद्ध किया जाएगा।",
+    "no_remote": "कोई रिमोट कॉन्फ़िगर नहीं किया गया है। पहले अपनी गिटहब रेपो जोड़ें:"
+  },
+  "setup": {
+    "title": "cerebralos सेटअप",
+    "subtitle": "आपके दिमाग को AI एजेंटों से जोड़ रहा है।",
+    "detected": "पता लगाए गए एजेंट: {{agents}}",
+    "no_agents": "कोई समर्थित एजेंट नहीं मिला।",
+    "supported": "समर्थित: claude-code, cursor, windsurf",
+    "run_with_agent": "चलाएँ: cerebralos setup --agent claude-code",
+    "add_to": "इसमें जोड़ें: {{path}}",
+    "auto_written": "✓ {{agent}} — {{path}} में लिखा गया",
+    "auto_failed": "✗ {{agent}} — स्वचालित रूप से नहीं लिखा जा सका",
+    "hint_auto": "सभी पता लगाए गए एजेंटों में स्वचालित रूप से लिखने के लिए:",
+    "hint_mcp": "MCP-आधारित एजेंटों के लिए, अपनी MCP कॉन्फ़िग में जोड़ें:",
+    "no_brain": "दिमाग नहीं मिला। पहले `cerebralos init` चलाएँ।"
+  },
+  "import": {
+    "header": "[CerebraLOS इम्पोर्ट]",
+    "source": "स्रोत: {{path}}",
+    "type": "प्रकार: {{type}}",
+    "imported_file": "✓ इम्पोर्ट किया गया: {{filename}}",
+    "imported_folder": "✓ फ़ोल्डर से {{count}} फ़ाइलें इम्पोर्ट की गईं।",
+    "imported_chatgpt": "✓ {{count}} ChatGPT वार्तालाप इम्पोर्ट किए गए।",
+    "result": "{{count}} फ़ाइल(ें) इसमें इम्पोर्ट की गईं: ~/.cerebralos/peripheral/imported/",
+    "next": "अगला कदम: इन यादों को अपने दिमाग में एकीकृत करने के लिए `cerebralos sleep` चलाएँ।",
+    "no_brain": "दिमाग नहीं मिला। पहले `cerebralos init` चलाएँ।",
+    "no_from": "कृपया --from <path> के साथ एक स्रोत निर्दिष्ट करें।",
+    "not_found_file": "फ़ाइल नहीं मिली: {{path}}",
+    "not_found_folder": "फ़ोल्डर नहीं मिला: {{path}}",
+    "no_md": "निर्दिष्ट फ़ोल्डर में कोई Markdown फ़ाइलें नहीं मिलीं।",
+    "json_error": "JSON फ़ाइल को पार्स करने में विफल। सुनिश्चित करें कि यह एक वैध ChatGPT निर्यात है।",
+    "unknown_type": "अज्ञात प्रकार: {{type}}"
+  },
+  "init": {
+    "start": "CerebraLOS इनिशियलाइज़ कर रहा है...",
+    "mode_global": "मोड: ग्लोबल ({{path}})",
+    "mode_local": "मोड: लोकल ({{path}})",
+    "already_exists": "दिमाग पहले से ही {{path}} पर मौजूद है।",
+    "created": "core/, peripheral/, dreams/, और archive/ निर्देशिकाएँ बनाई गईं।",
+    "ready": "आपका दिमाग {{path}} पर तैयार है।",
+    "tagline": "सहेजना बंद करें। याद रखना शुरू करें।"
+  },
+  "hook": {
+    "installed": "Zero UI हुक {{path}} में सफलतापूर्वक स्थापित किया गया।",
+    "already_exists": "जीरो यूआई हुक {{path}} में पहले से मौजूद है",
+    "created": "{{path}} बनाया गया और जीरो यूआई हुक स्थापित किया गया",
+    "unsupported_shell": "असमर्थित शेल। कृपया `cerebralos wake` को अपने शेल प्रोफाइल में मैन्युअल रूप से जोड़ें।"
+  },
+  "explore": {
+    "title": "✦ CerebraLOS एक्सप्लोरर — आपके विचारों के बीच का स्थान",
+    "no_agents": "अभी तक कोई एजेंट कनेक्टेड नहीं है। ~/.cerebralos/peripheral/ में यादें जोड़ें।",
+    "prompt": "आप क्या खोजना चाहेंगे?",
+    "latest_dream": "✦ नवीनतम स्वप्न (latest.md)",
+    "exit": "↩ बाहर निकलें",
+    "nav_hint": "[↑↓] नेविगेट करें [Enter] चुनें [q] छोड़ें",
+    "connected_agents": "जुड़े हुए एजेंट",
+    "no_content": "(अभी कोई सामग्री नहीं है। सपने उत्पन्न करने के लिए `cerebralos sleep` चलाएँ।)",
+    "back_hint": "[कोई भी कुंजी] वापस  [q] बाहर निकलें",
+    "no_dream_yet": "अभी तक कोई नहीं — पहले `cerebralos sleep` चलाएँ",
+    "goodbye": "अलविदा। आपके विचार बने रहेंगे।"
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "wake": {
+    "greeting": "Good morning. I remembered something while you slept.",
+    "from_date": "(from {{date}} — run `cerebralos sleep` to dream again)"
+  },
+  "recall": {
+    "recalling": "Recalling: \"{{query}}\"...",
+    "surfaced": "✦ Something surfaced.",
+    "nothing": "Nothing surfaced. The memory may be frozen or never stored.",
+    "no_memories": "No memories found in the brain yet.",
+    "no_brain": "Brain not found. Run `cerebralos init` first.",
+    "faded": "faded"
+  },
+  "sleep": {
+    "start": "Good night. Your brain is now dreaming...",
+    "forgetting": "Running Active Forgetting (compress → freeze)...",
+    "forgetting_done": "Compressed {{compressed}} memories. Frozen {{frozen}}. Protected {{protected}}.",
+    "synthesizing": "Synthesizing memories...",
+    "recalling": "Recalling memories for dream synthesis...",
+    "synthesizing_via": "Synthesizing {{count}} memories via {{provider}}...",
+    "complete": "Sleep Job complete. Dream saved to dreams/{{date}}.md",
+    "hint_wake": "Run `cerebralos wake` to read your Morning Insight.",
+    "no_llm": "No LLM configured — dreams are empty. Set up llm in ~/.cerebralos/.brain/config.json",
+    "no_brain": "Brain not found. Run `cerebralos init` first.",
+    "no_memories": "No memories found. Add some memories first.",
+    "llm_error": "LLM error: {{message}}",
+    "pushed": "Pushed to GitHub.",
+    "github_actions_mode": "GitHub Actions mode: pushing memories to trigger dream generation...",
+    "github_pushed": "Pushed to GitHub. Your AI will dream tonight.",
+    "github_hint": "The dream will be committed back automatically by GitHub Actions.",
+    "no_remote": "No remote configured. Add your GitHub repo first:"
+  },
+  "setup": {
+    "title": "cerebralos setup",
+    "subtitle": "Connecting your brain to AI agents.",
+    "detected": "Detected agents: {{agents}}",
+    "no_agents": "No supported agents detected.",
+    "supported": "Supported: claude-code, cursor, windsurf",
+    "run_with_agent": "Run: cerebralos setup --agent claude-code",
+    "add_to": "Add to: {{path}}",
+    "auto_written": "✓ {{agent}} — written to {{path}}",
+    "auto_failed": "✗ {{agent}} — could not auto-write",
+    "hint_auto": "To auto-write to all detected agents:",
+    "hint_mcp": "For MCP-based agents, add to your MCP config:",
+    "no_brain": "Brain not found. Run `cerebralos init` first."
+  },
+  "import": {
+    "header": "[CerebraLOS Import]",
+    "source": "Source: {{path}}",
+    "type": "Type: {{type}}",
+    "imported_file": "✓ Imported: {{filename}}",
+    "imported_folder": "✓ Imported {{count}} files from folder.",
+    "imported_chatgpt": "✓ Imported {{count}} ChatGPT conversations.",
+    "result": "{{count}} file(s) imported to: ~/.cerebralos/peripheral/imported/",
+    "next": "Next step: Run `cerebralos sleep` to integrate these memories into your brain.",
+    "no_brain": "Brain not found. Run `cerebralos init` first.",
+    "no_from": "Please specify a source with --from <path>",
+    "not_found_file": "File not found: {{path}}",
+    "not_found_folder": "Folder not found: {{path}}",
+    "no_md": "No Markdown files found in the specified folder.",
+    "json_error": "Failed to parse JSON file. Make sure it is a valid ChatGPT export.",
+    "unknown_type": "Unknown type: {{type}}"
+  },
+  "init": {
+    "start": "Initializing CerebraLOS...",
+    "mode_global": "Mode: global ({{path}})",
+    "mode_local": "Mode: local ({{path}})",
+    "already_exists": "Brain already exists at {{path}}",
+    "created": "Created core/, peripheral/, dreams/, and archive/ directories.",
+    "ready": "Your brain is ready at {{path}}",
+    "tagline": "Stop saving. Start remembering."
+  },
+  "hook": {
+    "installed": "Successfully installed Zero UI hook in {{path}}",
+    "already_exists": "Zero UI hook already exists in {{path}}",
+    "created": "Created {{path}} and installed Zero UI hook",
+    "unsupported_shell": "Unsupported shell. Please add `cerebralos wake` to your shell profile manually."
+  },
+  "explore": {
+    "title": "✦ CerebraLOS Explorer  — The space between your thoughts",
+    "no_agents": "No agents connected yet. Add memories to ~/.cerebralos/peripheral/",
+    "connected_agents": "Connected Agents",
+    "no_content": "(No content yet. Run `cerebralos sleep` to generate dreams.)",
+    "back_hint": "[any key] Back  [q] Quit",
+    "prompt": "What would you like to explore?",
+    "latest_dream": "✦ Latest Dream  (latest.md)",
+    "no_dream_yet": "none yet — run cerebralos sleep first",
+    "exit": "↩ Exit",
+    "nav_hint": "[↑↓] Navigate  [Enter] Select  [q] Quit",
+    "goodbye": "Goodbye. Your thoughts remain."
+  }
+}

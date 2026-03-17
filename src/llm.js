@@ -130,6 +130,36 @@ Respond with only the compressed memory, no preamble.`;
 }
 
 /**
+ * Gemini API でDreamを生成する
+ */
+async function generateWithGemini(prompt, llmConfig) {
+  let GoogleGenerativeAI;
+  try {
+    const mod = await import('@google/generative-ai');
+    GoogleGenerativeAI = mod.GoogleGenerativeAI;
+  } catch (e) {
+    throw new Error(
+      'Gemini provider requires @google/generative-ai.\n' +
+      'Run: npm install -g @google/generative-ai'
+    );
+  }
+
+  const apiKeyEnv = llmConfig.api_key_env || 'GEMINI_API_KEY';
+  const apiKey = process.env[apiKeyEnv];
+  if (!apiKey) {
+    throw new Error(
+      `API key not found. Set the ${apiKeyEnv} environment variable.\n` +
+      'Example: export GEMINI_API_KEY=...'
+    );
+  }
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: llmConfig.model || 'gemini-2.0-flash' });
+  const result = await model.generateContent(prompt);
+  return result.response.text();
+}
+
+/**
  * Dream生成のメインエントリーポイント
  *
  * @param {Array} memories - recallContextの結果配列（relativePath, content）
@@ -147,8 +177,9 @@ export async function generateDream(memories, config) {
 
   if (provider === 'claude') return await generateWithClaude(prompt, llmConfig);
   if (provider === 'openai') return await generateWithOpenAI(prompt, llmConfig);
+  if (provider === 'gemini') return await generateWithGemini(prompt, llmConfig);
 
-  throw new Error(`Unknown LLM provider: "${provider}". Use: claude | openai | github-actions | none`);
+  throw new Error(`Unknown LLM provider: "${provider}". Use: claude | openai | gemini | github-actions | none`);
 }
 
 /**
@@ -169,6 +200,7 @@ export async function compressMemory(filePath, content, config) {
 
   if (provider === 'claude') return await generateWithClaude(prompt, llmConfig);
   if (provider === 'openai') return await generateWithOpenAI(prompt, llmConfig);
+  if (provider === 'gemini') return await generateWithGemini(prompt, llmConfig);
 
   return null;
 }

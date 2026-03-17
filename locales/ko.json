@@ -1,0 +1,92 @@
+{
+  "wake": {
+    "greeting": "좋은 아침입니다. 주무시는 동안 뭔가 기억났습니다.",
+    "from_date": "({{date}}부터 — 다시 꿈을 꾸려면 `cerebralos sleep`을 실행하세요)"
+  },
+  "recall": {
+    "recalling": "회상 중: \"{{query}}\"...",
+    "surfaced": "✦ 무언가 떠올랐습니다.",
+    "nothing": "아무것도 떠오르지 않았습니다. 기억이 동결되었거나 저장되지 않았을 수 있습니다.",
+    "no_memories": "뇌에서 아직 기억을 찾을 수 없습니다.",
+    "no_brain": "뇌를 찾을 수 없습니다. 먼저 `cerebralos init`을 실행하세요.",
+    "faded": "희미해짐"
+  },
+  "sleep": {
+    "start": "안녕히 주무세요. 당신의 뇌는 지금 꿈을 꾸고 있습니다...",
+    "forgetting": "능동적 망각 실행 중 (압축 → 동결)...",
+    "forgetting_done": "{{compressed}}개의 기억을 압축했습니다. {{frozen}}개 동결. {{protected}}개 보호.",
+    "synthesizing": "기억 합성 중...",
+    "recalling": "꿈 합성을 위해 기억 회상 중...",
+    "synthesizing_via": "{{provider}}를 통해 {{count}}개의 기억 합성 중...",
+    "complete": "수면 작업 완료. 꿈이 dreams/{{date}}.md에 저장되었습니다.",
+    "hint_wake": "당신의 아침 통찰을 읽으려면 `cerebralos wake`을 실행하세요.",
+    "no_llm": "LLM이 구성되지 않았습니다 — 꿈이 비어있습니다. ~/.cerebralos/.brain/config.json에서 LLM을 설정하세요.",
+    "no_brain": "뇌를 찾을 수 없습니다. 먼저 `cerebralos init`을 실행하세요.",
+    "no_memories": "기억을 찾을 수 없습니다. 먼저 기억을 추가하세요.",
+    "llm_error": "LLM 오류: {{message}}",
+    "pushed": "GitHub에 푸시되었습니다.",
+    "github_actions_mode": "GitHub Actions 모드: 꿈 생성을 트리거하기 위해 기억 푸시 중...",
+    "github_pushed": "GitHub에 푸시되었습니다. 당신의 AI는 오늘 밤 꿈을 꿀 것입니다.",
+    "github_hint": "꿈은 GitHub Actions에 의해 자동으로 다시 커밋됩니다.",
+    "no_remote": "원격이 구성되지 않았습니다. 먼저 GitHub 저장소를 추가하세요:"
+  },
+  "setup": {
+    "title": "cerebralos 설정",
+    "subtitle": "당신의 뇌를 AI 에이전트에 연결합니다.",
+    "detected": "감지된 에이전트: {{agents}}",
+    "no_agents": "지원되는 에이전트가 감지되지 않았습니다.",
+    "supported": "지원됨: claude-code, cursor, windsurf",
+    "run_with_agent": "실행: cerebralos setup --agent claude-code",
+    "add_to": "추가할 위치: {{path}}",
+    "auto_written": "✓ {{agent}} — {{path}}에 기록되었습니다.",
+    "auto_failed": "✗ {{agent}} — 자동으로 기록할 수 없습니다.",
+    "hint_auto": "감지된 모든 에이전트에 자동으로 기록하려면:",
+    "hint_mcp": "MCP 기반 에이전트의 경우, MCP 설정에 추가하세요:",
+    "no_brain": "뇌를 찾을 수 없습니다. 먼저 `cerebralos init`을 실행하세요."
+  },
+  "import": {
+    "header": "[CerebraLOS 가져오기]",
+    "source": "출처: {{path}}",
+    "type": "유형: {{type}}",
+    "imported_file": "✓ 가져옴: {{filename}}",
+    "imported_folder": "✓ 폴더에서 {{count}}개의 파일을 가져왔습니다.",
+    "imported_chatgpt": "✓ {{count}}개의 ChatGPT 대화를 가져왔습니다.",
+    "result": "{{count}}개의 파일이 다음으로 가져와졌습니다: ~/.cerebralos/peripheral/imported/",
+    "next": "다음 단계: 이 기억들을 당신의 뇌에 통합하려면 `cerebralos sleep`을 실행하세요.",
+    "no_brain": "뇌를 찾을 수 없습니다. 먼저 `cerebralos init`을 실행하세요.",
+    "no_from": "--from <경로>를 사용하여 출처를 지정하십시오.",
+    "not_found_file": "파일을 찾을 수 없습니다: {{path}}",
+    "not_found_folder": "폴더를 찾을 수 없습니다: {{path}}",
+    "no_md": "지정된 폴더에서 Markdown 파일을 찾을 수 없습니다.",
+    "json_error": "JSON 파일 구문 분석에 실패했습니다. 유효한 ChatGPT 내보내기인지 확인하세요.",
+    "unknown_type": "알 수 없는 유형: {{type}}"
+  },
+  "init": {
+    "start": "CerebraLOS 초기화 중...",
+    "mode_global": "모드: 전역 ({{path}})",
+    "mode_local": "모드: 로컬 ({{path}})",
+    "already_exists": "{{path}}에 뇌가 이미 존재합니다.",
+    "created": "core/, peripheral/, dreams/, archive/ 디렉토리를 생성했습니다.",
+    "ready": "당신의 뇌가 {{path}}에서 준비되었습니다.",
+    "tagline": "저장을 멈추세요. 기억을 시작하세요."
+  },
+  "hook": {
+    "installed": "{{path}}에 Zero UI 훅이 성공적으로 설치되었습니다.",
+    "already_exists": "Zero UI 훅이 {{path}}에 이미 존재합니다",
+    "created": "{{path}}을(를) 생성하고 Zero UI 훅을 설치했습니다",
+    "unsupported_shell": "지원되지 않는 쉘입니다. 쉘 프로필에 `cerebralos wake`를 수동으로 추가해 주세요."
+  },
+  "explore": {
+    "title": "✦ CerebraLOS 탐색기 — 당신의 생각 사이의 공간",
+    "no_agents": "아직 연결된 에이전트가 없습니다. ~/.cerebralos/peripheral/에 기억을 추가하세요.",
+    "prompt": "무엇을 탐색하시겠습니까?",
+    "latest_dream": "✦ 최신 꿈 (latest.md)",
+    "exit": "↩ 종료",
+    "nav_hint": "[↑↓] 탐색 [Enter] 선택 [q] 종료",
+    "connected_agents": "연결된 에이전트",
+    "no_content": "(아직 콘텐츠가 없습니다. 꿈을 생성하려면 `cerebralos sleep`을 실행하세요.)",
+    "back_hint": "[아무 키] 뒤로  [q] 종료",
+    "no_dream_yet": "아직 없음 — 먼저 `cerebralos sleep`을 실행하세요",
+    "goodbye": "안녕히 가세요. 당신의 생각은 남아있습니다."
+  }
+}

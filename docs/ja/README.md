@@ -155,6 +155,8 @@ CerebraLOSは、4つの原則のもとで動きます。
   - [English](../en/AGENTS.md) | [日本語](AGENTS.md) | [简体中文](../zh-CN/AGENTS.md) | [繁體中文](../zh-TW/AGENTS.md) | [한국어](../ko/AGENTS.md) | [Español](../es/AGENTS.md) | [Français](../fr/AGENTS.md) | [Deutsch](../de/AGENTS.md) | [Português](../pt/AGENTS.md) | [Русский](../ru/AGENTS.md) | [Italiano](../it/AGENTS.md) | [हिन्दी](../hi/AGENTS.md) | [العربية](../ar/AGENTS.md)
 - **記憶の移行**: ChatGPT、Claude、Obsidianなどからの記憶インポート
   - [English](../en/MIGRATION.md) | [日本語](MIGRATION.md)
+- **コマンドリファレンス**: 全コマンド・オプション・使用例を一冊に
+  - [English](../en/REFERENCE.md) | [日本語](REFERENCE.md) | [简体中文](../zh-CN/REFERENCE.md) | [繁體中文](../zh-TW/REFERENCE.md) | [한국어](../ko/REFERENCE.md) | [Español](../es/REFERENCE.md) | [Français](../fr/REFERENCE.md) | [Deutsch](../de/REFERENCE.md) | [Português](../pt/REFERENCE.md) | [Русский](../ru/REFERENCE.md) | [Italiano](../it/REFERENCE.md) | [हिन्दी](../hi/REFERENCE.md) | [العربية](../ar/REFERENCE.md)
 
 ---
 

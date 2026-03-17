@@ -1,0 +1,92 @@
+{
+  "wake": {
+    "greeting": "صباح الخير. تذكرت شيئًا بينما كنت نائمًا.",
+    "from_date": "(من {{date}} — قم بتشغيل `cerebralos sleep` لتحلم مرة أخرى)"
+  },
+  "recall": {
+    "recalling": "جاري استرجاع: \"{{query}}\"...",
+    "surfaced": "✦ ظهر شيء ما.",
+    "nothing": "لم يظهر شيء. قد تكون الذاكرة مجمدة أو لم يتم تخزينها أبدًا.",
+    "no_memories": "لم يتم العثور على ذكريات في الدماغ بعد.",
+    "no_brain": "لم يتم العثور على الدماغ. قم بتشغيل `cerebralos init` أولاً.",
+    "faded": "تلاشت"
+  },
+  "sleep": {
+    "start": "تصبح على خير. دماغك يحلم الآن...",
+    "forgetting": "جاري تشغيل النسيان النشط (ضغط → تجميد)...",
+    "forgetting_done": "تم ضغط {{compressed}} ذاكرة. تم تجميد {{frozen}}. تم حماية {{protected}}.",
+    "synthesizing": "جاري تركيب الذكريات...",
+    "recalling": "جاري استرجاع الذكريات لتركيب الأحلام...",
+    "synthesizing_via": "جاري تركيب {{count}} ذاكرة عبر {{provider}}...",
+    "complete": "اكتملت مهمة النوم. تم حفظ الحلم في dreams/{{date}}.md",
+    "hint_wake": "قم بتشغيل `cerebralos wake` لقراءة رؤيتك الصباحية.",
+    "no_llm": "لم يتم تكوين LLM — الأحلام فارغة. قم بإعداد llm في ~/.cerebralos/.brain/config.json",
+    "no_brain": "لم يتم العثور على الدماغ. قم بتشغيل `cerebralos init` أولاً.",
+    "no_memories": "لم يتم العثور على ذكريات. أضف بعض الذكريات أولاً.",
+    "llm_error": "خطأ في LLM: {{message}}",
+    "pushed": "تم الدفع إلى GitHub.",
+    "github_actions_mode": "وضع GitHub Actions: دفع الذكريات لتشغيل توليد الأحلام...",
+    "github_pushed": "تم الدفع إلى GitHub. ستحلم ذكاءك الاصطناعي الليلة.",
+    "github_hint": "سيتم إعادة تثبيت الحلم تلقائيًا بواسطة GitHub Actions.",
+    "no_remote": "لم يتم تكوين مستودع بعيد. أضف مستودع GitHub الخاص بك أولاً:"
+  },
+  "setup": {
+    "title": "إعداد cerebralos",
+    "subtitle": "ربط دماغك بوكلاء الذكاء الاصطناعي.",
+    "detected": "الوكلاء المكتشفون: {{agents}}",
+    "no_agents": "لم يتم اكتشاف وكلاء مدعومين.",
+    "supported": "المدعومون: claude-code, cursor, windsurf",
+    "run_with_agent": "تشغيل: cerebralos setup --agent claude-code",
+    "add_to": "أضف إلى: {{path}}",
+    "auto_written": "✓ {{agent}} — تم الكتابة إلى {{path}}",
+    "auto_failed": "✗ {{agent}} — تعذر الكتابة تلقائيًا",
+    "hint_auto": "للكتابة التلقائية لجميع الوكلاء المكتشفين:",
+    "hint_mcp": "للوكلاء المستندين إلى MCP، أضف إلى تكوين MCP الخاص بك:",
+    "no_brain": "لم يتم العثور على الدماغ. قم بتشغيل `cerebralos init` أولاً."
+  },
+  "import": {
+    "header": "[استيراد CerebraLOS]",
+    "source": "المصدر: {{path}}",
+    "type": "النوع: {{type}}",
+    "imported_file": "✓ تم الاستيراد: {{filename}}",
+    "imported_folder": "✓ تم استيراد {{count}} ملفًا من المجلد.",
+    "imported_chatgpt": "✓ تم استيراد {{count}} محادثة ChatGPT.",
+    "result": "تم استيراد {{count}} ملف(ات) إلى: ~/.cerebralos/peripheral/imported/",
+    "next": "الخطوة التالية: قم بتشغيل `cerebralos sleep` لدمج هذه الذكريات في دماغك.",
+    "no_brain": "لم يتم العثور على الدماغ. قم بتشغيل `cerebralos init` أولاً.",
+    "no_from": "الرجاء تحديد مصدر باستخدام --from <path>",
+    "not_found_file": "لم يتم العثور على الملف: {{path}}",
+    "not_found_folder": "لم يتم العثور على المجلد: {{path}}",
+    "no_md": "لم يتم العثور على ملفات Markdown في المجلد المحدد.",
+    "json_error": "فشل تحليل ملف JSON. تأكد من أنه تصدير ChatGPT صالح.",
+    "unknown_type": "نوع غير معروف: {{type}}"
+  },
+  "init": {
+    "start": "جاري تهيئة CerebraLOS...",
+    "mode_global": "الوضع: عام ({{path}})",
+    "mode_local": "الوضع: محلي ({{path}})",
+    "already_exists": "الدماغ موجود بالفعل في {{path}}",
+    "created": "تم إنشاء أدلة core/, peripheral/, dreams/, و archive/.",
+    "ready": "دماغك جاهز في {{path}}",
+    "tagline": "توقف عن الحفظ. ابدأ التذكر."
+  },
+  "hook": {
+    "installed": "تم تثبيت Zero UI hook بنجاح في {{path}}",
+    "already_exists": "خطاف Zero UI موجود بالفعل في {{path}}",
+    "created": "تم إنشاء {{path}} وتم تثبيت خطاف Zero UI",
+    "unsupported_shell": "صدفة غير مدعومة. الرجاء إضافة `cerebralos wake` إلى ملف تعريف صدفة الخاص بك يدويًا."
+  },
+  "explore": {
+    "title": "✦ مستكشف CerebraLOS — المساحة بين أفكارك",
+    "no_agents": "لم يتم ربط أي وكلاء بعد. أضف ذكريات إلى ~/.cerebralos/peripheral/",
+    "prompt": "ماذا ترغب في استكشافه؟",
+    "latest_dream": "✦ أحدث حلم (latest.md)",
+    "exit": "↩ خروج",
+    "nav_hint": "[↑↓] للتنقل [Enter] للاختيار [q] للخروج",
+    "connected_agents": "الوكلاء المتصلون",
+    "no_content": "(لا يوجد محتوى بعد. شغّل `cerebralos sleep` لتوليد الأحلام.)",
+    "back_hint": "[أي مفتاح] للعودة  [q] للخروج",
+    "no_dream_yet": "لا يوجد بعد — شغّل cerebralos sleep أولاً",
+    "goodbye": "إلى اللقاء. أفكارك باقية."
+  }
+}

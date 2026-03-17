@@ -1,0 +1,92 @@
+{
+  "wake": {
+    "greeting": "Buenos días. Recordé algo mientras dormías.",
+    "from_date": "(desde {{date}} — ejecuta `cerebralos sleep` para volver a soñar)"
+  },
+  "recall": {
+    "recalling": "Recordando: \"{{query}}\"...",
+    "surfaced": "✦ Algo ha emergido.",
+    "nothing": "Nada ha emergido. La memoria puede estar congelada o nunca fue almacenada.",
+    "no_memories": "Aún no se encontraron recuerdos en el cerebro.",
+    "no_brain": "Cerebro no encontrado. Ejecuta `cerebralos init` primero.",
+    "faded": "desvanecido"
+  },
+  "sleep": {
+    "start": "Buenas noches. Tu cerebro ahora está soñando...",
+    "forgetting": "Ejecutando Olvido Activo (comprimir → congelar)...",
+    "forgetting_done": "Memorias comprimidas: {{compressed}}. Congeladas: {{frozen}}. Protegidas: {{protected}}.",
+    "synthesizing": "Sintetizando recuerdos...",
+    "recalling": "Recordando recuerdos para la síntesis de sueños...",
+    "synthesizing_via": "Sintetizando {{count}} recuerdos a través de {{provider}}...",
+    "complete": "Tarea de sueño completada. Sueño guardado en dreams/{{date}}.md",
+    "hint_wake": "Ejecuta `cerebralos wake` para leer tu Visión Matutina.",
+    "no_llm": "Ningún LLM configurado — los sueños están vacíos. Configura el LLM en ~/.cerebralos/.brain/config.json",
+    "no_brain": "Cerebro no encontrado. Ejecuta `cerebralos init` primero.",
+    "no_memories": "No se encontraron recuerdos. Añade algunos recuerdos primero.",
+    "llm_error": "Error de LLM: {{message}}",
+    "pushed": "Enviado a GitHub.",
+    "github_actions_mode": "Modo GitHub Actions: enviando recuerdos para activar la generación de sueños...",
+    "github_pushed": "Enviado a GitHub. Tu IA soñará esta noche.",
+    "github_hint": "El sueño será enviado de vuelta automáticamente por GitHub Actions.",
+    "no_remote": "No hay remoto configurado. Añade tu repositorio de GitHub primero:"
+  },
+  "setup": {
+    "title": "Configuración de cerebralos",
+    "subtitle": "Conectando tu cerebro a agentes de IA.",
+    "detected": "Agentes detectados: {{agents}}",
+    "no_agents": "No se detectaron agentes compatibles.",
+    "supported": "Compatibles: claude-code, cursor, windsurf",
+    "run_with_agent": "Ejecuta: cerebralos setup --agent claude-code",
+    "add_to": "Añadir a: {{path}}",
+    "auto_written": "✓ {{agent}} — escrito en {{path}}",
+    "auto_failed": "✗ {{agent}} — no se pudo escribir automáticamente",
+    "hint_auto": "Para escribir automáticamente en todos los agentes detectados:",
+    "hint_mcp": "Para agentes basados en MCP, añade a tu configuración de MCP:",
+    "no_brain": "Cerebro no encontrado. Ejecuta `cerebralos init` primero."
+  },
+  "import": {
+    "header": "[Importación de CerebraLOS]",
+    "source": "Origen: {{path}}",
+    "type": "Tipo: {{type}}",
+    "imported_file": "✓ Importado: {{filename}}",
+    "imported_folder": "✓ Se importaron {{count}} archivos de la carpeta.",
+    "imported_chatgpt": "✓ Se importaron {{count}} conversaciones de ChatGPT.",
+    "result": "{{count}} archivo(s) importado(s) a: ~/.cerebralos/peripheral/imported/",
+    "next": "Siguiente paso: Ejecuta `cerebralos sleep` para integrar estos recuerdos en tu cerebro.",
+    "no_brain": "Cerebro no encontrado. Ejecuta `cerebralos init` primero.",
+    "no_from": "Por favor, especifica un origen con --from <path>",
+    "not_found_file": "Archivo no encontrado: {{path}}",
+    "not_found_folder": "Carpeta no encontrada: {{path}}",
+    "no_md": "No se encontraron archivos Markdown en la carpeta especificada.",
+    "json_error": "No se pudo analizar el archivo JSON. Asegúrate de que sea una exportación válida de ChatGPT.",
+    "unknown_type": "Tipo desconocido: {{type}}"
+  },
+  "init": {
+    "start": "Inicializando CerebraLOS...",
+    "mode_global": "Modo: global ({{path}})",
+    "mode_local": "Modo: local ({{path}})",
+    "already_exists": "El cerebro ya existe en {{path}}",
+    "created": "Se crearon los directorios core/, peripheral/, dreams/ y archive/.",
+    "ready": "Tu cerebro está listo en {{path}}",
+    "tagline": "Deja de guardar. Empieza a recordar."
+  },
+  "hook": {
+    "installed": "Hook de Zero UI instalado con éxito en {{path}}",
+    "already_exists": "El hook de Zero UI ya existe en {{path}}",
+    "created": "Se creó {{path}} y se instaló el hook de Zero UI",
+    "unsupported_shell": "Shell no compatible. Por favor, añade `cerebralos wake` a tu perfil de shell manualmente."
+  },
+  "explore": {
+    "title": "✦ Explorador de CerebraLOS — El espacio entre tus pensamientos",
+    "no_agents": "Aún no hay agentes conectados. Añade recuerdos a ~/.cerebralos/peripheral/",
+    "prompt": "¿Qué te gustaría explorar?",
+    "latest_dream": "✦ Último Sueño (latest.md)",
+    "exit": "↩ Salir",
+    "nav_hint": "[↑↓] Navegar  [Enter] Seleccionar  [q] Salir",
+    "connected_agents": "Agentes Conectados",
+    "no_content": "(Aún no hay contenido. Ejecuta `cerebralos sleep` para generar sueños.)",
+    "back_hint": "[cualquier tecla] Atrás  [q] Salir",
+    "no_dream_yet": "ninguno aún — ejecuta cerebralos sleep primero",
+    "goodbye": "Adiós. Tus pensamientos permanecen."
+  }
+}

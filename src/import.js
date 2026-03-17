@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import chalk from 'chalk';
+import { t } from './i18n.js';
 import { globSync } from 'glob';
 
 const CEREBRALOS_DIR = path.join(os.homedir(), '.cerebralos');
@@ -10,12 +11,12 @@ export async function importMemory(options = {}) {
   const { from, type = 'auto' } = options;
 
   if (!fs.existsSync(CEREBRALOS_DIR)) {
-    console.log(chalk.red('Brain not found. Run `cerebralos init` first.'));
+    console.log(chalk.red(t('import.no_brain')));
     return;
   }
 
   if (!from) {
-    console.log(chalk.red('Please specify a source with --from <path>'));
+    console.log(chalk.red(t('import.no_from')));
     console.log(chalk.gray('Examples:'));
     console.log(chalk.gray('  cerebralos import --from ~/my_memory.md'));
     console.log(chalk.gray('  cerebralos import --from ~/ObsidianVault'));
@@ -42,9 +43,9 @@ export async function importMemory(options = {}) {
     }
   }
 
-  console.log(chalk.cyan(`\n[CerebraLOS Import]`));
-  console.log(chalk.gray(`Source: ${resolvedFrom}`));
-  console.log(chalk.gray(`Type: ${detectedType}`));
+  console.log(chalk.cyan('\n' + t('import.header')));
+  console.log(chalk.gray(t('import.source', { path: resolvedFrom })));
+  console.log(chalk.gray(t('import.type', { type: detectedType })));
   console.log('');
 
   let importedCount = 0;
@@ -52,7 +53,7 @@ export async function importMemory(options = {}) {
   if (detectedType === 'markdown' || detectedType === 'ai_export') {
     // Single markdown file import
     if (!fs.existsSync(resolvedFrom)) {
-      console.log(chalk.red(`File not found: ${resolvedFrom}`));
+      console.log(chalk.red(t('import.not_found_file', { path: resolvedFrom })));
       return;
     }
     const content = fs.readFileSync(resolvedFrom, 'utf-8');
@@ -60,17 +61,17 @@ export async function importMemory(options = {}) {
     const destPath = path.join(importDir, filename);
     fs.writeFileSync(destPath, content);
     importedCount = 1;
-    console.log(chalk.green(`✓ Imported: ${filename}`));
+    console.log(chalk.green(t('import.imported_file', { filename })));
 
   } else if (detectedType === 'folder') {
     // Folder import (Obsidian Vault, etc.)
     if (!fs.existsSync(resolvedFrom)) {
-      console.log(chalk.red(`Folder not found: ${resolvedFrom}`));
+      console.log(chalk.red(t('import.not_found_folder', { path: resolvedFrom })));
       return;
     }
     const mdFiles = globSync(path.join(resolvedFrom, '**/*.md'));
     if (mdFiles.length === 0) {
-      console.log(chalk.yellow('No Markdown files found in the specified folder.'));
+      console.log(chalk.yellow(t('import.no_md')));
       return;
     }
     for (const file of mdFiles) {
@@ -80,19 +81,19 @@ export async function importMemory(options = {}) {
       fs.copyFileSync(file, destPath);
       importedCount++;
     }
-    console.log(chalk.green(`✓ Imported ${importedCount} files from folder.`));
+    console.log(chalk.green(t('import.imported_folder', { count: importedCount })));
 
   } else if (detectedType === 'chatgpt') {
     // ChatGPT conversation export (conversations.json)
     if (!fs.existsSync(resolvedFrom)) {
-      console.log(chalk.red(`File not found: ${resolvedFrom}`));
+      console.log(chalk.red(t('import.not_found_file', { path: resolvedFrom })));
       return;
     }
     let data;
     try {
       data = JSON.parse(fs.readFileSync(resolvedFrom, 'utf-8'));
     } catch (e) {
-      console.log(chalk.red('Failed to parse JSON file. Make sure it is a valid ChatGPT export.'));
+      console.log(chalk.red(t('import.json_error')));
       return;
     }
 
@@ -128,16 +129,16 @@ export async function importMemory(options = {}) {
       fs.writeFileSync(destPath, mdContent);
       importedCount++;
     }
-    console.log(chalk.green(`✓ Imported ${importedCount} ChatGPT conversations.`));
+    console.log(chalk.green(t('import.imported_chatgpt', { count: importedCount })));
 
   } else {
-    console.log(chalk.red(`Unknown type: ${detectedType}`));
+    console.log(chalk.red(t('import.unknown_type', { type: detectedType })));
     console.log(chalk.gray('Supported types: markdown, ai_export, folder, chatgpt'));
     return;
   }
 
   console.log('');
-  console.log(chalk.white(`${importedCount} file(s) imported to: ~/.cerebralos/peripheral/imported/`));
+  console.log(chalk.white(t('import.result', { count: importedCount })));
   console.log('');
-  console.log(chalk.cyan('Next step: Run `cerebralos sleep` to integrate these memories into your brain.'));
+  console.log(chalk.cyan(t('import.next')));
 }

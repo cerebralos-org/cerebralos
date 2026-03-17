@@ -1,0 +1,92 @@
+{
+  "wake": {
+    "greeting": "Доброе утро. Пока вы спали, я кое-что вспомнил.",
+    "from_date": "(от {{date}} — запустите `cerebralos sleep`, чтобы снова увидеть сон)"
+  },
+  "recall": {
+    "recalling": "Вспоминаю: «{{query}}»...",
+    "surfaced": "✦ Кое-что всплыло.",
+    "nothing": "Ничего не всплыло. Воспоминание может быть заморожено или никогда не сохранялось.",
+    "no_memories": "Воспоминаний в мозге пока не найдено.",
+    "no_brain": "Мозг не найден. Сначала запустите `cerebralos init`.",
+    "faded": "угасло"
+  },
+  "sleep": {
+    "start": "Доброй ночи. Ваш мозг сейчас спит...",
+    "forgetting": "Запускаю активное забывание (сжатие → заморозка)...",
+    "forgetting_done": "Сжато {{compressed}} воспоминаний. Заморожено {{frozen}}. Защищено {{protected}}.",
+    "synthesizing": "Синтезирую воспоминания...",
+    "recalling": "Вспоминаю воспоминания для синтеза сновидений...",
+    "synthesizing_via": "Синтезирую {{count}} воспоминаний через {{provider}}...",
+    "complete": "Задание по сну завершено. Сон сохранен в dreams/{{date}}.md",
+    "hint_wake": "Запустите `cerebralos wake`, чтобы прочитать свое Утреннее Озарение.",
+    "no_llm": "LLM не настроен — сны пусты. Настройте llm в ~/.cerebralos/.brain/config.json",
+    "no_brain": "Мозг не найден. Сначала запустите `cerebralos init`.",
+    "no_memories": "Воспоминаний не найдено. Сначала добавьте воспоминания.",
+    "llm_error": "Ошибка LLM: {{message}}",
+    "pushed": "Отправлено на GitHub.",
+    "github_actions_mode": "Режим GitHub Actions: отправка воспоминаний для запуска генерации сновидений...",
+    "github_pushed": "Отправлено на GitHub. Ваш ИИ увидит сон сегодня ночью.",
+    "github_hint": "Сон будет автоматически возвращен через GitHub Actions.",
+    "no_remote": "Удаленный репозиторий не настроен. Сначала добавьте свой репозиторий GitHub:"
+  },
+  "setup": {
+    "title": "Настройка cerebralos",
+    "subtitle": "Подключение вашего мозга к ИИ-агентам.",
+    "detected": "Обнаруженные агенты: {{agents}}",
+    "no_agents": "Поддерживаемые агенты не обнаружены.",
+    "supported": "Поддерживаемые: claude-code, cursor, windsurf",
+    "run_with_agent": "Запустить: cerebralos setup --agent claude-code",
+    "add_to": "Добавить в: {{path}}",
+    "auto_written": "✓ {{agent}} — записано в {{path}}",
+    "auto_failed": "✗ {{agent}} — не удалось выполнить автозапись",
+    "hint_auto": "Для автозаписи во все обнаруженные агенты:",
+    "hint_mcp": "Для агентов на базе MCP добавьте в свою конфигурацию MCP:",
+    "no_brain": "Мозг не найден. Сначала запустите `cerebralos init`."
+  },
+  "import": {
+    "header": "[Импорт CerebraLOS]",
+    "source": "Источник: {{path}}",
+    "type": "Тип: {{type}}",
+    "imported_file": "✓ Импортировано: {{filename}}",
+    "imported_folder": "✓ Импортировано {{count}} файлов из папки.",
+    "imported_chatgpt": "✓ Импортировано {{count}} бесед ChatGPT.",
+    "result": "{{count}} файл(ов) импортирован(о) в: ~/.cerebralos/peripheral/imported/",
+    "next": "Следующий шаг: Запустите `cerebralos sleep`, чтобы интегрировать эти воспоминания в ваш мозг.",
+    "no_brain": "Мозг не найден. Сначала запустите `cerebralos init`.",
+    "no_from": "Пожалуйста, укажите источник с помощью --from <path>",
+    "not_found_file": "Файл не найден: {{path}}",
+    "not_found_folder": "Папка не найдена: {{path}}",
+    "no_md": "Файлы Markdown не найдены в указанной папке.",
+    "json_error": "Не удалось разобрать файл JSON. Убедитесь, что это действительный экспорт ChatGPT.",
+    "unknown_type": "Неизвестный тип: {{type}}"
+  },
+  "init": {
+    "start": "Инициализация CerebraLOS...",
+    "mode_global": "Режим: глобальный ({{path}})",
+    "mode_local": "Режим: локальный ({{path}})",
+    "already_exists": "Мозг уже существует по адресу {{path}}",
+    "created": "Созданы каталоги core/, peripheral/, dreams/ и archive/.",
+    "ready": "Ваш мозг готов по адресу {{path}}",
+    "tagline": "Перестаньте сохранять. Начните вспоминать."
+  },
+  "hook": {
+    "installed": "Хук Zero UI успешно установлен в {{path}}",
+    "already_exists": "Хук Zero UI уже существует в {{path}}",
+    "created": "Создан {{path}} и установлен хук Zero UI",
+    "unsupported_shell": "Неподдерживаемая оболочка. Пожалуйста, добавьте `cerebralos wake` в ваш профиль оболочки вручную."
+  },
+  "explore": {
+    "title": "✦ CerebraLOS Explorer — Пространство между вашими мыслями",
+    "no_agents": "Агенты еще не подключены. Добавьте воспоминания в ~/.cerebralos/peripheral/",
+    "prompt": "Что бы вы хотели исследовать?",
+    "latest_dream": "✦ Последний Сон (latest.md)",
+    "exit": "↩ Выход",
+    "nav_hint": "[↑↓] Навигация  [Enter] Выбрать  [q] Выход",
+    "connected_agents": "Подключенные Агенты",
+    "no_content": "(Пока нет контента. Запустите `cerebralos sleep`, чтобы сгенерировать сны.)",
+    "back_hint": "[любая клавиша] Назад  [q] Выход",
+    "no_dream_yet": "пока нет — сначала запустите cerebralos sleep",
+    "goodbye": "До свидания. Ваши мысли остаются."
+  }
+}

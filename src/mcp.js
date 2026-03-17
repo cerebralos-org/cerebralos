@@ -5,6 +5,7 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { recallContext } from "./recall.js";
+import { writeMemory } from "./write_memory.js";
 
 export async function startMcpServer() {
   const server = new Server(
@@ -50,6 +51,24 @@ export async function startMcpServer() {
             required: ["query"],
           },
         },
+        {
+          name: "write_memory",
+          description: "Write a memory to peripheral/ storage. Use this to save session summaries, decisions, or discoveries.",
+          inputSchema: {
+            type: "object",
+            properties: {
+              content: {
+                type: "string",
+                description: "The memory content to write (Markdown format recommended)",
+              },
+              filename: {
+                type: "string",
+                description: "Optional filename (default: YYYY-MM-DD-session.md)",
+              },
+            },
+            required: ["content"],
+          },
+        },
       ],
     };
   });
@@ -76,6 +95,17 @@ export async function startMcpServer() {
 
       return {
         content: [{ type: "text", text: formattedResults }],
+      };
+    }
+
+    if (request.params.name === "write_memory") {
+      const content = String(request.params.arguments?.content);
+      const filename = request.params.arguments?.filename;
+      if (!content) throw new Error("Content is required");
+
+      const result = writeMemory(content, filename);
+      return {
+        content: [{ type: "text", text: `Memory written to: ${result}` }],
       };
     }
 

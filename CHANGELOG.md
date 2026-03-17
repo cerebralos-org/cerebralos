@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-03-17
+
+### Added
+- **i18n (Internationalization)**: All CLI output now adapts to your language. Set `user.locale` in `~/.cerebralos/.brain/config.json`. Supported: `en`, `ja`, `zh-CN`, `zh-TW`, `ko`, `es`, `fr`, `de`, `pt`, `ru`, `it`, `hi`, `ar`
+- **Multilingual Command Reference (`REFERENCE.md`)**: Quick-lookup docs for every command in all 13 languages under `docs/<lang>/REFERENCE.md`
+- **`cerebralos setup`**: New command to connect AI agents (Claude Code, Cursor, Windsurf) to your brain — generates integration rules and optionally auto-writes to agent config files
+- **`write_memory` MCP tool**: MCP-connected agents can now write directly to `peripheral/` via the new `write_memory(content, filename?)` tool
+- **Comprehensive `--help` text**: Every command now has detailed inline help with examples and output samples
+- **2-phase Active Forgetting**: `sleep` now runs both Phase 1 (compress → archive/compressed/ at 30d) and Phase 2 (freeze → archive/frozen/ at 90d)
+- **Morning Insight**: `wake` extracts and displays only `**The Connection**` section from dreams
+- **`cerebralos recall`** now searches active memories AND compressed memories (frozen are excluded by design)
+- **Gemini provider**: `cerebralos sleep` now supports `gemini` as LLM provider (`@google/generative-ai`)
+
+### Changed
+- Default LLM provider changed to `none` for clean installs; configure via config.json
+
+## [1.1.0] - 2026-03-16 (unpublished)
+
+### Added
+- Morning Insight wake command
+- 2-phase Active Forgetting
+- MCP write_memory tool
+- cerebralos setup command
+
 ## [1.0.5] - 2026-03-16
 
 ### Added

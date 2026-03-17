@@ -1,6 +1,6 @@
 {
   "name": "cerebralos",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "The most elegant Cognitive OS for AI Agents. Stop saving. Start remembering.",
   "main": "src/cli.js",
   "type": "module",
@@ -33,6 +33,7 @@
   },
   "homepage": "https://github.com/cerebralos-org/cerebralos#readme",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@modelcontextprotocol/sdk": "^1.27.1",
     "chalk": "^5.6.2",
     "chokidar": "^5.0.0",
