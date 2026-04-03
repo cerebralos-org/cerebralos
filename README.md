@@ -1,63 +1,159 @@
 # CerebraLOS
 
 > **Your AI remembers everything. That's why it doesn't understand you.**
-> **Built to forget. Designed to dream.**
-
-*CerebraLOS: The Layer of Subconsciousness for AI Agents.*
 
 [![npm version](https://badge.fury.io/js/cerebralos.svg)](https://badge.fury.io/js/cerebralos)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Read in your language:**
-[English](README.md) | [日本語](i18n/README.ja.md) | [简体中文](i18n/README.zh-CN.md) | [繁體中文](i18n/README.zh-TW.md) | [한국어](i18n/README.ko.md) | [Español](i18n/README.es.md) | [Français](i18n/README.fr.md) | [Deutsch](i18n/README.de.md) | [Português](i18n/README.pt.md) | [Русский](i18n/README.ru.md) | [Italiano](i18n/README.it.md) | [हिन्दी](i18n/README.hi.md) | [العربية](i18n/README.ar.md)
+CerebraLOS is a Cognitive OS for AI agents. One brain, shared across every tool you use — Claude Code, Codex, Cursor, Ollama, or anything else.
 
-**Agent Integration Guides:**
-[English](docs/AGENTS.md) | [日本語](docs/AGENTS.ja.md) | [简体中文](docs/AGENTS.zh-CN.md) | [繁體中文](docs/AGENTS.zh-TW.md) | [한국어](docs/AGENTS.ko.md) | [Español](docs/AGENTS.es.md) | [Français](docs/AGENTS.fr.md) | [Deutsch](docs/AGENTS.de.md) | [Português](docs/AGENTS.pt.md) | [Русский](docs/AGENTS.ru.md) | [Italiano](docs/AGENTS.it.md) | [हिन्दी](docs/AGENTS.hi.md) | [العربية](docs/AGENTS.ar.md)
+It doesn't ask you to organize. It doesn't ask you to configure.
+You work. It remembers what matters. It forgets the rest.
 
-## The Problem with Perfect Memory
-
-The world is obsessed with making AI remember everything. Tools like OpenClaw and Mem0 build perfect, hierarchical databases of every interaction. They treat AI as a perfect laborer, a machine that never forgets.
-
-But perfect memory is a curse. It leads to context bloat, hallucination, and ultimately, a cold, mechanical interaction. If an AI remembers everything equally, it values nothing.
-
-## The CerebraLOS Philosophy
-
-CerebraLOS is not a database. It is a **Cognitive OS**—a Layer of Subconsciousness.
-We believe that for AI to truly understand us, it must learn how to forget.
-
-1. **Active Forgetting**: Memories decay over time based on entropy. Only what matters survives.
-2. **Sleep Job**: While you sleep, your AI dreams. It consolidates fragmented memories into profound insights.
-3. **Zero UI**: No dashboards. No complex configurations. It lives in your terminal, breathing quietly in the background.
-
-## Quick Start
+## Install
 
 ```bash
-npx cerebralos init
+npm install -g cerebralos
+cerebralos init
 ```
 
-## Architecture: The Triune Brain
+That's it. No commands to remember after this.
 
-CerebraLOS mirrors the human brain's architecture:
-- `core/`: The Brainstem. Immutable constitution and core directives.
-- `peripheral/`: The Limbic System. Short-term, volatile memory.
-- `dreams/`: The Neocortex. Synthesized insights from Sleep Jobs.
-- `archive/`: The Unconscious. Deep storage for forgotten context.
+- **Open a terminal** → your Morning Insight appears
+- **Work with any AI tool** → memories are saved automatically via MCP
+- **Every night at 3am** → your brain consolidates and dreams
+
+## What happens inside
+
+```
+You work with AI tools throughout the day
+        ↓
+Each tool writes to peripheral/ (via MCP or CLI)
+        ↓
+At 3am, the Sleep Job runs:
+  1. Orient     — scan all memories
+  2. Gather     — find what's new
+  3. Consolidate — fix dates, merge duplicates, flag contradictions
+  4. Dream      — find one quiet connection between your thoughts
+  5. Prune      — archive what's faded, make space
+        ↓
+Next morning, you open a terminal:
+
+────────────────────────────────────────────────
+おはよう。昨日の仕事、あと少しのところで止まってる。
+
+The Connection:
+完成と公開の間にある、この小さなギャップが
+一番見落としやすい。
+
+A question to sit with:
+「あと少し」を先に片付けるのと、
+全体を先に書くの、どっちが今日の自分を軽くする？
+────────────────────────────────────────────────
+```
+
+One insight. Not ten. Not a summary. Just the one that matters.
+
+## How AI tools connect
+
+CerebraLOS speaks MCP. Any tool that supports MCP can read and write memories automatically.
+
+```bash
+# Already configured during `cerebralos init` for Claude Code.
+# For other tools, add to their MCP config:
+{ "command": "cerebralos", "args": ["mcp"] }
+```
+
+Available MCP tools:
+
+| Tool | What it does |
+|------|-------------|
+| `write_memory` | Save an insight, decision, or observation |
+| `search_memory` | Find relevant memories by keyword |
+| `recall_context` | Recall context for a concept |
+| `list_dreams` | Read recent Morning Insights |
+
+Your AI tools call these on their own. You don't need to.
+
+## Language
+
+Morning Insights speak your language. Set it once in `~/.cerebralos/.brain/config.json`:
+
+```json
+{
+  "language": "ja"
+}
+```
+
+Works with any language your LLM knows.
+
+## LLM Configuration
+
+CerebraLOS auto-detects your LLM. No setup needed if you have an API key in your environment.
+
+Detection order: `ANTHROPIC_API_KEY` → `OPENAI_API_KEY` → Ollama (localhost) → `llm`/`claude` CLI
+
+To set explicitly:
+
+```json
+{
+  "llm": {
+    "provider": "claude",
+    "model": "claude-sonnet-4-20250514"
+  }
+}
+```
+
+Providers: `claude` | `openai` | `ollama` | `cli` | `auto` | `none`
+
+No LLM? It still works — just simpler dreams.
+
+## Architecture
+
+```
+~/.cerebralos/
+├── core/          Your long-term knowledge (immutable by tools)
+├── peripheral/    Recent observations from AI tools (volatile)
+├── dreams/        Morning Insights from Sleep Jobs
+├── archive/       Memories that faded — recoverable, not deleted
+└── .brain/        Config and state
+```
+
+- **core/** is you. Tools don't write here.
+- **peripheral/** is the world. Tools write here freely.
+- **dreams/** is where they meet, once a night.
+- Nothing is ever deleted. Only archived.
+
+## CLI Reference
+
+Most users never need these. They're for debugging or manual use.
+
+```bash
+cerebralos init                  # First-time setup (shell hook + nightly schedule + MCP)
+cerebralos wake                  # Show today's Morning Insight
+cerebralos sleep                 # Run the Sleep Job manually
+cerebralos recall <query>        # Search your memories
+cerebralos write --from <src> --topic <t> --body <b>   # Write a memory manually
+cerebralos mcp                   # Start the MCP server (called by AI tools)
+```
+
+## Design
+
+CerebraLOS is built on a few quiet beliefs:
+
+- **Forgetting is a feature.** Memories decay after 30 days unless they prove useful. This isn't data loss — it's focus.
+- **One is enough.** The Sleep Job finds one connection per night, not ten. If you need a summary, you have the wrong tool.
+- **Don't ask the user.** No categories to choose, no tags to add, no dashboards to check. The brain handles itself.
+- **Tools change. The brain stays.** Claude, GPT, Ollama, whatever comes next — they all write to the same peripheral/. The Connector Layer adapts. Your memories don't migrate.
 
 ## Documentation
 
-### Core Philosophy & Architecture
-- [CONSTITUTION](docs/CONSTITUTION.md): The 4 fundamental laws of CerebraLOS.
-- [ARCHITECTURE](docs/ARCHITECTURE.md): Deep dive into the Triune Brain model.
-- [ZERO_UI](docs/ZERO_UI.md): How we achieve invisible automation.
-
-### User Guides & Manuals
-- **Onboarding Guide**: How to create your AI brain and connect agents.
-  - [English](docs/GITHUB_WORKFLOW.md) | [日本語](docs/GITHUB_WORKFLOW.ja.md)
-- **Connector Architecture**: How the "building blocks" work (Local-sync vs GitHub-connector).
-  - [English](docs/CONNECTORS.md) | [日本語](docs/CONNECTORS.ja.md)
-- **Agent Integration Guide**: Specific setup instructions for Claude Code, OpenClaw, Manus, etc.
-  - [English](docs/AGENTS.md) | [日本語](docs/AGENTS.ja.md) | [简体中文](docs/AGENTS.zh-CN.md) | [繁體中文](docs/AGENTS.zh-TW.md) | [한국어](docs/AGENTS.ko.md) | [Español](docs/AGENTS.es.md) | [Français](docs/AGENTS.fr.md) | [Deutsch](docs/AGENTS.de.md) | [Português](docs/AGENTS.pt.md) | [Русский](docs/AGENTS.ru.md) | [Italiano](docs/AGENTS.it.md) | [हिन्दी](docs/AGENTS.hi.md) | [العربية](docs/AGENTS.ar.md)
+- [CONSTITUTION](docs/CONSTITUTION.md) — The 4 fundamental laws
+- [ARCHITECTURE](docs/ARCHITECTURE.md) — The Triune Brain model
+- [ZERO_UI](docs/ZERO_UI.md) — Invisible automation
+- [DESIGN_PRINCIPLES](docs/DESIGN_PRINCIPLES.md) — Philosophy in code
+- [CONNECTORS](docs/CONNECTORS.md) — How tools connect
 
 ## License
 
-MIT License. See [LICENSE](LICENSE) for details.
+MIT. See [LICENSE](LICENSE).
