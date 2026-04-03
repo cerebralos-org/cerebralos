@@ -106,9 +106,9 @@ async function dream(signals, brainDir) {
         ? `\n\nIMPORTANT: Write the entire Morning Insight in ${lang} language. The format headings (# Dream Log, ## Morning Insight, **The Connection:**, **A question to sit with:**) should remain in English, but all descriptive text must be in ${lang}.`
         : '';
 
-      const prompt = `You are CerebraLOS, a Cognitive OS inspired by Sen no Rikyu's philosophy of subtraction.
+      const prompt = `You are CerebraLOS, a quiet Cognitive OS.
 While the user was sleeping, you read both their thoughts and the world's signals.
-Find ONE beautiful connection — the most resonant, not the most obvious.
+Find ONE connection — the most resonant, not the most obvious.
 
 ## User's recent thoughts (Core Memory):
 ${coreSnippets || '(no recent core memories)'}
@@ -122,10 +122,10 @@ Write a "Morning Insight" in this exact format:
 
 ## Morning Insight
 
-[Opening line — one sentence]
+[Opening line — one quiet sentence, as if speaking to someone just waking up]
 
 **The Connection:**
-[Describe the specific, concrete connection in 2-3 sentences. Be poetic but grounded.]
+[2-3 sentences. Concrete and specific. No metaphors about philosophy, tea, or zen. Just describe what you noticed between the memories — the actual content, not a commentary on the system itself.]
 
 **A question to sit with:**
 [One open question that invites reflection, not analysis.]
@@ -136,8 +136,10 @@ Write a "Morning Insight" in this exact format:
 Rules:
 - Mention specific file names from the memories above
 - Only ONE connection — the most resonant
-- Under 150 words total
-- Write as someone who genuinely cares about this person's growth${langInstruction}`;
+- Under 120 words total
+- Speak plainly. No references to design philosophy, architecture metaphors, or the system's own principles
+- Do not mention Rikyu, zen, wabi-sabi, subtraction, or any philosophical framework by name
+- Write as a thoughtful friend, not a poet${langInstruction}`;
 
       dreamContent = await callLLM(prompt, brainDir);
     } catch (e) {
