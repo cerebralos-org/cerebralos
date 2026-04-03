@@ -3,7 +3,7 @@ import path from 'path';
 import os from 'os';
 import chalk from 'chalk';
 
-export function installHook() {
+export function installHook(_CEREBRALOS_DIR) {  // brainDir は hook では不使用（~/.zshrc に書くコマンドのみ）
   const shell = process.env.SHELL || '';
   let rcFile = '';
   

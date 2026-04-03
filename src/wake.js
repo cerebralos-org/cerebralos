@@ -3,9 +3,7 @@ import path from 'path';
 import os from 'os';
 import chalk from 'chalk';
 
-const CEREBRALOS_DIR = path.join(os.homedir(), '.cerebralos');
-
-export function wakeUp() {
+export function wakeUp(CEREBRALOS_DIR = path.join(os.homedir(), '.cerebralos')) {
   if (!fs.existsSync(CEREBRALOS_DIR)) {
     return; // Silent fail for Zero UI
   }

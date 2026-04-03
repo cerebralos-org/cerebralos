@@ -6,9 +6,7 @@ import natural from 'natural';
 import { globSync } from 'glob';
 
 const TfIdf = natural.TfIdf;
-const CEREBRALOS_DIR = path.join(os.homedir(), '.cerebralos');
-
-export async function recallContext(query, options = { topK: 3, silent: false }) {
+export async function recallContext(query, options = { topK: 3, silent: false }, CEREBRALOS_DIR = path.join(os.homedir(), '.cerebralos')) {
   if (!fs.existsSync(CEREBRALOS_DIR)) {
     if (!options.silent) console.log(chalk.red('Brain not found. Run `cerebralos init` first.'));
     return [];

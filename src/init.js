@@ -3,10 +3,9 @@ import path from 'path';
 import os from 'os';
 import chalk from 'chalk';
 import simpleGit from 'simple-git';
+// os は brainDir のデフォルト値でのみ使用
 
-const CEREBRALOS_DIR = path.join(os.homedir(), '.cerebralos');
-
-export async function initBrain() {
+export async function initBrain(CEREBRALOS_DIR = path.join(os.homedir(), '.cerebralos')) {
   console.log(chalk.green('Initializing CerebraLOS...'));
 
   if (fs.existsSync(CEREBRALOS_DIR)) {

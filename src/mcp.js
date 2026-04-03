@@ -1,3 +1,5 @@
+import path from 'path';
+import os from 'os';
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -6,7 +8,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { recallContext } from "./recall.js";
 
-export async function startMcpServer() {
+export async function startMcpServer(CEREBRALOS_DIR = path.join(os.homedir(), '.cerebralos')) {
   const server = new Server(
     {
       name: "cerebralos-mcp",
@@ -62,7 +64,7 @@ export async function startMcpServer() {
       }
 
       // Use the actual recall logic, but silently
-      const results = await recallContext(query, { topK: 3, silent: true });
+      const results = await recallContext(query, { topK: 3, silent: true }, CEREBRALOS_DIR);
       
       if (results.length === 0) {
         return {
