@@ -1,11 +1,14 @@
 {
   "name": "cerebralos",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "The most elegant Cognitive OS for AI Agents. Stop saving. Start remembering.",
   "main": "src/cli.js",
   "type": "module",
   "bin": {
     "cerebralos": "./bin/cerebralos"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "scripts": {
     "start": "node src/cli.js",

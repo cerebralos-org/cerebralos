@@ -12,11 +12,12 @@ import { wakeUp } from './wake.js';
 import { recallContext } from './recall.js';
 import { startMcpServer } from './mcp.js';
 import { installHook } from './hook.js';
+import { writeCommand } from './write.js';
 
 program
   .name('cerebralos')
   .description('The most elegant Cognitive OS for AI Agents. Stop saving. Start remembering.')
-  .version('1.0.0')
+  .version('2.0.0')
   .option('--local', 'Use .cerebralos/ in the current directory instead of ~/.cerebralos')
   .option('--brain <path>', 'Use a custom brain directory path');
 
@@ -50,6 +51,20 @@ program
   .action((query) => {
     const opts = program.opts();
     recallContext(query, { topK: 3, silent: false }, resolveBrainDir(opts));
+  });
+
+program
+  .command('write')
+  .description('Write a memory to peripheral storage')
+  .requiredOption('--from <source>', 'Source identifier (e.g., claude-code, codex, manual)')
+  .requiredOption('--topic <topic>', 'Short title for this memory')
+  .option('--body <body>', 'Memory content')
+  .option('--tags <tags>', 'Comma-separated tags')
+  .option('--stdin', 'Read body from stdin')
+  .option('--core', 'Write to core/ instead of peripheral/')
+  .action((cmdOpts) => {
+    const opts = program.opts();
+    writeCommand(cmdOpts, resolveBrainDir(opts));
   });
 
 program

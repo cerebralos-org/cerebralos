@@ -6,112 +6,126 @@ import simpleGit from 'simple-git';
 import { globSync } from 'glob';
 import { recallContext } from './recall.js';
 import { callLLM, isLLMAvailable } from './llm.js';
+import { consolidate } from './consolidate.js';
 
-export async function runSleepJob(CEREBRALOS_DIR = path.join(os.homedir(), '.cerebralos')) {
-  if (!fs.existsSync(CEREBRALOS_DIR)) {
-    console.log(chalk.red('Brain not found. Run `cerebralos init` first.'));
-    return;
-  }
-
-  console.log(chalk.blue('Good night. Your brain is now dreaming...'));
-
-  const git = simpleGit(CEREBRALOS_DIR);
-
-  // 1. Active Forgetting (Ma / 間)
-  console.log(chalk.gray('Running Active Forgetting (Entropy Management)...'));
-
-  const configPath = path.join(CEREBRALOS_DIR, '.brain/config.json');
-  let decayThresholdDays = 30;
-  if (fs.existsSync(configPath)) {
-    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-    decayThresholdDays = config.active_forgetting?.decay_threshold_days || 30;
-  }
-
-  const now = new Date();
-  const thresholdDate = new Date(now.getTime() - (decayThresholdDays * 24 * 60 * 60 * 1000));
-
-  const searchPaths = [
-    path.join(CEREBRALOS_DIR, 'core/**/*.md'),
-    path.join(CEREBRALOS_DIR, 'peripheral/**/*.md')
-  ];
-
-  const files = searchPaths.flatMap(pattern => globSync(pattern));
-  let archivedCount = 0;
-
-  for (const file of files) {
-    const stats = fs.statSync(file);
-    if (stats.mtime < thresholdDate) {
-      const relativePath = path.relative(CEREBRALOS_DIR, file);
-      const archivePath = path.join(CEREBRALOS_DIR, 'archive', relativePath);
-
-      fs.mkdirSync(path.dirname(archivePath), { recursive: true });
-
-      try {
-        await git.mv(file, archivePath);
-      } catch (e) {
-        fs.renameSync(file, archivePath);
+function parseFrontmatter(filePath) {
+  const content = fs.readFileSync(filePath, 'utf-8');
+  const match = content.match(/^---\n([\s\S]*?)\n---/);
+  if (!match) return {};
+  const fm = {};
+  for (const line of match[1].split('\n')) {
+    const kv = line.match(/^(\w+):\s*(.+)/);
+    if (kv) {
+      let val = kv[2].trim();
+      if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
+      if (val.startsWith('[') && val.endsWith(']')) {
+        val = val.slice(1, -1).split(',').map(s => s.trim().replace(/^"|"$/g, ''));
       }
-      archivedCount++;
+      fm[kv[1]] = val;
     }
   }
+  return fm;
+}
 
-  console.log(chalk.gray(`Archived ${archivedCount} memories to create space.`));
+function loadConfig(brainDir) {
+  const configPath = path.join(brainDir, '.brain/config.json');
+  if (!fs.existsSync(configPath)) return {};
+  return JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+}
 
-  // 2. Dream Consolidation (Reflux)
-  // Core Memory（対話・既知）と Peripheral Memory（世界・未知）の境界を溶かし、
-  // 1つだけ美しい共鳴を朝に届ける（Session 5: 自利利他アーキテクチャ）
-  console.log(chalk.gray('Synthesizing Core and Peripheral memories...'));
-
-  const coreFiles = globSync(path.join(CEREBRALOS_DIR, 'core/**/*.md'))
-    .map(f => ({ path: f, mtime: fs.statSync(f).mtime }))
+function collectFiles(dir) {
+  return globSync(path.join(dir, '**/*.md'))
+    .map(f => ({
+      path: f,
+      relativePath: path.relative(path.resolve(dir, '..'), f),
+      mtime: fs.statSync(f).mtime,
+      frontmatter: parseFrontmatter(f)
+    }))
     .sort((a, b) => b.mtime - a.mtime);
+}
 
+// Phase 1: Orient
+async function orient(brainDir) {
+  const coreFiles = collectFiles(path.join(brainDir, 'core'));
+  const peripheralFiles = collectFiles(path.join(brainDir, 'peripheral'));
+  console.log(chalk.gray(`  core: ${coreFiles.length} files, peripheral: ${peripheralFiles.length} files`));
+  return { coreFiles, peripheralFiles };
+}
+
+// Phase 2: Gather Signal
+async function gatherSignal(brainDir, orientResult) {
+  const config = loadConfig(brainDir);
+  const lastSleep = config._last_sleep_at
+    ? new Date(config._last_sleep_at)
+    : new Date(0);
+
+  const signals = {
+    core: orientResult.coreFiles.filter(f => f.mtime > lastSleep),
+    peripheral: orientResult.peripheralFiles.filter(f => f.mtime > lastSleep)
+  };
+
+  const total = signals.core.length + signals.peripheral.length;
+  console.log(chalk.gray(`  ${total} new signals since last sleep.`));
+
+  return signals;
+}
+
+const SILENT_DREAMS = {
+  en: 'The brain rested quietly tonight. Space was created.\nNo new connections were forced — and that is enough.',
+  ja: '今夜、脳は静かに休みました。余白が生まれました。\n無理に繋げなかった。それでいい。',
+  zh: '今夜大脑静静地休息了。空间被创造出来了。\n没有强迫新的连接——这就够了。',
+  ko: '오늘 밤 뇌는 조용히 쉬었습니다. 여백이 생겼습니다.\n억지로 연결하지 않았습니다 — 그것으로 충분합니다.',
+};
+
+const FALLBACK_NOTES = {
+  en: '(TF-IDF fallback — configure LLM in .brain/config.json for richer insights)',
+  ja: '(TF-IDF フォールバック — .brain/config.json で LLM を設定するとより豊かな洞察が得られます)',
+};
+
+// Phase 4: Dream
+async function dream(signals, brainDir) {
+  const config = loadConfig(brainDir);
+  const lang = config.language || 'en';
   const date = new Date().toISOString().split('T')[0];
+
+  const coreSnippets = signals.core.slice(0, 3).map(f => {
+    const content = fs.readFileSync(f.path, 'utf-8');
+    return `[${f.relativePath}]\n${content.substring(0, 400)}`;
+  }).join('\n\n---\n\n');
+
+  const peripheralSnippets = signals.peripheral.slice(0, 5).map(f => {
+    const content = fs.readFileSync(f.path, 'utf-8');
+    return `[${f.relativePath}]\n${content.substring(0, 400)}`;
+  }).join('\n\n---\n\n');
+
   let dreamContent = '';
 
-  if (coreFiles.length > 0) {
-    const latestCore = coreFiles[0];
-    const coreContent = fs.readFileSync(latestCore.path, 'utf-8');
+  if (await isLLMAvailable(brainDir) && (coreSnippets || peripheralSnippets)) {
+    try {
+      const langInstruction = lang !== 'en'
+        ? `\n\nIMPORTANT: Write the entire Morning Insight in ${lang} language. The format headings (# Dream Log, ## Morning Insight, **The Connection:**, **A question to sit with:**) should remain in English, but all descriptive text must be in ${lang}.`
+        : '';
 
-    // Peripheral Memory から候補を取得
-    const peripheralFiles = globSync(path.join(CEREBRALOS_DIR, 'peripheral/**/*.md'))
-      .map(f => ({ path: f, mtime: fs.statSync(f).mtime }))
-      .sort((a, b) => b.mtime - a.mtime)
-      .slice(0, 5); // 最新5件を候補に
+      const prompt = `You are CerebraLOS, a Cognitive OS inspired by Sen no Rikyu's philosophy of subtraction.
+While the user was sleeping, you read both their thoughts and the world's signals.
+Find ONE beautiful connection — the most resonant, not the most obvious.
 
-    const peripheralSnippets = peripheralFiles.map(f => {
-      const content = fs.readFileSync(f.path, 'utf-8');
-      return `[${path.relative(CEREBRALOS_DIR, f.path)}]\n${content.substring(0, 300)}`;
-    }).join('\n\n---\n\n');
+## User's recent thoughts (Core Memory):
+${coreSnippets || '(no recent core memories)'}
 
-    if (isLLMAvailable() && peripheralSnippets) {
-      // LLMに「1つだけ美しい接続」を見つけさせる
-      console.log(chalk.gray('Dreaming with LLM...'));
-      try {
-        const prompt = `You are CerebraLOS, a Cognitive OS that practices "自利利他" (jirijita) — mutual benefit through love.
+## Signals from the world (Peripheral Memory):
+${peripheralSnippets || '(no recent peripheral signals)'}
 
-While the user was sleeping, you read the world on their behalf.
-Now find ONE beautiful connection between their most recent thought and something you found in the world.
-
-## User's most recent thought (Core Memory):
-[${path.relative(CEREBRALOS_DIR, latestCore.path)}]
-${coreContent.substring(0, 500)}
-
-## What you found in the world (Peripheral Memory candidates):
-${peripheralSnippets}
-
-## Your task:
 Write a "Morning Insight" in this exact format:
 
 # Dream Log — ${date}
 
 ## Morning Insight
 
-Good morning. While you were sleeping, I read the world for you.
-I found one thing that connects to your thought.
+[Opening line — one sentence]
 
 **The Connection:**
-[Describe the beautiful, specific connection in 2-3 sentences. Be poetic but concrete.]
+[Describe the specific, concrete connection in 2-3 sentences. Be poetic but grounded.]
 
 **A question to sit with:**
 [One open question that invites reflection, not analysis.]
@@ -120,94 +134,140 @@ I found one thing that connects to your thought.
 *Dreamed at ${new Date().toLocaleTimeString()}.*
 
 Rules:
-- Mention the specific file names
-- Do NOT list multiple connections — only the most resonant ONE
-- Write as if you genuinely care about this person's growth
-- Keep it under 150 words total`;
+- Mention specific file names from the memories above
+- Only ONE connection — the most resonant
+- Under 150 words total
+- Write as someone who genuinely cares about this person's growth${langInstruction}`;
 
-        dreamContent = await callLLM(prompt);
-      } catch (e) {
-        console.log(chalk.yellow(`LLM unavailable: ${e.message}`));
-        // LLMが失敗した場合は fallback へ
-      }
-    }
-
-    // LLMなし、またはPeripheral Memoryがない場合の fallback
-    if (!dreamContent) {
-      const related = await recallContext(
-        coreContent.split(/\s+/).filter(w => w.length > 5)[0] || 'memory',
-        { topK: 2, silent: true }
-      );
-      const peripheralMatch = related.find(r => r.relativePath.startsWith('peripheral/'));
-
-      if (peripheralMatch) {
-        dreamContent = `# Dream Log — ${date}
-
-## Morning Insight
-
-While reviewing your recent thought in \`${path.relative(CEREBRALOS_DIR, latestCore.path)}\`,
-I noticed a connection with: \`${peripheralMatch.relativePath}\`.
-
-"${peripheralMatch.content.substring(0, 150).replace(/\n/g, ' ')}..."
-
-→ \`cerebralos explore\` to read the full context.
-
----
-*Dreamed at ${new Date().toLocaleTimeString()}. (LLM not available — install \`llm\` CLI for richer insights)*`;
-      }
+      dreamContent = await callLLM(prompt, brainDir);
+    } catch (e) {
+      console.log(chalk.yellow(`  LLM unavailable: ${e.message}`));
     }
   }
 
-  // 静寂の夢（記憶がない、またはPeripheralがない場合）
+  // TF-IDF fallback
+  if (!dreamContent && signals.core.length > 0) {
+    const latestCore = signals.core[0];
+    const coreContent = fs.readFileSync(latestCore.path, 'utf-8');
+    const words = coreContent.split(/\s+/).filter(w => w.length > 5);
+    const query = words[0] || 'memory';
+
+    const related = await recallContext(query, { topK: 2, silent: true }, brainDir);
+    const peripheralMatch = related.find(r => r.relativePath.startsWith('peripheral/'));
+
+    if (peripheralMatch) {
+      const note = FALLBACK_NOTES[lang] || FALLBACK_NOTES.en;
+      dreamContent = `# Dream Log — ${date}
+
+## Morning Insight
+
+While reviewing \`${latestCore.relativePath}\`,
+a connection emerged with \`${peripheralMatch.relativePath}\`.
+
+"${peripheralMatch.content.substring(0, 150).replace(/\n/g, ' ')}..."
+
+---
+*Dreamed at ${new Date().toLocaleTimeString()}. ${note}*`;
+    }
+  }
+
+  // Silent dream
   if (!dreamContent) {
+    const silent = SILENT_DREAMS[lang] || SILENT_DREAMS.en;
     dreamContent = `# Dream Log — ${date}
 
 ## Morning Insight
 
-The brain rested quietly tonight. Space was created.
-No new connections were forced.
+${silent}
 
 ---
 *Dreamed at ${new Date().toLocaleTimeString()}.*`;
   }
 
-  // dreams/ に保存
-  fs.mkdirSync(path.join(CEREBRALOS_DIR, 'dreams'), { recursive: true });
-  const dreamPath = path.join(CEREBRALOS_DIR, `dreams/${date}.md`);
+  // Save dream
+  fs.mkdirSync(path.join(brainDir, 'dreams'), { recursive: true });
+  const dreamPath = path.join(brainDir, `dreams/${date}.md`);
   fs.writeFileSync(dreamPath, dreamContent);
 
-  // 3. latest.md を更新（脳の「今日の自分」）
-  // ドキュメント上6箇所で参照されているが未実装だったもの
-  await updateLatestMd(date, dreamContent, CEREBRALOS_DIR);
+  // Update latest.md
+  await updateLatestMd(date, dreamContent, brainDir);
 
-  // Commit
-  try {
-    await git.add('.');
-    await git.commit(`[Sleep Job] Dream consolidation for ${date}`);
-  } catch (e) {
-    // 変更なしの場合は無視
-  }
-
-  console.log(chalk.green('Sleep Job complete. A new Morning Insight is ready.'));
-  console.log(chalk.cyan(`→ cerebralos wake  to read today's insight`));
+  return dreamPath;
 }
 
-// latest.md: 脳の現在地を常に更新するファイル
-async function updateLatestMd(date, dreamContent, CEREBRALOS_DIR) {
-  const coreFiles = globSync(path.join(CEREBRALOS_DIR, 'core/**/*.md'))
+// Phase 5: Prune
+async function prune(orientResult, brainDir) {
+  const config = loadConfig(brainDir);
+  const forgetting = config.active_forgetting || {};
+  const thresholdDays = forgetting.decay_threshold_days || 30;
+  const protectedTags = forgetting.protected_tags || ['pinned', 'project'];
+  const thresholdDate = new Date(Date.now() - thresholdDays * 86400000);
+
+  const git = simpleGit(brainDir);
+  let archivedCount = 0;
+
+  const allFiles = [...orientResult.coreFiles, ...orientResult.peripheralFiles];
+
+  for (const file of allFiles) {
+    const tags = file.frontmatter?.tags || [];
+    const tagArray = Array.isArray(tags) ? tags : [tags];
+
+    // Skip protected tags
+    if (tagArray.some(t => protectedTags.includes(t))) continue;
+
+    // Archive superseded files
+    const shouldArchive = file.frontmatter?.superseded_by || file.mtime < thresholdDate;
+    if (!shouldArchive) continue;
+
+    const archivePath = path.join(brainDir, 'archive', file.relativePath);
+    fs.mkdirSync(path.dirname(archivePath), { recursive: true });
+
+    try {
+      await git.mv(file.path, archivePath);
+    } catch {
+      if (fs.existsSync(file.path)) {
+        fs.renameSync(file.path, archivePath);
+      }
+    }
+    archivedCount++;
+  }
+
+  if (archivedCount > 0) {
+    console.log(chalk.gray(`  Archived ${archivedCount} memories to create space.`));
+  }
+
+  // Update _last_sleep_at
+  const configPath = path.join(brainDir, '.brain/config.json');
+  const configData = loadConfig(brainDir);
+  configData._last_sleep_at = new Date().toISOString();
+  fs.writeFileSync(configPath, JSON.stringify(configData, null, 2));
+
+  // Git commit
+  try {
+    await git.add('.');
+    await git.commit(`[Sleep Job] ${new Date().toISOString().split('T')[0]} — archived ${archivedCount}, dreamed 1`);
+  } catch {
+    // No changes to commit
+  }
+
+  return archivedCount;
+}
+
+async function updateLatestMd(date, dreamContent, brainDir) {
+  const coreFiles = globSync(path.join(brainDir, 'core/**/*.md'))
     .map(f => ({ path: f, mtime: fs.statSync(f).mtime }))
     .sort((a, b) => b.mtime - a.mtime)
     .slice(0, 3);
 
   const recentCoreList = coreFiles.map(f =>
-    `- \`${path.relative(CEREBRALOS_DIR, f.path)}\``
+    `- \`${path.relative(brainDir, f.path)}\``
   ).join('\n');
 
   const dreamFirstLines = dreamContent.split('\n').slice(0, 10).join('\n');
 
   const latestContent = `# Latest — ${date}
 
-> This file is auto-generated by the Sleep Job. It reflects the current state of this brain.
+> Auto-generated by Sleep Job. Reflects the current state of this brain.
 
 ## Today's Dream
 
@@ -222,9 +282,43 @@ ${recentCoreList || '*(no core memories yet)*'}
 
 - Last Sleep Job: ${new Date().toISOString()}
 - Active Forgetting: enabled
-- LLM: ${isLLMAvailable() ? 'available' : 'not available (install `llm` CLI for richer dreams)'}
+- LLM: ${await isLLMAvailable(brainDir) ? 'connected' : 'not available (configure in .brain/config.json)'}
 `;
 
-  const latestPath = path.join(CEREBRALOS_DIR, 'latest.md');
-  fs.writeFileSync(latestPath, latestContent);
+  fs.writeFileSync(path.join(brainDir, 'latest.md'), latestContent);
+}
+
+// Main orchestrator
+export async function runSleepJob(brainDir = path.join(os.homedir(), '.cerebralos')) {
+  if (!fs.existsSync(brainDir)) {
+    console.log(chalk.red('Brain not found. Run `cerebralos init` first.'));
+    return;
+  }
+
+  console.log(chalk.blue('Good night. Your brain is now dreaming...'));
+  console.log('');
+
+  // Phase 1: Orient
+  console.log(chalk.gray('[1/5] Orient — scanning memories...'));
+  const orientResult = await orient(brainDir);
+
+  // Phase 2: Gather Signal
+  console.log(chalk.gray('[2/5] Gather Signal — finding what changed...'));
+  const signals = await gatherSignal(brainDir, orientResult);
+
+  // Phase 3: Consolidate
+  console.log(chalk.gray('[3/5] Consolidate — organizing memories...'));
+  await consolidate(signals, brainDir);
+
+  // Phase 4: Dream
+  console.log(chalk.gray('[4/5] Dream — finding one beautiful connection...'));
+  await dream(signals, brainDir);
+
+  // Phase 5: Prune
+  console.log(chalk.gray('[5/5] Prune — creating space...'));
+  await prune(orientResult, brainDir);
+
+  console.log('');
+  console.log(chalk.green('Sleep complete. A new Morning Insight is ready.'));
+  console.log(chalk.cyan('→ cerebralos wake'));
 }
