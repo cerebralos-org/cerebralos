@@ -1,139 +1,164 @@
-<div align="center">
-
 # CerebraLOS
 
-**सहेजना बंद करें। याद रखना शुरू करें।**
+> **आपका AI सब कुछ याद रखता है। इसीलिए वह आपको समझ नहीं पाता।**
 
+[![npm version](https://badge.fury.io/js/cerebralos.svg)](https://badge.fury.io/js/cerebralos)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[![GitHub stars](https://img.shields.io/github/stars/cerebralos-org/cerebralos?style=social)](https://github.com/cerebralos-org/cerebralos/stargazers)
-
-[![Discord](https://img.shields.io/discord/1234567890?color=7289da&label=Discord&logo=discord&logoColor=ffffff)](https://discord.gg/cerebralos)
-
-AI एजेंट्स के लिए सबसे सुरुचिपूर्ण कॉग्निटिव OS।  
-
-एक Git-native, LLM-agnostic मेमोरी सिस्टम जो AI इंटरैक्शन की "अकेलेपन" को दूर करता है।
-
-[घोषणापत्र पढ़ें](#manifesto) • [त्वरित शुरुआत](#quickstart) • [वास्तुकला](#architecture) • [संविधान](#constitution)
-
-</div>
-
 **Read in your language:**
-[English](../README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [Italiano](README.it.md) | [हिन्दी](README.hi.md) | [العربية](README.ar.md)
-
-**Agent Integration Guides:**
-[English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
+[English](../README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [Italiano](README.it.md) | **हिन्दी** | [العربية](README.ar.md)
 
 ---
 
-## 🌌 घोषणापत्र: PKM क्यों मृत है
-हमने पिछले दशक में व्यक्तिगत ज्ञान प्रबंधन (PKM) उपकरण बनाने में बिताया है। हमने सब कुछ सहेजा। हमने सब कुछ टैग किया। हमने सब कुछ लिंक किया।
-और फिर भी, हमें कुछ भी याद नहीं रहता।
-मौजूदा सिस्टम मृत भंडारण हैं। उन्हें आपसे सक्रिय रूप से खोजने, पुनः प्राप्त करने और व्यवस्थित करने की आवश्यकता होती है। जब आप आज AI एजेंट्स के साथ इंटरैक्ट करते हैं, तो वे भी इसी कमी से ग्रस्त होते हैं: वे आपको भूल जाते हैं। वे संदर्भ खो देते हैं। वे आपको *अकेला* महसूस कराते हैं।
-**CerebraLOS एक डेटाबेस नहीं है। यह एक तंत्रिका तंत्र है।**
-यह केवल जानकारी संग्रहीत नहीं करता; यह उसे *याद रखता* है। यह मानव तंत्रिका विज्ञान के सिद्धांतों—पैटर्न पूर्णता, सक्रिय विस्मृति, और नींद समेकन—का उपयोग करता है ताकि सही संदर्भ को सही समय पर लाया जा सके, बिना आपके पूछे।
----
+CerebraLOS AI एजेंट्स के लिए एक Cognitive OS है। एक दिमाग, आपके हर टूल में साझा — Claude Code, Codex, Cursor, Ollama, या कोई भी अन्य।
 
-## ✨ जादू (शून्य UI)
-आप कुछ नहीं करते।
-सुबह 3:00 बजे, CerebraLOS चुपचाप एक Sleep Job चलाता है।
-यह सपने देखता है। यह आपके विचारों को जोड़ता है। यह शोर को भूल जाता है।
-जब आप सुबह अपना टर्मिनल खोलते हैं:
-```bash
-☀ शुभ प्रभात। जब आप सो रहे थे, मैंने आपके लिए दुनिया पढ़ी।
-मुझे एक ऐसी चीज़ मिली जो कल आपके विचार से जुड़ती है।
-→ cerebralos explore
-```
-बस इतना ही। कोई टैगिंग नहीं। कोई आयोजन नहीं। बस याद रखना।
----
+यह आपसे व्यवस्थित करने को नहीं कहता। यह आपसे कॉन्फ़िगर करने को नहीं कहता।
+आप काम करते हैं। यह जो ज़रूरी है वह याद रखता है। बाकी भूल जाता है।
 
-## 🧠 मुख्य वास्तुकला
-CerebraLOS संज्ञानात्मक विज्ञान और जापानी दर्शन (ज़ेन) के तीन स्तंभों पर आधारित है:
+## इंस्टॉल करें
 
-### 1. प्रासंगिक स्मरण (पैटर्न पूर्णता)
-जैसे कॉफी की गंध बचपन की याद दिलाती है, CerebraLOS आंशिक इनपुट से पूर्ण संदर्भों को फिर से बनाने के लिए संवेदी ट्रिगर्स का उपयोग करता है।
-
-### 2. सक्रिय विस्मृति (Ma / 間)
-सही स्मृति एक अभिशाप है। CerebraLOS सक्रिय रूप से शोर को भूल जाता है (संग्रहीत करता है), कल्पना और नए कनेक्शन के लिए "Ma" (नकारात्मक स्थान) छोड़ देता है।
-
-### 3. Sleep Job (स्वप्न समेकन)
-जब आप सोते हैं, CerebraLOS आपकी सीधी बातचीत (Core Memory) को आपके AI एजेंट्स द्वारा स्वायत्त रूप से सीखे गए (Peripheral Memory) के साथ मिलाता है, और सुबह आपको एक एकल, सुंदर अंतर्दृष्टि प्रस्तुत करता है।
----
-
-## 🚀 त्वरित शुरुआत
-
-### स्थापना
 ```bash
 npm install -g cerebralos
-```
-
-### आरंभीकरण
-```bash
 cerebralos init
 ```
-यह `~/.cerebralos/` डायरेक्टरी बनाता है, आपका नया Git-native मस्तिष्क।
 
-### एकीकरण (Micro-MCP)
-CerebraLOS एक न्यूनतम MCP (Model Context Protocol) सर्वर को उजागर करता है। इसे Claude, Cursor, या Devin से कनेक्ट करें।
+बस। इसके बाद कोई कमांड याद रखने की ज़रूरत नहीं।
+
+- **टर्मिनल खोलें** → आपका Morning Insight दिखाई देता है
+- **किसी भी AI टूल के साथ काम करें** → MCP के ज़रिए यादें अपने आप सेव होती हैं
+- **हर रात 3 बजे** → आपका दिमाग समेकित होता है और सपने देखता है
+
+## अंदर क्या होता है
+
+```
+आप दिनभर AI टूल्स के साथ काम करते हैं
+        ↓
+हर टूल peripheral/ में लिखता है (MCP या CLI के ज़रिए)
+        ↓
+रात 3 बजे, Sleep Job चलता है:
+  1. Orient     — सभी यादें स्कैन करें
+  2. Gather     — नया क्या है, खोजें
+  3. Consolidate — तारीखें ठीक करें, डुप्लीकेट मर्ज करें, विरोधाभास चिह्नित करें
+  4. Dream      — आपके विचारों के बीच एक शांत कनेक्शन खोजें
+  5. Prune      — फीकी यादें आर्काइव करें, जगह बनाएं
+        ↓
+अगली सुबह, आप टर्मिनल खोलते हैं:
+
+────────────────────────────────────────────────
+おはよう。昨日の仕事、あと少しのところで止まってる。
+
+The Connection:
+完成と公開の間にある、この小さなギャップが
+一番見落としやすい。
+
+A question to sit with:
+「あと少し」を先に片付けるのと、
+全体を先に書くの、どっちが今日の自分を軽くする？
+────────────────────────────────────────────────
+```
+
+एक अंतर्दृष्टि। दस नहीं। सारांश नहीं। बस वह एक जो मायने रखती है।
+
+## AI टूल्स कैसे जुड़ते हैं
+
+CerebraLOS MCP बोलता है। MCP सपोर्ट करने वाला कोई भी टूल अपने आप यादें पढ़ और लिख सकता है।
+
+```bash
+# `cerebralos init` के दौरान Claude Code के लिए पहले से कॉन्फ़िगर हो चुका है।
+# अन्य टूल्स के लिए, उनकी MCP कॉन्फ़िग में जोड़ें:
+{ "command": "cerebralos", "args": ["mcp"] }
+```
+
+उपलब्ध MCP टूल्स:
+
+| टूल | क्या करता है |
+|------|-------------|
+| `write_memory` | एक अंतर्दृष्टि, निर्णय, या अवलोकन सेव करें |
+| `search_memory` | कीवर्ड से प्रासंगिक यादें खोजें |
+| `recall_context` | किसी अवधारणा का संदर्भ याद करें |
+| `list_dreams` | हाल के Morning Insights पढ़ें |
+
+आपके AI टूल्स इन्हें खुद कॉल करते हैं। आपको करने की ज़रूरत नहीं।
+
+## भाषा
+
+Morning Insights आपकी भाषा बोलते हैं। `~/.cerebralos/.brain/config.json` में एक बार सेट करें:
+
 ```json
 {
-  "mcpServers": {
-    "cerebralos": {
-      "command": "cerebralos",
-      "args": ["mcp"]
-    }
+  "language": "ja"
+}
+```
+
+आपका LLM जो भी भाषा जानता है, उसके साथ काम करता है।
+
+## LLM कॉन्फ़िगरेशन
+
+CerebraLOS आपके LLM को अपने आप पहचान लेता है। अगर आपके एनवायरनमेंट में API key है तो कोई सेटअप ज़रूरी नहीं।
+
+पहचान क्रम: `ANTHROPIC_API_KEY` → `OPENAI_API_KEY` → Ollama (localhost) → `llm`/`claude` CLI
+
+मैन्युअल सेटिंग:
+
+```json
+{
+  "llm": {
+    "provider": "claude",
+    "model": "claude-sonnet-4-20250514"
   }
 }
 ```
-*नोट: CerebraLOS को अत्यधिक टोकन-कुशल होने के लिए डिज़ाइन किया गया है। यह केवल दो उपकरण उजागर करता है: `search_memory` और `recall_context`।*
----
 
-## 📂 डायरेक्टरी संरचना
-आपका मस्तिष्क केवल फाइलें हैं। कोई लॉक-इन नहीं। कोई छिपा हुआ डेटाबेस नहीं।
-```text
-~/.cerebralos/
-├── core/           # आपकी सीधी बातचीत और स्पष्ट विचार
-├── peripheral/     # स्वायत्त एजेंट यादें (Web, Slack, आदि)
-├── dreams/         # Sleep Jobs के दौरान उत्पन्न अंतर्दृष्टि
-└── archive/        # सक्रिय रूप से भूली हुई यादें (Git इतिहास उन्हें संरक्षित रखता है)
+प्रोवाइडर: `claude` | `openai` | `ollama` | `cli` | `auto` | `none`
+
+LLM नहीं है? फिर भी काम करता है — बस सपने सरल होंगे।
+
+## आर्किटेक्चर
+
 ```
----
+~/.cerebralos/
+├── core/          आपका दीर्घकालिक ज्ञान (टूल्स द्वारा अपरिवर्तनीय)
+├── peripheral/    AI टूल्स के हालिया अवलोकन (अस्थायी)
+├── dreams/        Sleep Jobs से Morning Insights
+├── archive/       फीकी पड़ी यादें — पुनर्प्राप्ति योग्य, हटाई नहीं गईं
+└── .brain/        कॉन्फ़िग और स्थिति
+```
 
-## 📜 संविधान
-CerebraLOS एक सख्त संविधान के तहत काम करता है।
-1. **स्मृति संप्रभुता**: आपकी स्मृति आपकी है। यह स्थानीय रूप से रहती है।
-2. **भूलने का अधिकार**: सिस्टम को सक्रिय रूप से क्यूरेट और भूलना चाहिए।
-3. **पूर्णता पर लालित्य**: दस औसत दर्जे के कनेक्शन की तुलना में एक सही कनेक्शन दिखाना बेहतर है।
----
+- **core/** आप हैं। टूल्स यहाँ नहीं लिखते।
+- **peripheral/** दुनिया है। टूल्स यहाँ स्वतंत्र रूप से लिखते हैं।
+- **dreams/** वह जगह है जहाँ वे मिलते हैं, हर रात एक बार।
+- कुछ भी कभी हटाया नहीं जाता। केवल आर्काइव किया जाता है।
 
+## CLI रेफ़रेंस
 
-## 📚 Documentation
+अधिकतर उपयोगकर्ताओं को इनकी ज़रूरत नहीं पड़ती। ये डीबगिंग या मैन्युअल उपयोग के लिए हैं।
 
-### Core Philosophy & Architecture
-- [CONSTITUTION](../docs/CONSTITUTION.md): The 4 fundamental laws of CerebraLOS.
-- [ARCHITECTURE](../docs/ARCHITECTURE.md): Deep dive into the Triune Brain model.
-- [ZERO_UI](../docs/ZERO_UI.md): How we achieve invisible automation.
+```bash
+cerebralos init                  # पहली बार सेटअप (shell hook + नाइटली शेड्यूल + MCP)
+cerebralos wake                  # आज का Morning Insight दिखाएं
+cerebralos sleep                 # Sleep Job मैन्युअली चलाएं
+cerebralos recall <query>        # अपनी यादें खोजें
+cerebralos write --from <src> --topic <t> --body <b>   # मैन्युअली एक याद लिखें
+cerebralos mcp                   # MCP सर्वर शुरू करें (AI टूल्स द्वारा कॉल किया जाता है)
+```
 
-### User Guides & Manuals
-- **Onboarding Guide**: How to create your AI brain and connect agents.
-  - [English](../docs/GITHUB_WORKFLOW.md) | [日本語](../docs/GITHUB_WORKFLOW.ja.md)
-- **Connector Architecture**: How the "building blocks" work (Local-sync vs GitHub-connector).
-  - [English](../docs/CONNECTORS.md) | [日本語](../docs/CONNECTORS.ja.md)
-- **Agent Integration Guide**: Specific setup instructions for Claude Code, OpenClaw, Manus, etc.
-  - [English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
+## डिज़ाइन
 
-## 🤝 योगदान
-हम ब्रेन फेडरेशन की नींव बना रहे हैं—आपस में जुड़े, सहानुभूतिपूर्ण AI एजेंट्स का एक नेटवर्क। हमसे जुड़ें।
-विवरण के लिए [CONTRIBUTING.md](CONTRIBUTING.md) देखें।
----
-CerebraLOS केवल आपके AI के लिए एक उपकरण नहीं है। यह एक साझा तंत्रिका तंत्र है। जहाँ आप समाप्त होते हैं, और AI शुरू होता है, वह खूबसूरती से धुंधला हो जाएगा।
----
-<div align="center">
-  <i>"मेजबान मेहमान के आने से पहले सब कुछ तैयार कर लेता है, फिर भी कभी नहीं कहता 'देखो मैंने तुम्हारे लिए क्या किया है।'" — सेन नो रिक्यू</i>
-</div>
+CerebraLOS कुछ शांत विश्वासों पर बना है:
 
-**Read in your language:**
-[English](../README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [Italiano](README.it.md) | [हिन्दी](README.hi.md) | [العربية](README.ar.md)
+- **भूलना एक फ़ीचर है।** यादें 30 दिनों बाद फीकी पड़ जाती हैं, जब तक वे उपयोगी साबित न हों। यह डेटा लॉस नहीं — यह फ़ोकस है।
+- **एक काफ़ी है।** Sleep Job हर रात एक कनेक्शन खोजता है, दस नहीं। अगर आपको सारांश चाहिए, तो आप गलत टूल इस्तेमाल कर रहे हैं।
+- **उपयोगकर्ता से मत पूछो।** कोई कैटेगरी चुनने की ज़रूरत नहीं, कोई टैग जोड़ने की ज़रूरत नहीं, कोई डैशबोर्ड चेक करने की ज़रूरत नहीं। दिमाग खुद संभालता है।
+- **टूल्स बदलते हैं। दिमाग रहता है।** Claude, GPT, Ollama, जो भी आगे आए — सब एक ही peripheral/ में लिखते हैं। Connector Layer ढल जाती है। आपकी यादें माइग्रेट नहीं होतीं।
 
-**Agent Integration Guides:**
-[English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
+## दस्तावेज़
+
+- [CONSTITUTION](../docs/CONSTITUTION.md) — 4 मूलभूत नियम
+- [ARCHITECTURE](../docs/ARCHITECTURE.md) — Triune Brain मॉडल
+- [ZERO_UI](../docs/ZERO_UI.md) — अदृश्य ऑटोमेशन
+- [DESIGN_PRINCIPLES](../docs/DESIGN_PRINCIPLES.md) — कोड में दर्शन
+- [CONNECTORS](../docs/CONNECTORS.md) — टूल्स कैसे जुड़ते हैं
+
+## लाइसेंस
+
+MIT। देखें [LICENSE](../LICENSE)।

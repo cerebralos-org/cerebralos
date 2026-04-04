@@ -1,139 +1,161 @@
-<div align="center">
+[English](../README.md) | **한국어**
 
 # CerebraLOS
 
-**저장하는 것을 멈추고, 기억하기 시작하세요.**
+> **당신의 AI는 모든 것을 기억합니다. 그래서 당신을 이해하지 못합니다.**
 
+[![npm version](https://badge.fury.io/js/cerebralos.svg)](https://badge.fury.io/js/cerebralos)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[![GitHub stars](https://img.shields.io/github/stars/cerebralos-org/cerebralos?style=social)](https://github.com/cerebralos-org/cerebralos/stargazers)
+CerebraLOS는 AI 에이전트를 위한 Cognitive OS입니다. 하나의 두뇌를, 당신이 사용하는 모든 도구가 공유합니다 -- Claude Code, Codex, Cursor, Ollama, 그 외 무엇이든.
 
-[![Discord](https://img.shields.io/discord/1234567890?color=7289da&label=Discord&logo=discord&logoColor=ffffff)](https://discord.gg/cerebralos)
+정리하라고 요구하지 않습니다. 설정하라고 요구하지 않습니다.
+당신은 일합니다. 중요한 것을 기억합니다. 나머지는 잊습니다.
 
-AI 에이전트를 위한 가장 우아한 인지 OS.
+## 설치
 
-Git-native, LLM-agnostic 메모리 시스템으로 AI 상호작용의 "외로움"을 치유합니다.
-
-[선언문 읽기](#manifesto) • [빠른 시작](#quickstart) • [아키텍처](#architecture) • [헌법](#constitution)
-
-</div>
-
-**Read in your language:**
-[English](../README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [Italiano](README.it.md) | [हिन्दी](README.hi.md) | [العربية](README.ar.md)
-
-**Agent Integration Guides:**
-[English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
-
----
-
-## 🌌 선언문: PKM은 왜 죽었는가
-우리는 지난 10년간 개인 지식 관리(PKM) 도구를 구축하는 데 시간을 보냈습니다. 모든 것을 저장했습니다. 모든 것에 태그를 달았습니다. 모든 것을 연결했습니다.
-하지만 우리는 아무것도 기억하지 못합니다.
-기존 시스템은 죽은 저장소입니다. 능동적으로 검색하고, 검색하고, 정리해야 합니다. 오늘날 AI 에이전트와 상호작용할 때도 동일한 결함에 시달립니다. 그들은 당신을 잊습니다. 그들은 맥락을 잃습니다. 그들은 당신을 *외롭게* 만듭니다.
-**CerebraLOS는 데이터베이스가 아닙니다. 그것은 신경계입니다.**
-정보를 저장하는 것만이 아닙니다. 그것은 정보를 *기억합니다*. 인간 신경과학의 원리—패턴 완성, 능동적 망각, 수면 통합—를 사용하여 당신이 요청하지 않아도 적절한 맥락을 적절한 순간에 가져옵니다.
----
-
-## ✨ 마법 (Zero UI)
-당신은 아무것도 하지 않습니다.
-새벽 3시, CerebraLOS는 조용히 Sleep Job을 실행합니다.
-그것은 꿈을 꿉니다. 당신의 생각을 연결합니다. 소음을 잊습니다.
-아침에 터미널을 열면:
-```bash
-☀ Good morning. While you were sleeping, I read the world for you.
-I found one thing that connects to your thought yesterday.
-→ cerebralos explore
-```
-그게 다입니다. 태그 지정도, 정리도 없습니다. 그저 기억할 뿐입니다.
----
-
-## 🧠 핵심 아키텍처
-CerebraLOS는 인지 과학과 일본 철학(선)의 세 가지 기둥 위에 구축되었습니다:
-
-### 1. 맥락적 회상 (패턴 완성)
-어린 시절의 기억을 되살리는 커피 향처럼, CerebraLOS는 감각적 트리거를 사용하여 부분적인 입력에서 완전한 맥락을 재구성합니다.
-
-### 2. 능동적 망각 (Ma / 間)
-완벽한 기억은 저주입니다. CerebraLOS는 소음을 능동적으로 잊고(아카이브), 상상력과 새로운 연결을 위한 "Ma"(부정적 공간)를 남깁니다.
-
-### 3. Sleep Job (꿈 통합)
-당신이 잠든 동안, CerebraLOS는 당신의 직접적인 상호작용(Core Memory)과 AI 에이전트가 자율적으로 학습한 것(Peripheral Memory)을 병합하여 아침에 하나의 아름다운 통찰력을 제공합니다.
----
-
-## 🚀 빠른 시작
-
-### Installation
 ```bash
 npm install -g cerebralos
-```
-
-### Initialization
-```bash
 cerebralos init
 ```
-이것은 `~/.cerebralos/` 디렉토리를 생성합니다. 당신의 새로운 Git-native 두뇌입니다.
 
-### Integration (Micro-MCP)
-CerebraLOS는 최소한의 MCP (Model Context Protocol) 서버를 노출합니다. Claude, Cursor 또는 Devin에 연결하세요.
+이것으로 끝입니다. 이후에 기억해야 할 명령어는 없습니다.
+
+- **터미널을 열면** → Morning Insight가 나타납니다
+- **어떤 AI 도구로든 작업하면** → MCP를 통해 기억이 자동 저장됩니다
+- **매일 새벽 3시** → 두뇌가 통합하고 꿈을 꿉니다
+
+## 내부에서 일어나는 일
+
+```
+하루 종일 AI 도구로 작업합니다
+        ↓
+각 도구가 peripheral/에 기록합니다 (MCP 또는 CLI를 통해)
+        ↓
+새벽 3시, Sleep Job이 실행됩니다:
+  1. Orient     — 모든 기억을 탐색합니다
+  2. Gather     — 새로운 것을 찾습니다
+  3. Consolidate — 날짜를 정리하고, 중복을 병합하고, 모순을 표시합니다
+  4. Dream      — 당신의 생각 사이에서 하나의 조용한 연결을 찾습니다
+  5. Prune      — 흐려진 것을 아카이브하고, 공간을 만듭니다
+        ↓
+다음 날 아침, 터미널을 열면:
+
+────────────────────────────────────────────────
+おはよう。昨日の仕事、あと少しのところで止まってる。
+
+The Connection:
+完成と公開の間にある、この小さなギャップが
+一番見落としやすい。
+
+A question to sit with:
+「あと少し」を先に片付けるのと、
+全体を先に書くの、どっちが今日の自分を軽くする？
+────────────────────────────────────────────────
+```
+
+하나의 통찰. 열 개가 아닙니다. 요약이 아닙니다. 중요한 단 하나.
+
+## AI 도구 연결 방법
+
+CerebraLOS는 MCP를 사용합니다. MCP를 지원하는 모든 도구가 자동으로 기억을 읽고 쓸 수 있습니다.
+
+```bash
+# `cerebralos init` 중에 Claude Code용으로 이미 설정됩니다.
+# 다른 도구의 경우, 해당 도구의 MCP 설정에 추가하세요:
+{ "command": "cerebralos", "args": ["mcp"] }
+```
+
+사용 가능한 MCP 도구:
+
+| 도구 | 기능 |
+|------|------|
+| `write_memory` | 통찰, 결정, 관찰을 저장합니다 |
+| `search_memory` | 키워드로 관련 기억을 검색합니다 |
+| `recall_context` | 개념에 대한 맥락을 회상합니다 |
+| `list_dreams` | 최근 Morning Insight를 읽습니다 |
+
+AI 도구들이 스스로 이것들을 호출합니다. 당신이 할 필요는 없습니다.
+
+## 언어
+
+Morning Insight는 당신의 언어로 말합니다. `~/.cerebralos/.brain/config.json`에서 한 번만 설정하세요:
+
 ```json
 {
-  "mcpServers": {
-    "cerebralos": {
-      "command": "cerebralos",
-      "args": ["mcp"]
-    }
+  "language": "ja"
+}
+```
+
+LLM이 아는 모든 언어로 작동합니다.
+
+## LLM 설정
+
+CerebraLOS는 LLM을 자동 감지합니다. 환경에 API 키가 있으면 별도 설정이 필요 없습니다.
+
+감지 순서: `ANTHROPIC_API_KEY` → `OPENAI_API_KEY` → Ollama (localhost) → `llm`/`claude` CLI
+
+명시적으로 설정하려면:
+
+```json
+{
+  "llm": {
+    "provider": "claude",
+    "model": "claude-sonnet-4-20250514"
   }
 }
 ```
-*Note: CerebraLOS는 극도로 토큰 효율적으로 설계되었습니다. `search_memory`와 `recall_context` 두 가지 도구만 노출합니다.*
----
 
-## 📂 Directory Structure
-당신의 두뇌는 그저 파일입니다. 락인도, 숨겨진 데이터베이스도 없습니다.
-```text
-~/.cerebralos/
-├── core/           # 당신의 직접적인 상호작용과 명시적인 생각
-├── peripheral/     # 자율 에이전트 메모리 (Web, Slack 등)
-├── dreams/         # Sleep Jobs 동안 생성된 통찰력
-└── archive/        # 능동적으로 잊혀진 메모리 (Git 기록이 보존함)
+제공자: `claude` | `openai` | `ollama` | `cli` | `auto` | `none`
+
+LLM이 없어도 작동합니다 -- 다만 꿈이 단순해질 뿐입니다.
+
+## 아키텍처
+
 ```
----
+~/.cerebralos/
+├── core/          장기 지식 (도구가 수정 불가)
+├── peripheral/    AI 도구로부터의 최근 관찰 (휘발성)
+├── dreams/        Sleep Job에서 생성된 Morning Insight
+├── archive/       흐려진 기억 — 복구 가능, 삭제되지 않음
+└── .brain/        설정 및 상태
+```
 
-## 📜 The Constitution
-CerebraLOS는 엄격한 헌법에 따라 작동합니다.
-1. **Memory Sovereignty**: 당신의 기억은 당신의 것입니다. 그것은 로컬에 존재합니다.
-2. **The Right to Forget**: 시스템은 능동적으로 큐레이션하고 잊어야 합니다.
-3. **Elegance over Exhaustiveness**: 열 개의 평범한 연결보다 하나의 완벽한 연결을 보여주는 것이 낫습니다.
----
+- **core/** 는 당신입니다. 도구는 여기에 쓰지 않습니다.
+- **peripheral/** 은 세계입니다. 도구가 자유롭게 기록합니다.
+- **dreams/** 는 둘이 만나는 곳입니다, 하루에 한 번 밤에.
+- 아무것도 삭제되지 않습니다. 아카이브될 뿐입니다.
 
+## CLI 레퍼런스
 
-## 📚 Documentation
+대부분의 사용자는 이것들이 필요 없습니다. 디버깅이나 수동 사용을 위한 것입니다.
 
-### Core Philosophy & Architecture
-- [CONSTITUTION](../docs/CONSTITUTION.md): The 4 fundamental laws of CerebraLOS.
-- [ARCHITECTURE](../docs/ARCHITECTURE.md): Deep dive into the Triune Brain model.
-- [ZERO_UI](../docs/ZERO_UI.md): How we achieve invisible automation.
+```bash
+cerebralos init                  # 최초 설정 (셸 훅 + 야간 스케줄 + MCP)
+cerebralos wake                  # 오늘의 Morning Insight 표시
+cerebralos sleep                 # Sleep Job 수동 실행
+cerebralos recall <query>        # 기억 검색
+cerebralos write --from <src> --topic <t> --body <b>   # 기억 수동 작성
+cerebralos mcp                   # MCP 서버 시작 (AI 도구가 호출)
+```
 
-### User Guides & Manuals
-- **Onboarding Guide**: How to create your AI brain and connect agents.
-  - [English](../docs/GITHUB_WORKFLOW.md) | [日本語](../docs/GITHUB_WORKFLOW.ja.md)
-- **Connector Architecture**: How the "building blocks" work (Local-sync vs GitHub-connector).
-  - [English](../docs/CONNECTORS.md) | [日本語](../docs/CONNECTORS.ja.md)
-- **Agent Integration Guide**: Specific setup instructions for Claude Code, OpenClaw, Manus, etc.
-  - [English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
+## 설계 철학
 
-## 🤝 Contributing
-우리는 상호 연결되고 공감하는 AI 에이전트 네트워크인 Brain Federation의 기반을 구축하고 있습니다. 우리와 함께하세요.
-자세한 내용은 [CONTRIBUTING.md](CONTRIBUTING.md)를 참조하십시오.
----
-CerebraLOS는 당신의 AI를 위한 도구 그 이상입니다. 그것은 공유된 신경계입니다. 당신이 끝나는 곳과 AI가 시작되는 곳은 아름답게 흐려질 것입니다.
----
-<div align="center">
-  <i>"주인은 손님이 도착하기 전에 모든 것을 준비하지만, '내가 당신을 위해 무엇을 했는지 보라'고 결코 말하지 않는다." — 센노리큐</i>
-</div>
+CerebraLOS는 몇 가지 조용한 신념 위에 만들어졌습니다:
 
-**Read in your language:**
-[English](../README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [Italiano](README.it.md) | [हिन्दी](README.hi.md) | [العربية](README.ar.md)
+- **망각은 기능입니다.** 기억은 유용함이 증명되지 않으면 30일 후 소멸합니다. 이것은 데이터 손실이 아닙니다 -- 집중입니다.
+- **하나면 충분합니다.** Sleep Job은 밤마다 열 개가 아닌 하나의 연결을 찾습니다. 요약이 필요하다면, 당신은 잘못된 도구를 쓰고 있는 것입니다.
+- **사용자에게 묻지 않습니다.** 선택할 카테고리도, 추가할 태그도, 확인할 대시보드도 없습니다. 두뇌가 스스로 관리합니다.
+- **도구는 바뀝니다. 두뇌는 남습니다.** Claude, GPT, Ollama, 다음에 무엇이 오든 -- 모두 같은 peripheral/에 기록합니다. Connector Layer가 적응합니다. 기억은 마이그레이션되지 않습니다.
 
-**Agent Integration Guides:**
-[English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
+## 문서
+
+- [CONSTITUTION](docs/CONSTITUTION.md) — 4가지 근본 법칙
+- [ARCHITECTURE](docs/ARCHITECTURE.md) — Triune Brain 모델
+- [ZERO_UI](docs/ZERO_UI.md) — 보이지 않는 자동화
+- [DESIGN_PRINCIPLES](docs/DESIGN_PRINCIPLES.md) — 코드 안의 철학
+- [CONNECTORS](docs/CONNECTORS.md) — 도구 연결 방법
+
+## 라이선스
+
+MIT. [LICENSE](LICENSE)를 참조하세요.

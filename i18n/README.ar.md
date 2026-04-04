@@ -1,140 +1,188 @@
-<div align="center">
+<div dir="rtl">
 
 # CerebraLOS
 
-**توقف عن الحفظ. ابدأ بالتذكر.**
+> **ذكاؤك الاصطناعي يتذكر كل شيء. لهذا السبب لا يفهمك.**
 
+[![npm version](https://badge.fury.io/js/cerebralos.svg)](https://badge.fury.io/js/cerebralos)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[![GitHub stars](https://img.shields.io/github/stars/cerebralos-org/cerebralos?style=social)](https://github.com/cerebralos-org/cerebralos/stargazers)
+**Read in your language:**
+[English](../README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [Italiano](README.it.md) | [हिन्दी](README.hi.md) | **العربية**
 
-[![Discord](https://img.shields.io/discord/1234567890?color=7289da&label=Discord&logo=discord&logoColor=ffffff)](https://discord.gg/cerebralos)
+---
 
-نظام التشغيل المعرفي الأكثر أناقة لوكلاء الذكاء الاصطناعي.  
+CerebraLOS هو نظام تشغيل معرفي لوكلاء الذكاء الاصطناعي. دماغ واحد، مشترك عبر كل أداة تستخدمها — Claude Code أو Codex أو Cursor أو Ollama أو أي شيء آخر.
 
-نظام ذاكرة أصيل لـ Git، لا يعتمد على LLM، يعالج "وحدة" تفاعلات الذكاء الاصطناعي.
+لا يطلب منك التنظيم. لا يطلب منك الإعداد.
+أنت تعمل. وهو يتذكر ما يهم. والباقي ينساه.
 
-[اقرأ البيان](#manifesto) • [بدء سريع](#quickstart) • [الهندسة المعمارية](#architecture) • [الدستور](#constitution)
+## التثبيت
+
+```bash
+npm install -g cerebralos
+cerebralos init
+```
+
+هذا كل شيء. لا أوامر تحتاج تذكّرها بعد ذلك.
+
+- **افتح الطرفية** ← يظهر Morning Insight الخاص بك
+- **اعمل مع أي أداة AI** ← تُحفظ الذكريات تلقائيًا عبر MCP
+- **كل ليلة الساعة 3 صباحًا** ← دماغك يتوحّد ويحلم
+
+## ماذا يحدث بالداخل
+
+```
+تعمل مع أدوات AI طوال اليوم
+        ↓
+كل أداة تكتب في peripheral/ (عبر MCP أو CLI)
+        ↓
+في الساعة 3 صباحًا، يعمل Sleep Job:
+  1. Orient     — مسح جميع الذكريات
+  2. Gather     — إيجاد ما هو جديد
+  3. Consolidate — تصحيح التواريخ، دمج المكررات، تمييز التناقضات
+  4. Dream      — إيجاد رابط هادئ واحد بين أفكارك
+  5. Prune      — أرشفة ما تلاشى، وإفساح المجال
+        ↓
+في الصباح التالي، تفتح الطرفية:
+
+────────────────────────────────────────────────
+おはよう。昨日の仕事、あと少しのところで止まってる。
+
+The Connection:
+完成と公開の間にある、この小さなギャップが
+一番見落としやすい。
+
+A question to sit with:
+「あと少し」を先に片付けるのと、
+全体を先に書くの、どっちが今日の自分を軽くする？
+────────────────────────────────────────────────
+```
+
+رؤية واحدة. ليست عشرة. ليست ملخصًا. فقط تلك التي تهم.
+
+## كيف تتصل أدوات AI
+
+يتحدث CerebraLOS بروتوكول MCP. أي أداة تدعم MCP يمكنها قراءة وكتابة الذكريات تلقائيًا.
+
+<div dir="ltr">
+
+```bash
+# Already configured during `cerebralos init` for Claude Code.
+# For other tools, add to their MCP config:
+{ "command": "cerebralos", "args": ["mcp"] }
+```
 
 </div>
 
-**Read in your language:**
-[English](../README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [Italiano](README.it.md) | [हिन्दी](README.hi.md) | [العربية](README.ar.md)
+أدوات MCP المتاحة:
 
-**Agent Integration Guides:**
-[English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
+| الأداة | ماذا تفعل |
+|--------|-----------|
+| `write_memory` | حفظ رؤية أو قرار أو ملاحظة |
+| `search_memory` | البحث عن ذكريات ذات صلة بكلمة مفتاحية |
+| `recall_context` | استرجاع السياق لمفهوم معين |
+| `list_dreams` | قراءة Morning Insights الأخيرة |
 
----
+أدوات AI الخاصة بك تستدعي هذه تلقائيًا. لست بحاجة لفعل ذلك.
 
-## 🌌 البيان: لماذا ماتت إدارة المعرفة الشخصية (PKM)
-لقد أمضينا العقد الماضي في بناء أدوات إدارة المعرفة الشخصية (PKM). حفظنا كل شيء. وضعنا علامات على كل شيء. ربطنا كل شيء.
-ومع ذلك، لا نتذكر شيئًا.
-الأنظمة الحالية هي مجرد تخزين ميت. تتطلب منك البحث بنشاط واسترجاع وتنظيم. عندما تتفاعل مع وكلاء الذكاء الاصطناعي اليوم، فإنهم يعانون من نفس العيب: ينسونك. يفقدون السياق. يجعلوك تشعر *بالوحدة*.
-**CerebraLOS ليس قاعدة بيانات. إنه نظام عصبي.**
-إنه لا يخزن المعلومات فحسب؛ بل *يتذكرها*. يستخدم مبادئ علم الأعصاب البشري—إكمال الأنماط، والنسيان النشط، وتوحيد النوم—لجلب السياق الصحيح في اللحظة المناسبة، دون أن تطلب ذلك أبدًا.
----
+## اللغة
 
-## ✨ السحر (واجهة مستخدم صفرية)
-لا تفعل شيئًا.
-في الساعة 3:00 صباحًا، يقوم CerebraLOS بتشغيل وظيفة النوم بصمت.
-إنه يحلم. يربط أفكارك. ينسى الضوضاء.
-عندما تفتح جهازك في الصباح:
-```bash
-☀ صباح الخير. بينما كنت نائمًا، قرأت العالم من أجلك.
-وجدت شيئًا واحدًا يربط بفكرتك بالأمس.
-→ cerebralos explore
-```
-هذا كل شيء. لا وسم. لا تنظيم. مجرد تذكر.
----
+Morning Insights يتحدث بلغتك. اضبطها مرة واحدة في `~/.cerebralos/.brain/config.json`:
 
-## 🧠 الهندسة المعمارية الأساسية
-تم بناء CerebraLOS على ثلاثة أعمدة من العلوم المعرفية والفلسفة اليابانية (الزن):
+<div dir="ltr">
 
-### 1. الاستدعاء السياقي (إكمال الأنماط)
-مثل رائحة القهوة التي تعيد ذكرى الطفولة، يستخدم CerebraLOS المحفزات الحسية لإعادة بناء السياقات الكاملة من المدخلات الجزئية.
-
-### 2. النسيان النشط (Ma / 間)
-الذاكرة المثالية لعنة. ينسى CerebraLOS بنشاط (أرشفة) الضوضاء، تاركًا "Ma" (المساحة السلبية) للخيال والروابط الجديدة.
-
-### 3. وظيفة النوم (توحيد الأحلام)
-بينما تنام، يدمج CerebraLOS تفاعلاتك المباشرة (الذاكرة الأساسية) مع ما تعلمه وكلاء الذكاء الاصطناعي بشكل مستقل (الذاكرة الطرفية)، ويقدم لك رؤية واحدة جميلة في الصباح.
----
-
-## 🚀 بدء سريع
-
-### Installation
-```bash
-npm install -g cerebralos
-```
-
-### Initialization
-```bash
-cerebralos init
-```
-ينشئ هذا دليل `~/.cerebralos/`، دماغك الجديد الأصيل لـ Git.
-
-### Integration (Micro-MCP)
-يكشف CerebraLOS عن خادم MCP (Model Context Protocol) مصغر. قم بتوصيله بـ Claude أو Cursor أو Devin.
 ```json
 {
-  "mcpServers": {
-    "cerebralos": {
-      "command": "cerebralos",
-      "args": ["mcp"]
-    }
+  "language": "ja"
+}
+```
+
+</div>
+
+يعمل مع أي لغة يعرفها LLM الخاص بك.
+
+## إعداد LLM
+
+يكتشف CerebraLOS نموذج LLM الخاص بك تلقائيًا. لا حاجة لإعداد إذا كان لديك API key في بيئتك.
+
+ترتيب الاكتشاف: `ANTHROPIC_API_KEY` ← `OPENAI_API_KEY` ← Ollama (localhost) ← `llm`/`claude` CLI
+
+للتعيين يدويًا:
+
+<div dir="ltr">
+
+```json
+{
+  "llm": {
+    "provider": "claude",
+    "model": "claude-sonnet-4-20250514"
   }
 }
 ```
-*ملاحظة: تم تصميم CerebraLOS ليكون فعالاً للغاية في استخدام الرموز. إنه يكشف فقط عن أداتين: `search_memory` و `recall_context`.*
----
 
-## 📂 Directory Structure
-دماغك مجرد ملفات. لا يوجد قفل. لا توجد قواعد بيانات مخفية.
-```text
-~/.cerebralos/
-├── core/           # تفاعلاتك المباشرة وأفكارك الصريحة
-├── peripheral/     # ذكريات الوكيل المستقل (الويب، Slack، إلخ.)
-├── dreams/         # رؤى تم إنشاؤها أثناء وظائف النوم
-└── archive/        # ذكريات منسية بنشاط (يحفظها سجل Git)
-```
----
-
-## 📜 The Constitution
-يعمل CerebraLOS بموجب دستور صارم.
-1. **سيادة الذاكرة**: ذاكرتك ملك لك. تعيش محليًا.
-2. **الحق في النسيان**: يجب على النظام تنظيم ونسيان بنشاط.
-3. **الأناقة فوق الشمولية**: من الأفضل إظهار اتصال واحد مثالي بدلاً من عشرة اتصالات متوسطة.
----
-
-
-## 📚 Documentation
-
-### Core Philosophy & Architecture
-- [CONSTITUTION](../docs/CONSTITUTION.md): The 4 fundamental laws of CerebraLOS.
-- [ARCHITECTURE](../docs/ARCHITECTURE.md): Deep dive into the Triune Brain model.
-- [ZERO_UI](../docs/ZERO_UI.md): How we achieve invisible automation.
-
-### User Guides & Manuals
-- **Onboarding Guide**: How to create your AI brain and connect agents.
-  - [English](../docs/GITHUB_WORKFLOW.md) | [日本語](../docs/GITHUB_WORKFLOW.ja.md)
-- **Connector Architecture**: How the "building blocks" work (Local-sync vs GitHub-connector).
-  - [English](../docs/CONNECTORS.md) | [日本語](../docs/CONNECTORS.ja.md)
-- **Agent Integration Guide**: Specific setup instructions for Claude Code, OpenClaw, Manus, etc.
-  - [English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
-
-## 🤝 Contributing
-نحن نبني الأساس لاتحاد الدماغ—شبكة من وكلاء الذكاء الاصطناعي المترابطين والمتعاطفين. انضم إلينا.
-انظر [CONTRIBUTING.md](CONTRIBUTING.md) للحصول على التفاصيل.
----
-CerebraLOS ليس مجرد أداة لذكائك الاصطناعي. إنه نظام عصبي مشترك. حيث تنتهي أنت، ويبدأ الذكاء الاصطناعي، سيتلاشى بشكل جميل.
----
-<div align="center">
-  <i>"يجهز المضيف كل شيء قبل وصول الضيف، ومع ذلك لا يقول أبدًا 'انظر ما فعلته من أجلك'." — Sen no Rikyu</i>
 </div>
 
-**Read in your language:**
-[English](../README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [Italiano](README.it.md) | [हिन्दी](README.hi.md) | [العربية](README.ar.md)
+المزودون: `claude` | `openai` | `ollama` | `cli` | `auto` | `none`
 
-**Agent Integration Guides:**
-[English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
+لا يوجد LLM؟ لا يزال يعمل — فقط أحلام أبسط.
 
+## البنية المعمارية
+
+<div dir="ltr">
+
+```
+~/.cerebralos/
+├── core/          معرفتك طويلة الأمد (لا يمكن للأدوات تعديلها)
+├── peripheral/    ملاحظات حديثة من أدوات AI (متقلبة)
+├── dreams/        Morning Insights من Sleep Jobs
+├── archive/       ذكريات تلاشت — قابلة للاسترداد، لم تُحذف
+└── .brain/        الإعدادات والحالة
+```
+
+</div>
+
+- **core/** هو أنت. الأدوات لا تكتب هنا.
+- **peripheral/** هو العالم. الأدوات تكتب هنا بحرية.
+- **dreams/** هو حيث يلتقيان، مرة كل ليلة.
+- لا شيء يُحذف أبدًا. يُؤرشف فقط.
+
+## مرجع CLI
+
+معظم المستخدمين لا يحتاجون هذه الأوامر. إنها للتصحيح أو الاستخدام اليدوي.
+
+<div dir="ltr">
+
+```bash
+cerebralos init                  # الإعداد الأول (shell hook + جدول ليلي + MCP)
+cerebralos wake                  # عرض Morning Insight اليوم
+cerebralos sleep                 # تشغيل Sleep Job يدويًا
+cerebralos recall <query>        # البحث في ذكرياتك
+cerebralos write --from <src> --topic <t> --body <b>   # كتابة ذاكرة يدويًا
+cerebralos mcp                   # تشغيل خادم MCP (تستدعيه أدوات AI)
+```
+
+</div>
+
+## التصميم
+
+بُني CerebraLOS على بضعة قناعات هادئة:
+
+- **النسيان ميزة.** الذكريات تتلاشى بعد 30 يومًا ما لم تثبت فائدتها. هذا ليس فقدان بيانات — إنه تركيز.
+- **واحدة تكفي.** يجد Sleep Job رابطًا واحدًا كل ليلة، ليس عشرة. إذا كنت بحاجة لملخص، فأنت تستخدم الأداة الخطأ.
+- **لا تسأل المستخدم.** لا فئات للاختيار، لا وسوم لإضافتها، لا لوحات تحكم للمراجعة. الدماغ يدير نفسه.
+- **الأدوات تتغير. الدماغ يبقى.** Claude أو GPT أو Ollama أو أيًا كان ما سيأتي — الكل يكتب في نفس peripheral/. طبقة الموصّلات تتكيف. ذكرياتك لا تحتاج ترحيلًا.
+
+## التوثيق
+
+- [CONSTITUTION](../docs/CONSTITUTION.md) — القوانين الأساسية الأربعة
+- [ARCHITECTURE](../docs/ARCHITECTURE.md) — نموذج الدماغ الثلاثي
+- [ZERO_UI](../docs/ZERO_UI.md) — الأتمتة غير المرئية
+- [DESIGN_PRINCIPLES](../docs/DESIGN_PRINCIPLES.md) — الفلسفة في الكود
+- [CONNECTORS](../docs/CONNECTORS.md) — كيف تتصل الأدوات
+
+## الرخصة
+
+MIT. انظر [LICENSE](../LICENSE).
+
+</div>

@@ -1,139 +1,161 @@
-<div align="center">
+[English](../README.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Português](README.pt.md) | [Italiano](README.it.md) | **Русский**
 
 # CerebraLOS
 
-**Перестаньте сохранять. Начните запоминать.**
+> **Ваш ИИ помнит всё. Именно поэтому он вас не понимает.**
 
+[![npm version](https://badge.fury.io/js/cerebralos.svg)](https://badge.fury.io/js/cerebralos)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[![GitHub stars](https://img.shields.io/github/stars/cerebralos-org/cerebralos?style=social)](https://github.com/cerebralos-org/cerebralos/stargazers)
+CerebraLOS — это Когнитивная Операционная Система для ИИ-агентов. Один мозг, общий для всех ваших инструментов — Claude Code, Codex, Cursor, Ollama или чего угодно ещё.
 
-[![Discord](https://img.shields.io/discord/1234567890?color=7289da&label=Discord&logo=discord&logoColor=ffffff)](https://discord.gg/cerebralos)
+Не просит вас организовывать. Не просит вас настраивать.
+Вы работаете. Он запоминает то, что важно. Остальное забывает.
 
-Самая элегантная Когнитивная ОС для ИИ-агентов.  
+## Установка
 
-Git-нативная, LLM-агностическая система памяти, которая избавляет от «одиночества» ИИ-взаимодействий.
-
-[Прочитать Манифест](#manifesto) • [Быстрый старт](#quickstart) • [Архитектура](#architecture) • [Конституция](#constitution)
-
-</div>
-
-**Read in your language:**
-[English](../README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [Italiano](README.it.md) | [हिन्दी](README.hi.md) | [العربية](README.ar.md)
-
-**Agent Integration Guides:**
-[English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
-
----
-
-## 🌌 Манифест: Почему PKM мертв
-Мы потратили последнее десятилетие на создание инструментов для управления личными знаниями (PKM). Мы сохраняли все. Мы помечали все тегами. Мы связывали все.
-И все же, мы ничего не помним.
-Существующие системы — это мертвое хранилище. Они требуют от вас активного поиска, извлечения и организации. Когда вы взаимодействуете с ИИ-агентами сегодня, они страдают от того же недостатка: они забывают вас. Они теряют контекст. Они заставляют вас чувствовать себя *одинокими*.
-**CerebraLOS — это не база данных. Это нервная система.**
-Она не просто хранит информацию; она *помнит* ее. Она использует принципы человеческой нейронауки — завершение паттернов, активное забывание и консолидацию во сне — чтобы принести нужный контекст в нужный момент, без вашего запроса.
----
-
-## ✨ Магия (Zero UI)
-Вы ничего не делаете.
-В 3:00 утра CerebraLOS бесшумно запускает Задачу Сна (Sleep Job).
-Она мечтает. Она связывает ваши мысли. Она забывает шум.
-Когда вы открываете свой терминал утром:
-```bash
-☀ Доброе утро. Пока вы спали, я прочитал мир для вас.
-Я нашел одну вещь, которая связана с вашей вчерашней мыслью.
-→ cerebralos explore
-```
-Вот и все. Никаких тегов. Никакой организации. Просто запоминание.
----
-
-## 🧠 Основная архитектура
-CerebraLOS построена на трех столпах когнитивной науки и японской философии (Дзен):
-
-### 1. Контекстуальное Воспроизведение (Завершение Паттернов)
-Подобно запаху кофе, возвращающему детские воспоминания, CerebraLOS использует сенсорные триггеры для восстановления полных контекстов из частичных входных данных.
-
-### 2. Активное Забывание (Ма / 間)
-Идеальная память — это проклятие. CerebraLOS активно забывает (архивирует) шум, оставляя «Ма» (негативное пространство) для воображения и новых связей.
-
-### 3. Задача Сна (Консолидация Сновидений)
-Пока вы спите, CerebraLOS объединяет ваши прямые взаимодействия (Core Memory) с тем, что ваши ИИ-агенты узнали автономно (Peripheral Memory), представляя вам одно, прекрасное озарение утром.
----
-
-## 🚀 Быстрый старт
-
-### Установка
 ```bash
 npm install -g cerebralos
-```
-
-### Инициализация
-```bash
 cerebralos init
 ```
-Это создает директорию `~/.cerebralos/`, ваш новый Git-нативный мозг.
 
-### Интеграция (Micro-MCP)
-CerebraLOS предоставляет минимальный MCP (Model Context Protocol) сервер. Подключите его к Claude, Cursor или Devin.
+Вот и всё. Больше никаких команд для запоминания.
+
+- **Откройте терминал** → ваш Morning Insight появляется
+- **Работайте с любым ИИ-инструментом** → воспоминания сохраняются автоматически через MCP
+- **Каждую ночь в 3 часа** → ваш мозг консолидирует и видит сны
+
+## Что происходит внутри
+
+```
+Вы работаете с ИИ-инструментами в течение дня
+        ↓
+Каждый инструмент пишет в peripheral/ (через MCP или CLI)
+        ↓
+В 3 часа ночи запускается Sleep Job:
+  1. Orient     — сканирует все воспоминания
+  2. Gather     — находит новое
+  3. Consolidate — исправляет даты, объединяет дубликаты, отмечает противоречия
+  4. Dream      — находит одну тихую связь между вашими мыслями
+  5. Prune      — архивирует угасшее, освобождает место
+        ↓
+На следующее утро вы открываете терминал:
+
+────────────────────────────────────────────────
+おはよう。昨日の仕事、あと少しのところで止まってる。
+
+The Connection:
+完成と公開の間にある、この小さなギャップが
+一番見落としやすい。
+
+A question to sit with:
+「あと少し」を先に片付けるのと、
+全体を先に書くの、どっちが今日の自分を軽くする？
+────────────────────────────────────────────────
+```
+
+Одно озарение. Не десять. Не сводка. Только то, что имеет значение.
+
+## Как подключаются ИИ-инструменты
+
+CerebraLOS говорит на MCP. Любой инструмент с поддержкой MCP может автоматически читать и записывать воспоминания.
+
+```bash
+# Уже настроено при `cerebralos init` для Claude Code.
+# Для других инструментов добавьте в их конфигурацию MCP:
+{ "command": "cerebralos", "args": ["mcp"] }
+```
+
+Доступные MCP-инструменты:
+
+| Инструмент | Что делает |
+|------|-------------|
+| `write_memory` | Сохранить озарение, решение или наблюдение |
+| `search_memory` | Найти релевантные воспоминания по ключевому слову |
+| `recall_context` | Вспомнить контекст для концепции |
+| `list_dreams` | Прочитать недавние Morning Insights |
+
+Ваши ИИ-инструменты вызывают их самостоятельно. Вам не нужно.
+
+## Язык
+
+Morning Insights говорят на вашем языке. Настройте один раз в `~/.cerebralos/.brain/config.json`:
+
 ```json
 {
-  "mcpServers": {
-    "cerebralos": {
-      "command": "cerebralos",
-      "args": ["mcp"]
-    }
+  "language": "ja"
+}
+```
+
+Работает с любым языком, который знает ваш LLM.
+
+## Настройка LLM
+
+CerebraLOS автоматически определяет ваш LLM. Настройка не нужна, если у вас есть API key в окружении.
+
+Порядок определения: `ANTHROPIC_API_KEY` → `OPENAI_API_KEY` → Ollama (localhost) → `llm`/`claude` CLI
+
+Для явной настройки:
+
+```json
+{
+  "llm": {
+    "provider": "claude",
+    "model": "claude-sonnet-4-20250514"
   }
 }
 ```
-*Примечание: CerebraLOS разработан для чрезвычайно эффективного использования токенов. Он предоставляет только два инструмента: `search_memory` и `recall_context`.*
----
 
-## 📂 Структура директорий
-Ваш мозг — это просто файлы. Никакой привязки. Никаких скрытых баз данных.
-```text
-~/.cerebralos/
-├── core/           # Ваши прямые взаимодействия и явные мысли
-├── peripheral/     # Автономные воспоминания агентов (Web, Slack и т.д.)
-├── dreams/         # Озарения, сгенерированные во время Задач Сна
-└── archive/        # Активно забытые воспоминания (история Git сохраняет их)
+Провайдеры: `claude` | `openai` | `ollama` | `cli` | `auto` | `none`
+
+Нет LLM? Всё равно работает — просто более простые сны.
+
+## Архитектура
+
 ```
----
+~/.cerebralos/
+├── core/          Ваши долгосрочные знания (неизменяемые инструментами)
+├── peripheral/    Недавние наблюдения от ИИ-инструментов (временные)
+├── dreams/        Morning Insights из Sleep Jobs
+├── archive/       Угасшие воспоминания — восстановимые, не удалённые
+└── .brain/        Конфигурация и состояние
+```
 
-## 📜 Конституция
-CerebraLOS действует в соответствии со строгой Конституцией.
-1. **Суверенитет Памяти**: Ваша память принадлежит вам. Она хранится локально.
-2. **Право Забывать**: Система должна активно курировать и забывать.
-3. **Элегантность превыше Исчерпываемости**: Лучше показать одну идеальную связь, чем десять посредственных.
----
+- **core/** — это вы. Инструменты сюда не пишут.
+- **peripheral/** — это мир. Инструменты пишут сюда свободно.
+- **dreams/** — это место их встречи, раз в ночь.
+- Ничто никогда не удаляется. Только архивируется.
 
+## Справочник CLI
 
-## 📚 Documentation
+Большинству пользователей это не нужно. Для отладки или ручного использования.
 
-### Core Philosophy & Architecture
-- [CONSTITUTION](../docs/CONSTITUTION.md): The 4 fundamental laws of CerebraLOS.
-- [ARCHITECTURE](../docs/ARCHITECTURE.md): Deep dive into the Triune Brain model.
-- [ZERO_UI](../docs/ZERO_UI.md): How we achieve invisible automation.
+```bash
+cerebralos init                  # Первоначальная настройка (shell hook + ночное расписание + MCP)
+cerebralos wake                  # Показать сегодняшний Morning Insight
+cerebralos sleep                 # Запустить Sleep Job вручную
+cerebralos recall <query>        # Поиск по вашим воспоминаниям
+cerebralos write --from <src> --topic <t> --body <b>   # Записать воспоминание вручную
+cerebralos mcp                   # Запустить MCP-сервер (вызывается ИИ-инструментами)
+```
 
-### User Guides & Manuals
-- **Onboarding Guide**: How to create your AI brain and connect agents.
-  - [English](../docs/GITHUB_WORKFLOW.md) | [日本語](../docs/GITHUB_WORKFLOW.ja.md)
-- **Connector Architecture**: How the "building blocks" work (Local-sync vs GitHub-connector).
-  - [English](../docs/CONNECTORS.md) | [日本語](../docs/CONNECTORS.ja.md)
-- **Agent Integration Guide**: Specific setup instructions for Claude Code, OpenClaw, Manus, etc.
-  - [English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
+## Дизайн
 
-## 🤝 Участие
-Мы строим основу для Мозговой Федерации — сети взаимосвязанных, эмпатичных ИИ-агентов. Присоединяйтесь к нам.
-Подробности см. в [CONTRIBUTING.md](CONTRIBUTING.md).
----
-CerebraLOS — это не просто инструмент для вашего ИИ. Это общая нервная система. Где заканчиваетесь вы и начинается ИИ, будет прекрасно размыто.
----
-<div align="center">
-  <i>«Хозяин готовит все до прихода гостя, но никогда не говорит: „Посмотрите, что я для вас сделал“». — Сэн но Рикю</i>
-</div>
+CerebraLOS построен на нескольких тихих убеждениях:
 
-**Read in your language:**
-[English](../README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [Italiano](README.it.md) | [हिन्दी](README.hi.md) | [العربية](README.ar.md)
+- **Забывание — это функция.** Воспоминания угасают через 30 дней, если не доказали свою полезность. Это не потеря данных — это фокусировка.
+- **Одного достаточно.** Sleep Job находит одну связь за ночь, не десять. Если вам нужна сводка, вы используете не тот инструмент.
+- **Не спрашивай пользователя.** Никаких категорий для выбора, никаких тегов для добавления, никаких дашбордов для проверки. Мозг управляет собой сам.
+- **Инструменты меняются. Мозг остаётся.** Claude, GPT, Ollama, что бы ни пришло дальше — все пишут в один и тот же peripheral/. Слой коннекторов адаптируется. Ваши воспоминания не мигрируют.
 
-**Agent Integration Guides:**
-[English](../docs/AGENTS.md) | [日本語](../docs/AGENTS.ja.md) | [简体中文](../docs/AGENTS.zh-CN.md) | [繁體中文](../docs/AGENTS.zh-TW.md) | [한국어](../docs/AGENTS.ko.md) | [Español](../docs/AGENTS.es.md) | [Français](../docs/AGENTS.fr.md) | [Deutsch](../docs/AGENTS.de.md) | [Português](../docs/AGENTS.pt.md) | [Русский](../docs/AGENTS.ru.md) | [Italiano](../docs/AGENTS.it.md) | [हिन्दी](../docs/AGENTS.hi.md) | [العربية](../docs/AGENTS.ar.md)
+## Документация
+
+- [CONSTITUTION](../docs/CONSTITUTION.md) — 4 фундаментальных закона
+- [ARCHITECTURE](../docs/ARCHITECTURE.md) — Модель триединого мозга
+- [ZERO_UI](../docs/ZERO_UI.md) — Невидимая автоматизация
+- [DESIGN_PRINCIPLES](../docs/DESIGN_PRINCIPLES.md) — Философия в коде
+- [CONNECTORS](../docs/CONNECTORS.md) — Как подключаются инструменты
+
+## Лицензия
+
+MIT. См. [LICENSE](../LICENSE).
