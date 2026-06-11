@@ -8,19 +8,20 @@ import { globSync } from 'glob';
 const TfIdf = natural.TfIdf;
 const CEREBRALOS_DIR = path.join(os.homedir(), '.cerebralos');
 
-export async function recallContext(query, options = { topK: 3, silent: false }) {
+export async function recallContext(query, options = {}) {
+  const { topK = 3, silent = false, paths } = options;
   if (!fs.existsSync(CEREBRALOS_DIR)) {
-    if (!options.silent) console.log(chalk.red('Brain not found. Run `cerebralos init` first.'));
+    if (!silent) console.log(chalk.red('Brain not found. Run `cerebralos init` first.'));
     return [];
   }
 
-  if (!options.silent) console.log(chalk.gray(`Recalling context for: "${query}"...`));
+  if (!silent) console.log(chalk.gray(`Recalling context for: "${query}"...`));
 
   const tfidf = new TfIdf();
   const documents = [];
 
-  // Read all markdown files from core/ and peripheral/
-  const searchPaths = [
+  // Defaults to core/ and peripheral/. options.paths can override the search targets (used by mcp.js).
+  const searchPaths = paths ?? [
     path.join(CEREBRALOS_DIR, 'core/**/*.md'),
     path.join(CEREBRALOS_DIR, 'peripheral/**/*.md')
   ];
@@ -28,7 +29,7 @@ export async function recallContext(query, options = { topK: 3, silent: false })
   const files = searchPaths.flatMap(pattern => globSync(pattern));
 
   if (files.length === 0) {
-    if (!options.silent) console.log(chalk.yellow('No memories found in the brain yet.'));
+    if (!silent) console.log(chalk.yellow('No memories found in the brain yet.'));
     return [];
   }
 
@@ -50,21 +51,33 @@ export async function recallContext(query, options = { topK: 3, silent: false })
   });
 
   // Calculate scores
-  const results = [];
+  // TF-IDF assumes whitespace-tokenized text, so queries in unsegmented
+  // languages (e.g. Japanese) score zero. Blend in a substring-match score
+  // per query term so those queries and proper nouns still hit.
+  const tfidfScores = new Map();
   tfidf.tfidfs(query, (i, measure) => {
-    if (measure > 0) {
-      results.push({
-        ...documents[i],
-        score: measure
-      });
+    if (measure > 0) tfidfScores.set(i, measure);
+  });
+
+  const terms = query.split(/\s+/).filter(Boolean);
+  const results = [];
+  documents.forEach((doc, i) => {
+    let substringScore = 0;
+    for (const term of terms) {
+      const count = doc.content.split(term).length - 1;
+      if (count > 0) substringScore += 1 + Math.log(1 + count);
+    }
+    const score = (tfidfScores.get(i) || 0) + substringScore;
+    if (score > 0) {
+      results.push({ ...doc, score });
     }
   });
 
   // Sort by score descending
   results.sort((a, b) => b.score - a.score);
-  const topResults = results.slice(0, options.topK);
+  const topResults = results.slice(0, topK);
 
-  if (!options.silent) {
+  if (!silent) {
     if (topResults.length === 0) {
       console.log(chalk.yellow('No relevant memories found for this query.'));
     } else {

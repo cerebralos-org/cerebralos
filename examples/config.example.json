@@ -1,9 +1,12 @@
 {
-  "version": "1.0.0",
+  "version": "2.0.0",
   "user": {
     "name": "Your Name",
     "timezone": "Asia/Tokyo"
   },
+  "language": "en",
+  "knowledge_repo": "",
+  "skill_path": "~/.cerebralos/skills/nightly-dream.md",
   "sleep_job": {
     "enabled": true,
     "schedule": "0 3 * * *",
@@ -14,6 +17,13 @@
     "decay_threshold_days": 30,
     "protected_tags": ["pinned", "project"]
   },
+  "intelligence": {
+    "enabled": true,
+    "command": "claude",
+    "timeout_minutes": 10
+  },
+  "expiry_scan_paths": ["~/Documents"],
+  "hygiene_scan_path": "~",
   "integrations": {
     "micro_mcp": {
       "enabled": true,

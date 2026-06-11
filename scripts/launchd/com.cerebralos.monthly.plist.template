@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Monthly storage-hygiene loop (1st of every month at 22:00). -->
+<!-- Template: placeholders are filled in by scripts/install-launchd.sh. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.cerebralos.monthly</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>CEREBRALOS_BIN_PLACEHOLDER</string>
+    <string>monthly</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>CEREBRALOS_BIN_DIR_PLACEHOLDER:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Day</key>
+    <integer>1</integer>
+    <key>Hour</key>
+    <integer>22</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+  <key>StandardOutPath</key>
+  <string>HOME_PLACEHOLDER/.cerebralos/.brain/monthly.log</string>
+  <key>StandardErrorPath</key>
+  <string>HOME_PLACEHOLDER/.cerebralos/.brain/monthly.log</string>
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>

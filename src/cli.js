@@ -14,6 +14,10 @@ import { exploreSpace } from './explore.js';
 import { startMcpServer } from './mcp.js';
 import { installHook } from './hook.js';
 import { importMemory } from './import.js';
+import { showReviewQueue, approveEntry, approveAll, rejectEntry } from './review.js';
+import { runWeeklyJob } from './weekly.js';
+import { runMonthlyJob } from './monthly.js';
+import { t } from './messages.js';
 
 const require = createRequire(import.meta.url);
 const { version } = require('../package.json');
@@ -30,8 +34,46 @@ program
 
 program
   .command('sleep')
-  .description('Run Active Forgetting and Dream Consolidation')
-  .action(runSleepJob);
+  .description('Run Active Forgetting and Dream Consolidation (Nightly loop)')
+  .option('--dry-run', 'Log actions without writing, moving, or committing anything')
+  .action((options) => runSleepJob({ dryRun: options.dryRun }));
+
+program
+  .command('review')
+  .description('Swipe through pending entries (→ approve / ← reject / ↓ skip)')
+  .option('--list', 'List only, no interactive swipe')
+  .action((options) => showReviewQueue({ list: options.list }));
+
+program
+  .command('approve [idOrNumber]')
+  .description('Approve a review-queue entry by number or RQ-id (promotes into the knowledge repo)')
+  .option('--all', 'Approve all pending entries')
+  .action((idOrNumber, options) => {
+    if (options.all) return approveAll();
+    if (!idOrNumber) {
+      console.log(t('review_approve_usage'));
+      process.exitCode = 2;
+      return;
+    }
+    return approveEntry(idOrNumber);
+  });
+
+program
+  .command('reject <idOrNumber> [reason]')
+  .description('Reject a review-queue entry by number or RQ-id')
+  .action((idOrNumber, reason) => rejectEntry(idOrNumber, reason));
+
+program
+  .command('weekly')
+  .description('Run the weekly inventory loop (sessions cleanup, expiry boxes, links review)')
+  .option('--dry-run', 'Log findings without moving files or writing the queue')
+  .action((options) => runWeeklyJob({ dryRun: options.dryRun }));
+
+program
+  .command('monthly')
+  .description('Run the monthly storage hygiene scan (node_modules / .stversions / .git)')
+  .option('--dry-run', 'Log findings without writing the queue')
+  .action((options) => runMonthlyJob({ dryRun: options.dryRun }));
 
 program
   .command('wake')

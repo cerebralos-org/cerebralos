@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Weekly review loop (Sunday at 22:00). -->
+<!-- Template: placeholders are filled in by scripts/install-launchd.sh. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.cerebralos.weekly</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>CEREBRALOS_BIN_PLACEHOLDER</string>
+    <string>weekly</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>CEREBRALOS_BIN_DIR_PLACEHOLDER:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Weekday</key>
+    <integer>0</integer>
+    <key>Hour</key>
+    <integer>22</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+  <key>StandardOutPath</key>
+  <string>HOME_PLACEHOLDER/.cerebralos/.brain/weekly.log</string>
+  <key>StandardErrorPath</key>
+  <string>HOME_PLACEHOLDER/.cerebralos/.brain/weekly.log</string>
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>

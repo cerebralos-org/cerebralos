@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Nightly loop (every night at 3:00). Do not put secrets in this file. -->
+<!-- Template: placeholders are filled in by scripts/install-launchd.sh. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.cerebralos.sleep</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>CEREBRALOS_BIN_PLACEHOLDER</string>
+    <string>sleep</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>CEREBRALOS_BIN_DIR_PLACEHOLDER:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>3</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+  <key>StandardOutPath</key>
+  <string>HOME_PLACEHOLDER/.cerebralos/.brain/sleep.log</string>
+  <key>StandardErrorPath</key>
+  <string>HOME_PLACEHOLDER/.cerebralos/.brain/sleep.log</string>
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>
