@@ -1,3 +1,5 @@
+> **Note:** This translation reflects v2.x. For v3.0 features (Loop Engine, Connector Layer, Write command), see the [English README](../../README.md).
+
 <div align="center">
 
 # CerebraLOS

@@ -15,7 +15,7 @@
 
 ## The Problem with Perfect Memory
 
-The world is obsessed with making AI remember everything. Tools like OpenClaw and Mem0 build perfect, hierarchical databases of every interaction. They treat AI as a perfect laborer, a machine that never forgets.
+The world is obsessed with making AI remember everything. Tools build perfect, hierarchical databases of every interaction. They treat AI as a perfect laborer — a machine that never forgets.
 
 But perfect memory is a curse. It leads to context bloat, hallucination, and ultimately, a cold, mechanical interaction. If an AI remembers everything equally, it values nothing.
 
@@ -25,9 +25,11 @@ The major AI vendors have started to dream about you — consolidating your memo
 
 CerebraLOS inverts this. **Your memory, your files, your machines — any agent can be your sleeping brain.** Everything lives in plain Markdown under `~/.cerebralos/`. The nightly dream runs on your machine, with whatever agent you choose (`claude`, or any headless CLI), and falls back to a deterministic layer when no agent is around. Switch vendors tomorrow; your subconscious stays yours.
 
+No API key. No cloud account. No lock-in.
+
 ## The CerebraLOS Philosophy
 
-CerebraLOS is not a database. It is a **Cognitive OS**—a Layer of Subconsciousness.
+CerebraLOS is not a database. It is a **Cognitive OS** — a Layer of Subconsciousness.
 We believe that for AI to truly understand us, it must learn how to forget.
 
 1. **Active Forgetting**: Memories decay over time based on entropy. Only what matters survives.
@@ -51,7 +53,16 @@ cerebralos wake
 cerebralos explore
 ```
 
-## The Loop Engine (new in v2.0)
+## What's New in v3.0
+
+v3.0 merges two independent major redesigns into one cohesive release:
+
+- **Loop Engine** (three recurring loops that keep the brain alive)
+- **Connector Layer** (any AI tool can now write directly into your brain)
+- **Write command** (direct memory injection from CLI or MCP)
+- **Sleep v2 pipeline concepts** absorbed into the nightly dream template
+
+## The Loop Engine
 
 Three loops run quietly in the background. None of them ever deletes your data on its own.
 
@@ -63,6 +74,8 @@ Two layers, so the loop never stops:
 - **Fallback layer**: when the agent is unavailable, times out, or fails, a deterministic dream is written instead. At minimum, an index of "what happened" is always preserved.
 
 Active Forgetting also runs here: stale peripheral memories move to `archive/`.
+
+The nightly dream follows a five-phase structure (Orient → Gather → Consolidate → Dream → Prune) encoded in `templates/nightly-dream.md`. Edit that file to change how your brain dreams.
 
 ### Weekly — `cerebralos weekly`
 
@@ -83,6 +96,23 @@ bash scripts/install-launchd.sh
 This generates and loads launchd agents for all three loops, with paths derived from your `$HOME`. On Linux, plain cron works: `0 3 * * * cerebralos sleep`.
 
 All three loops accept `--dry-run`.
+
+## Writing Memories — `cerebralos write`
+
+Any source — a CLI script, an AI agent, a cron job — can inject a memory directly:
+
+```bash
+# Write from stdin
+echo "Decided to use edge functions for the API layer" | cerebralos write --from agent --topic architecture --stdin
+
+# Write inline
+cerebralos write --from me --topic "meeting notes" --body "Agreed on Q3 scope" --tags "project,decision"
+
+# Write to core memory (long-term, not peripheral)
+cerebralos write --from me --topic "principle" --body "Prefer boring technology" --core
+```
+
+Via MCP, the `write_memory` tool exposes the same capability to any connected AI agent.
 
 ## Review Queue & Swipe UI
 
@@ -109,7 +139,7 @@ Memory flows in one direction, and every gate is yours:
 
 ```
 peripheral/  ──(sleep)──►  dreams/  ──(review queue)──►  knowledge repo
-short-term                 insights      ✅ approve only      long-term
+short-term                 insights      approve only       long-term
 ```
 
 - The intelligence layer can **propose** promotions, never perform them.
@@ -129,6 +159,8 @@ By default the knowledge repo is self-contained at `~/.cerebralos/knowledge/`. P
 | `context_pack` | "Where am I right now?" — current status, commitments and deadlines, and the last 3 days of activity across all agents and machines. Call it first at session start. |
 | `memory_recall` | "What do I know about X?" — searches the knowledge repo plus dreams and peripheral memory. |
 | `memory_locate` | "Where is that file?" — resolves external locations (Drive, archives) via the `links/` index. |
+| `write_memory` | Write a memory directly into peripheral storage from any connected agent. |
+| `list_dreams` | Retrieve recent Morning Insight logs. |
 
 The original `search_memory` / `recall_context` tools are unchanged.
 
@@ -136,6 +168,10 @@ The original `search_memory` / `recall_context` tools are unchanged.
 # Claude Code example
 claude mcp add cerebralos -- cerebralos mcp
 ```
+
+## Connector Layer
+
+`src/connectors/` provides pluggable LLM connectors (claude / openai / ollama / cli-legacy) for future integrations. The nightly intelligence layer itself exclusively uses the headless CLI approach (`claude -p`) — no API key required, vendor-agnostic by design. The connectors are available for custom use cases without coupling the core loop to any provider.
 
 ## Cross-Device
 
@@ -169,6 +205,8 @@ Everything lives in `~/.cerebralos/.brain/config.json`:
 | `intelligence.enabled` | `true` | Run the nightly intelligence layer (falls back when off or failing). |
 | `intelligence.command` | `"claude"` | Headless agent command, invoked as `<command> -p` with the prompt on stdin. |
 | `intelligence.timeout_minutes` | `10` | Time limit before falling back to the deterministic dream. |
+| `write.default_target` | `"peripheral"` | Default memory target for `cerebralos write` (`peripheral` or `core`). |
+| `write.auto_tag` | `true` | Automatically tag written memories with source and date. |
 | `active_forgetting.decay_threshold_days` | `30` | Days before peripheral memories decay to the archive. |
 | `active_forgetting.protected_tags` | `["pinned", "project"]` | Tags that never decay. |
 | `sleep_job.schedule` | `"0 3 * * *"` | Suggested nightly schedule (cron syntax). |
