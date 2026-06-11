@@ -5,6 +5,7 @@
 
 import { program } from 'commander';
 import chalk from 'chalk';
+import { createRequire } from 'module';
 import { initBrain } from './init.js';
 import { runSleepJob } from './sleep.js';
 import { wakeUp } from './wake.js';
@@ -14,10 +15,13 @@ import { startMcpServer } from './mcp.js';
 import { installHook } from './hook.js';
 import { importMemory } from './import.js';
 
+const require = createRequire(import.meta.url);
+const { version } = require('../package.json');
+
 program
   .name('cerebralos')
   .description('The most elegant Cognitive OS for AI Agents. Stop saving. Start remembering.')
-  .version('1.0.0');
+  .version(version);
 
 program
   .command('init')
