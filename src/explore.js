@@ -29,7 +29,7 @@ function readMarkdownFile(filePath) {
 function getLatestDream() {
   const dreamsDir = path.join(CEREBRALOS_DIR, 'dreams');
   if (!fs.existsSync(dreamsDir)) return null;
-  const files = fs.readdirSync(dreamsDir).filter(f => f.endsWith('.md'));
+  const files = fs.readdirSync(dreamsDir).filter(f => /^\d{4}-\d{2}-\d{2}\.md$/.test(f));
   if (files.length === 0) return null;
   const latest = files.sort().reverse()[0];
   return { name: latest, content: readMarkdownFile(path.join(dreamsDir, latest)) };

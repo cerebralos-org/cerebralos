@@ -127,6 +127,13 @@ export async function runSleepJob(options = {}) {
     }
   }
 
+  // Update dreams/latest.md so that wake and other consumers always have a
+  // stable pointer to the most recent dream (both intelligence and fallback paths).
+  if (!dryRun && fs.existsSync(dreamPath)) {
+    writeLatestDream(date, dreamPath);
+    console.log(chalk.gray(t('sleep_latest_dream_updated')));
+  }
+
   // ── 3. Commit (machine layer) ────────────────────────────────
   if (!dryRun) {
     try {
@@ -138,6 +145,18 @@ export async function runSleepJob(options = {}) {
   }
 
   console.log(chalk.green(t(dryRun ? 'sleep_complete_dry_run' : 'sleep_complete')));
+}
+
+// Write dreams/latest.md — a stable pointer to the most recent dream file.
+// Format mirrors the mini hotfix: header block + full dream body.
+function writeLatestDream(date, dreamPath) {
+  const latestPath = path.join(CEREBRALOS_DIR, 'dreams/latest.md');
+  const content = fs.readFileSync(dreamPath, 'utf-8');
+  const relative = `./${path.basename(dreamPath)}`;
+  fs.writeFileSync(
+    latestPath,
+    `# Latest Dream\n\n> Last updated: ${date}\n> Full log: [${path.basename(dreamPath)}](${relative})\n\n---\n\n${content}`
+  );
 }
 
 // Fill the skill-file placeholders and run the intelligence command headlessly.
