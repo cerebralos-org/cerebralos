@@ -56,6 +56,11 @@ absorbs the five-phase Sleep v2 concept into the nightly-dream skill template.
 - `src/mcp.js` server version bumped to `3.0.0`
 - `config.version` is now `3.0.0`; `write` section added to default config
 
+### Removed
+- `config.llm` block and direct LLM API calls — intelligence layer uses headless `claude -p` CLI exclusively (vendor-agnostic; no API key required). Connector modules are shipped for future use but not wired into the nightly pipeline
+
+> **Note**: v2.0 is skipped as a version number. Both "The Loop Update" and "Connector Layer & Sleep v2" were independently developed but never released; v3.0.0 is the first public release of either.
+
 ### Deprecated
 - MCP tools `tokoyo_recall`, `tokoyo_context`, `tokoyo_locate` — use `memory_recall`, `context_pack`, `memory_locate`. Old names kept as aliases
 

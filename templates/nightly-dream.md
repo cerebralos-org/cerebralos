@@ -11,6 +11,18 @@ Recent activity logs (peripheral):
 
 Reference (read-only, may not exist): {{PORTFOLIO_PATH}}
 
+## Processing pipeline (Sleep v2)
+
+Work through these five phases in order before writing any output:
+
+1. **Orient** — Read every input file once to get the full picture. Do not take notes yet; build a mental map of what happened today across all agents and machines.
+2. **Gather** — Collect the raw material: notable events, decisions, tool outputs, code changes, and any explicit user notes. Group by source (agent / machine).
+3. **Consolidate** — Detect overlaps and contradictions across sources. Remove duplicates. Flag ambiguities that cannot be resolved from the evidence alone (do not guess).
+4. **Dream** — Write the Dream Log (step 1 below) from the consolidated material. Find ONE meaningful connection across the gathered threads; if none exists, note "quiet night" instead of forcing one.
+5. **Prune** — From the Dream Log, select 0–3 knowledge-promotion candidates (step 2 below). The bar is "still useful in three months". Everything else stays in the log and fades naturally.
+
+---
+
 ## What to do
 
 ### 1. Write the Dream Log → `{{DREAM_PATH}}`

@@ -35,10 +35,6 @@
       "trigger": "terminal_open"
     }
   },
-  "llm": {
-    "provider": "any",
-    "note": "CerebraLOS is LLM-agnostic. Configure your preferred provider here."
-  },
   "write": {
     "default_target": "peripheral",
     "auto_tag": true
