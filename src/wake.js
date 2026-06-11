@@ -14,7 +14,7 @@ export function wakeUp() {
     return; // Silent fail for Zero UI
   }
 
-  // ── 1. Latest dream ───────────────────────────────────────
+  // ── 1. Latest dream (Morning Insight section) ────────────
   const dreamsDir = path.join(CEREBRALOS_DIR, 'dreams');
   if (fs.existsSync(dreamsDir)) {
     const files = fs
@@ -24,10 +24,20 @@ export function wakeUp() {
       .reverse();
     if (files.length > 0) {
       const latest = files[0];
-      console.log(chalk.yellow(t('wake_insight_header', { date: latest.replace('.md', '') })));
       const content = fs.readFileSync(path.join(dreamsDir, latest), 'utf-8');
-      const preview = content.split('\n').slice(0, 20).join('\n').trim();
-      console.log(chalk.white(preview));
+      const line = chalk.dim('─'.repeat(48));
+      // Extract Morning Insight section from dream log (Zero UI style from v3)
+      const insightMatch = content.match(/## Morning Insight\n\n([\s\S]*?)(?=\n---|\n##|$)/);
+      console.log(chalk.yellow(t('wake_insight_header', { date: latest.replace('.md', '') })));
+      console.log(line);
+      if (insightMatch) {
+        console.log(chalk.cyan(insightMatch[1].trim()));
+      } else {
+        // Fallback: show first meaningful lines when no Morning Insight section exists
+        const fallback = content.split('\n').slice(0, 20).join('\n').trim();
+        console.log(chalk.white(fallback));
+      }
+      console.log(line);
       console.log('');
     }
   }

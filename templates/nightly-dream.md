@@ -33,6 +33,14 @@ Read all of the activity logs above and write a consolidated log with this struc
 - (Relationships you noticed between today's activities and past context. Do not force connections. If there are none, write "none".)
 ```
 
+**Morning Insight writing principles** (absorbed from Sleep v2 pipeline):
+- Find ONE connection — the most resonant, not the most obvious
+- Under 120 words total for the Morning Insight section
+- Write as a thoughtful friend, not a poet — clear and grounded
+- Do not force insight when there is none; "quiet night" is a valid Morning Insight
+
+**Language**: Write the entire Dream Log (including Morning Insight) in the same language as the activity logs. If the logs are in Japanese, write in Japanese. If mixed, use the dominant language.
+
 ### 2. Extract promotion candidates → append to `{{QUEUE_PATH}}`
 
 From the activity logs, extract only content that would **change how the user (or their agents) acts when referenced three months from now** — **0 to 3 entries** (do not inflate; if nothing qualifies, append nothing). Learnings, decisions, and reusable procedures qualify. Plain work records do not.

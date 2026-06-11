@@ -98,6 +98,14 @@ const en = {
     '- .git: compact with git gc',
   monthly_queued: 'Monthly hygiene: queued the report for review',
   monthly_dry_run_would_queue: '  [dry-run] would queue hygiene report',
+
+  // ---- write (peripheral write command) --------------------------------------
+  write_no_content: 'No content provided. Use --body or pipe content via stdin.',
+  write_saved: 'Memory saved: {{path}}',
+
+  // ---- mcp (write_memory / list_dreams tools) --------------------------------
+  mcp_write_done: 'Memory saved: {{path}}',
+  mcp_no_dreams: 'No dreams found yet.',
 };
 
 const ja = {
@@ -184,6 +192,14 @@ const ja = {
     '- .git: git gc で圧縮',
   monthly_queued: 'Monthly hygiene: review-queue にレポートを登録',
   monthly_dry_run_would_queue: '  [dry-run] would queue hygiene report',
+
+  // ---- write (peripheral write command) --------------------------------------
+  write_no_content: 'コンテンツが指定されていません。--body またはstdin経由でパイプしてください。',
+  write_saved: 'メモリを保存しました: {{path}}',
+
+  // ---- mcp (write_memory / list_dreams tools) --------------------------------
+  mcp_write_done: 'メモリを保存しました: {{path}}',
+  mcp_no_dreams: '夢はまだありません。',
 };
 
 export const MESSAGES = { en, ja };

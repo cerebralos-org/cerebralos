@@ -17,6 +17,8 @@ import { importMemory } from './import.js';
 import { showReviewQueue, approveEntry, approveAll, rejectEntry } from './review.js';
 import { runWeeklyJob } from './weekly.js';
 import { runMonthlyJob } from './monthly.js';
+import { writeCommand } from './write.js';
+import { resolveBrainDir } from './brain-dir.js';
 import { t } from './messages.js';
 
 const require = createRequire(import.meta.url);
@@ -106,5 +108,52 @@ program
   .option('--from <path>', 'Source file or folder to import from')
   .option('--type <type>', 'Import type: markdown, ai_export, folder, chatgpt (default: auto)')
   .action((options) => importMemory(options));
+
+program
+  .command('write')
+  .description('Write a memory to peripheral storage')
+  .option('--local', 'Use .cerebralos/ in the current directory instead of ~/.cerebralos')
+  .option('--brain <path>', 'Use a custom brain directory path')
+  .requiredOption('--from <source>', 'Source identifier (e.g., claude-code, codex, manual)')
+  .requiredOption('--topic <topic>', 'Short title for this memory')
+  .option('--body <body>', 'Memory content')
+  .option('--tags <tags>', 'Comma-separated tags')
+  .option('--stdin', 'Read body from stdin')
+  .option('--core', 'Write to core/ instead of peripheral/')
+  .action((cmdOpts) => {
+    const brainDir = resolveBrainDir({ local: cmdOpts.local, brain: cmdOpts.brain });
+    writeCommand(cmdOpts, brainDir);
+  });
+
+// Daemon mode: cerebralos daemon — runs sleep job on cron schedule.
+// On macOS, prefer the launchd templates in scripts/ over this daemon mode.
+if (process.argv[2] === 'daemon') {
+  import('node-cron').then(({ default: cron }) => {
+    import('fs').then(({ default: fs }) => {
+      import('path').then(({ default: path }) => {
+        const brainDir = resolveBrainDir({});
+        const configPath = path.join(brainDir, '.brain/config.json');
+        if (fs.existsSync(configPath)) {
+          const cfg = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+          const schedule = cfg.sleep_job?.schedule || '0 3 * * *';
+          if (cfg.sleep_job?.enabled !== false) {
+            // Note: use launchd templates instead on macOS (see scripts/install-launchd.sh)
+            import('chalk').then(({ default: chalk }) => {
+              console.log(chalk.blue(`CerebraLOS daemon started. Sleep Job scheduled: ${schedule}`));
+              cron.schedule(schedule, () => {
+                console.log(chalk.gray('[Cron] Running Sleep Job...'));
+                runSleepJob({ dryRun: false }).catch((e) =>
+                  console.error(chalk.red('[Cron] Sleep Job failed:', e.message))
+                );
+              });
+            });
+          }
+        } else {
+          console.error('Brain not found. Run `cerebralos init` first.');
+        }
+      });
+    });
+  });
+}
 
 program.parse();

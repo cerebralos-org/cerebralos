@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0",
+  "version": "3.0.0",
   "user": {
     "name": "Your Name",
     "timezone": "Asia/Tokyo"
@@ -38,5 +38,9 @@
   "llm": {
     "provider": "any",
     "note": "CerebraLOS is LLM-agnostic. Configure your preferred provider here."
+  },
+  "write": {
+    "default_target": "peripheral",
+    "auto_tag": true
   }
 }

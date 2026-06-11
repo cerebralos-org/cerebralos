@@ -16,7 +16,9 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { globSync } from "glob";
 import { recallContext } from "./recall.js";
+import { writeMemory } from "./write.js";
 import { CEREBRALOS_DIR, knowledgeRepo } from "./util.js";
+import { t } from "./messages.js";
 
 const NO_RESULTS = "No relevant memories found.";
 
@@ -38,7 +40,7 @@ function linksSearchPaths() {
 
 export async function startMcpServer() {
   const server = new Server(
-    { name: "cerebralos-mcp", version: "2.0.0" },
+    { name: "cerebralos-mcp", version: "3.0.0" },
     { capabilities: { tools: {} } }
   );
 
@@ -92,6 +94,46 @@ export async function startMcpServer() {
           description: locateDescription,
           inputSchema: querySchema,
         },
+        {
+          name: "write_memory",
+          description: "Write a new memory to CerebraLOS peripheral storage. Use this to save insights, decisions, or observations during a work session.",
+          inputSchema: {
+            type: "object",
+            properties: {
+              content: {
+                type: "string",
+                description: "The memory content to write (markdown)",
+              },
+              topic: {
+                type: "string",
+                description: "A short title for this memory",
+              },
+              source: {
+                type: "string",
+                description: "Identifier of the agent writing (e.g., 'claude-code', 'cursor', 'codex')",
+              },
+              tags: {
+                type: "array",
+                items: { type: "string" },
+                description: "Optional tags for categorization",
+              },
+            },
+            required: ["content", "topic", "source"],
+          },
+        },
+        {
+          name: "list_dreams",
+          description: "Read the latest Morning Insight(s) from CerebraLOS dreams.",
+          inputSchema: {
+            type: "object",
+            properties: {
+              count: {
+                type: "number",
+                description: "Number of recent dreams to return (default: 1, max: 5)",
+              },
+            },
+          },
+        },
         // ---- deprecated aliases (kept for backwards compatibility) ----------
         {
           name: "tokoyo_recall",
@@ -132,6 +174,42 @@ export async function startMcpServer() {
     }
     if (name === "context_pack" || name === "tokoyo_context") {
       return textResult(await buildContextPack(args.project ? String(args.project) : undefined));
+    }
+
+    if (name === "write_memory") {
+      const { content, topic, source, tags } = args;
+      if (!content || !topic || !source) throw new Error("content, topic, and source are required");
+      const result = await writeMemory({
+        body: content,
+        topic,
+        from: source,
+        tags: tags || [],
+      });
+      return textResult(t('mcp_write_done', { path: result.relativePath }));
+    }
+
+    if (name === "list_dreams") {
+      const count = Math.min(Math.max(Number(args?.count) || 1, 1), 5);
+      const dreamsDir = path.join(CEREBRALOS_DIR, "dreams");
+      if (!fs.existsSync(dreamsDir)) {
+        return textResult(t('mcp_no_dreams'));
+      }
+      const files = fs
+        .readdirSync(dreamsDir)
+        .filter((f) => f.endsWith(".md"))
+        .sort()
+        .reverse()
+        .slice(0, count);
+      if (files.length === 0) {
+        return textResult(t('mcp_no_dreams'));
+      }
+      const dreams = files
+        .map((f) => {
+          const dreamContent = fs.readFileSync(path.join(dreamsDir, f), "utf-8");
+          return `--- ${f} ---\n${dreamContent}`;
+        })
+        .join("\n\n");
+      return textResult(dreams);
     }
 
     throw new Error(`Unknown tool: ${name}`);

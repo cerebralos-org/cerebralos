@@ -35,11 +35,13 @@ function installSkillTemplates() {
 }
 
 export async function initBrain() {
-  console.log(chalk.green('Initializing CerebraLOS...'));
+  console.log(chalk.green('Initializing CerebraLOS v3...'));
 
   if (fs.existsSync(CEREBRALOS_DIR)) {
     console.log(chalk.yellow(`Brain already exists at ${CEREBRALOS_DIR}`));
-    // Existing brains still pick up newly bundled skill templates (no overwrite).
+    // Existing brains pick up newly bundled skill templates (no overwrite) and
+    // have their config upgraded to v3.0.0 if needed.
+    upgradeConfig();
     installSkillTemplates();
     return;
   }
@@ -64,7 +66,7 @@ export async function initBrain() {
 
   // Create default config
   const defaultConfig = {
-    version: "2.0.0",
+    version: "3.0.0",
     user: {
       name: os.userInfo().username,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -92,6 +94,11 @@ export async function initBrain() {
       enabled: true,
       command: "claude",
       timeout_minutes: 10
+    },
+    // Write configuration (used by `cerebralos write` and mcp write_memory tool).
+    write: {
+      default_target: "peripheral",
+      auto_tag: true
     }
   };
 
@@ -112,4 +119,36 @@ export async function initBrain() {
 
   console.log(chalk.gray('Created core/, peripheral/, dreams/, and archive/ directories.'));
   console.log(chalk.cyan('Your brain is ready. Stop saving. Start remembering.'));
+}
+
+// Migrate an existing brain's config.json to v3.0.0 schema.
+// Adds missing keys; never overwrites existing user settings.
+function upgradeConfig() {
+  const configPath = path.join(CEREBRALOS_DIR, '.brain/config.json');
+  if (!fs.existsSync(configPath)) return;
+
+  const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+  if (config.version === '3.0.0') return; // already current
+
+  const changes = [];
+
+  if (!config.write) {
+    config.write = { default_target: 'peripheral', auto_tag: true };
+    changes.push('write');
+  }
+  if (!config.intelligence) {
+    config.intelligence = { enabled: true, command: 'claude', timeout_minutes: 10 };
+    changes.push('intelligence');
+  }
+  if (config.knowledge_repo === undefined) {
+    config.knowledge_repo = '';
+    changes.push('knowledge_repo');
+  }
+
+  if (changes.length > 0) {
+    config.version = '3.0.0';
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+    clearConfigCache();
+    console.log(chalk.green(`Config upgraded to v3.0.0 (added: ${changes.join(', ')})`));
+  }
 }
