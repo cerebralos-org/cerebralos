@@ -1,5 +1,5 @@
 // src/connectors/index.js — Connector Layer entry point (v3)
-// Selects the appropriate LLM connector based on config.json `llm.provider`.
+// Selects the appropriate LLM connector based on config.json `connector.provider`.
 // NOTE: sleep.js does NOT use this. The intelligence layer uses `claude -p`
 // headless CLI exclusively (vendor-agnostic, no API key required).
 // This module is available for future use by consolidate.js or other modules.
@@ -81,8 +81,10 @@ export function getConnector(brainDir = path.join(os.homedir(), '.cerebralos')) 
   if (cache.has(brainDir)) return cache.get(brainDir);
 
   const config = loadConfig(brainDir);
-  const llmConfig = config.llm || {};
-  const { provider = 'auto', model = null, api_key_env = null, options = {} } = llmConfig;
+  // config.connector (v3) provides optional Connector Layer settings.
+  // config.llm is not read — intelligence layer uses `claude -p` headless exclusively.
+  const connectorConfig = config.connector || {};
+  const { provider = 'auto', model = null, api_key_env = null, options = {} } = connectorConfig;
 
   let connector;
 

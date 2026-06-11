@@ -138,8 +138,10 @@ jobs:
           node-version: '20'
 
       - name: Run CerebraLOS Sleep Job
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} # Key to run the LLM
+        # v3: vendor-agnostic. The intelligence layer uses `claude -p` headless CLI.
+        # No API key is required — the fallback layer runs without any LLM.
+        # To enable the intelligence layer, install the Claude CLI on the runner:
+        #   run: npm install -g @anthropic-ai/claude-code
         run: npx cerebralos sleep
 
       - name: Commit Dreams
@@ -151,19 +153,13 @@ jobs:
           git diff --quiet && git diff --staged --quiet || (git commit -m "chore(memory): nightly dream consolidation" && git push)
 ```
 
-### ⚠️ Final Step: Register Your API Key
-To allow GitHub Actions to call the LLM, register your API key in the repository settings.
-1. Open your `my-ai-brain` repository on GitHub.
-2. Click **Settings** > **Secrets and variables** > **Actions**.
-3. Click **New repository secret**.
-4. Enter `OPENAI_API_KEY` as the Name.
-5. Paste your API key as the Value and save.
-
----
-
 ### What happens now?
 
 While you sleep (or at the specified time), GitHub Actions will automatically trigger.
-It will read the day's miscellaneous logs (Peripheral), use the LLM to distill them into "Dreams", and automatically commit them.
+It will read the day's logs (Peripheral), run the Dream Consolidation pipeline,
+and automatically commit the result to `dreams/`.
 
 The next morning, when you run `cd ~/my-ai-brain && git pull`, you will find **an AI brain that is slightly smarter than yesterday**.
+
+> **No API key needed.** The fallback layer produces a Dream Log even without any LLM.
+> For full intelligence-layer output, install the Claude CLI on your runner and CerebraLOS will use it automatically.

@@ -57,7 +57,7 @@ absorbs the five-phase Sleep v2 concept into the nightly-dream skill template.
 - `config.version` is now `3.0.0`; `write` section added to default config
 
 ### Removed
-- `config.llm` block and direct LLM API calls — intelligence layer uses headless `claude -p` CLI exclusively (vendor-agnostic; no API key required). Connector modules are shipped for future use but not wired into the nightly pipeline
+- `config.llm` config key — renamed to `config.connector` (optional Connector Layer settings for future use). The nightly intelligence layer uses headless `claude -p` CLI exclusively (vendor-agnostic; no API key required). GITHUB_WORKFLOW docs updated to remove the OPENAI_API_KEY step
 
 > **Note**: v2.0 is skipped as a version number. Both "The Loop Update" and "Connector Layer & Sleep v2" were independently developed but never released; v3.0.0 is the first public release of either.
 
