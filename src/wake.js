@@ -5,11 +5,12 @@
 // All output comes from the machine layer (deterministic).
 import fs from 'fs';
 import path from 'path';
+import readline from 'readline';
 import chalk from 'chalk';
-import { CEREBRALOS_DIR, knowledgeRepo, parseQueue } from './util.js';
+import { CEREBRALOS_DIR, knowledgeRepo, parseQueue, loadConfig } from './util.js';
 import { t } from './messages.js';
 
-export function wakeUp() {
+export async function wakeUp() {
   if (!fs.existsSync(CEREBRALOS_DIR)) {
     return; // Silent fail for Zero UI
   }
@@ -71,6 +72,51 @@ export function wakeUp() {
     }
     console.log('');
   }
+
+  // ── 4. Startup review prompt ──────────────────────────────
+  await maybeStartupReview(pending);
+}
+
+// Startup review: after the Morning Insight, offer to jump straight into the
+// swipe UI when there are pending cards. Strictly opt-in-safe:
+// - never when there are no pending cards (unchanged terminal startup)
+// - never on a non-TTY (scripts / SSH pipes / CI) — wake runs on every shell
+//   start, and a blocking prompt there would hang the terminal
+// - disabled via config.startup_review = "off" or env CEREBRALOS_NO_PROMPT
+// - config.startup_review = "auto" enters the swipe UI without asking
+// Existing configs (no key) default to "prompt", preserving prior behavior.
+async function maybeStartupReview(pending) {
+  if (pending.length === 0) return;
+  if (!process.stdin.isTTY || !process.stdout.isTTY) return;
+  if (process.env.CEREBRALOS_NO_PROMPT) return;
+
+  const mode = loadConfig().startup_review ?? 'prompt';
+  if (mode === 'off') return;
+
+  if (mode === 'auto') {
+    const { showReviewQueue } = await import('./review.js');
+    await showReviewQueue();
+    return;
+  }
+
+  // mode === 'prompt' (default): ask first; only a bare Enter starts.
+  const answer = await askStartupLine(chalk.cyan(t('wake_startup_prompt')));
+  if (answer === '') {
+    const { showReviewQueue } = await import('./review.js');
+    await showReviewQueue();
+  } else {
+    console.log(chalk.gray(t('wake_startup_deferred')));
+  }
+}
+
+function askStartupLine(prompt) {
+  return new Promise((resolve) => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    rl.question(prompt, (ans) => {
+      rl.close();
+      resolve(ans.trim());
+    });
+  });
 }
 
 // Commitments feature: parse <knowledge_repo>/portfolio/PORTFOLIO.md and pick

@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.1] - 2026-06-14
+
+### Added
+- `cerebralos wake` now offers an optional startup review prompt — when there are pending cards on an interactive terminal, it asks whether to jump straight into the swipe UI (bare Enter starts, any other input defers).
+- `startup_review` config key (`"prompt"` default / `"off"` / `"auto"`) and `CEREBRALOS_NO_PROMPT` env var to control the behavior per install.
+
+### Safety
+- The prompt never appears on non-TTY shells (scripts, SSH pipes, CI), so terminal startup is never blocked regardless of pending card count.
+- Existing configs without the key default to `"prompt"`, preserving prior behavior — no action required for current installs.
+
 ## [3.0.0] - 2026-06-12 — The Integration
 
 Two independent major redesigns — "The Loop Update" and "Connector Layer & Sleep v2" —

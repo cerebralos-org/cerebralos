@@ -47,6 +47,8 @@ const en = {
   wake_deadline_overdue: '{{days}}d overdue',
   wake_deadline_today: 'today',
   wake_deadline_tomorrow: 'tomorrow',
+  wake_startup_prompt: 'Triage now? [Enter = start / s = later] ',
+  wake_startup_deferred: 'Skipped for now. Run `cerebralos review` whenever you like.',
 
   // ---- review (queue triage / swipe UI) -------------------------------------
   review_queue_empty: 'Review queue is empty. ({{path}})',
@@ -142,6 +144,8 @@ const ja = {
   wake_deadline_overdue: '期限超過 {{days}}日',
   wake_deadline_today: '今日',
   wake_deadline_tomorrow: '明日',
+  wake_startup_prompt: '今スワイプ判定する? [Enter=開始 / s=あとで] ',
+  wake_startup_deferred: 'あとで。`cerebralos review` でいつでも開始できます。',
 
   // ---- review (queue triage / swipe UI) -------------------------------------
   review_queue_empty: 'Review queue is empty. ({{path}})',

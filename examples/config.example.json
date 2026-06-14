@@ -35,6 +35,7 @@
       "trigger": "terminal_open"
     }
   },
+  "startup_review": "prompt",
   "write": {
     "default_target": "peripheral",
     "auto_tag": true

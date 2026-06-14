@@ -95,6 +95,10 @@ export async function initBrain() {
       command: "claude",
       timeout_minutes: 10
     },
+    // Startup review prompt behaviour after Morning Insight.
+    // "prompt" (default): ask when there are pending cards on an interactive TTY.
+    // "off": never prompt. "auto": always jump straight into the swipe UI.
+    startup_review: "prompt",
     // Write configuration (used by `cerebralos write` and mcp write_memory tool).
     write: {
       default_target: "peripheral",
@@ -128,7 +132,7 @@ function upgradeConfig() {
   if (!fs.existsSync(configPath)) return;
 
   const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-  if (config.version === '3.0.0') return; // already current
+  if (config.version === '3.0.1') return; // already current
 
   const changes = [];
 
@@ -145,10 +149,15 @@ function upgradeConfig() {
     changes.push('knowledge_repo');
   }
 
+  if (config.startup_review === undefined) {
+    config.startup_review = 'prompt';
+    changes.push('startup_review');
+  }
+
   if (changes.length > 0) {
-    config.version = '3.0.0';
+    config.version = '3.0.1';
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
     clearConfigCache();
-    console.log(chalk.green(`Config upgraded to v3.0.0 (added: ${changes.join(', ')})`));
+    console.log(chalk.green(`Config upgraded to v3.0.1 (added: ${changes.join(', ')})`));
   }
 }
