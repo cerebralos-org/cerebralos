@@ -62,6 +62,8 @@ v3.0 merges two independent major redesigns into one cohesive release:
 - **Write command** (direct memory injection from CLI or MCP)
 - **Sleep v2 pipeline concepts** absorbed into the nightly dream template
 
+**v3.0.1** adds a TTY-safe startup nudge: after `wake`, a single keypress drops you into triage of pending cards (see "The startup nudge" under Review Queue below).
+
 ## The Loop Engine
 
 Three loops run quietly in the background. None of them ever deletes your data on its own.
@@ -126,12 +128,51 @@ cerebralos approve --all
 cerebralos reject 2 "stale"
 ```
 
-The swipe UI is dating-app simple: **→ approve, ← reject**, ↓ skip, `v` to peek at the body, `q` to quit.
+The swipe UI is dating-app simple: **→ approve, ← reject**, ↓ skip, `v` to peek at the body, `q` to quit. Each pending memory renders as a card:
 
-![cerebralos review — swipe UI](docs/assets/review-swipe.gif)
-<!-- TODO: record a terminal GIF of `cerebralos review` and place it at docs/assets/review-swipe.gif -->
+```text
+Review queue — 3 cards
+When unsure, swipe →. A bad promotion expires by itself after 90 days without references.
+
+╭─[1/3]─●0.82──────────────────────────────────
+│
+│  Prefer edge functions for the API layer
+│  → decided in three separate sessions this week
+│
+│  evidence: 2026-06-13 architecture notes
+│  target:   knowledge/architecture.md
+│  type: decision
+╰──────────────────────────────────────────────
+   ← reject        ↓ skip        approve →      (v:body q:quit)
+```
 
 When unsure, swipe right. Approval is not irreversible — see below.
+
+### The startup nudge — new in v3.0.1
+
+`cerebralos wake` is meant to run at the start of an interactive shell. When cards are waiting it prints your Morning Insight, lists the queue, and then offers to triage on the spot:
+
+```text
+☀ Morning Insight (2026-06-15)
+────────────────────────────────────────────
+You keep three projects open at once; the loop noticed two went
+quiet. Closing one before noon tends to unblock the others.
+────────────────────────────────────────────
+
+📥 Review queue: 3 pending
+  RQ-007  [decision] Prefer edge functions for the API layer
+  RQ-008  [link]     Spec doc → external Drive folder
+  RQ-009  [insight]  Standups run long on Mondays
+→ cerebralos review to triage / approve <id> to promote
+
+Triage now? [Enter = start / s = later]
+```
+
+Press **Enter** to drop straight into the swipe UI above; press any other key to defer (`Skipped for now. Run cerebralos review whenever you like.`). The nudge is strictly opt-in-safe:
+
+- It never appears when the queue is empty.
+- It never appears on a non-TTY — scripts, SSH pipes, and CI run untouched, so adding `wake` to your shell profile can never hang a session.
+- Set `startup_review: "off"` (or export `CEREBRALOS_NO_PROMPT=1`) to silence it; set `"auto"` to skip the question and open the swipe UI directly.
 
 ## Knowledge Promotion
 
@@ -200,6 +241,7 @@ Everything lives in `~/.cerebralos/.brain/config.json`:
 | Key | Default | Description |
 |---|---|---|
 | `language` | `"en"` | CLI output language (`en` / `ja`). |
+| `startup_review` | `"prompt"` | The `wake` startup nudge when cards are pending: `prompt` (ask), `off` (silent), `auto` (open the swipe UI without asking). Always suppressed on a non-TTY; `CEREBRALOS_NO_PROMPT=1` forces it off. |
 | `knowledge_repo` | `""` (→ `~/.cerebralos/knowledge`) | Where approved entries are promoted. Absolute or `~`-prefixed path to use an external repository. |
 | `skill_path` | `~/.cerebralos/skills/nightly-dream.md` | Prompt file for the nightly intelligence layer. |
 | `intelligence.enabled` | `true` | Run the nightly intelligence layer (falls back when off or failing). |
