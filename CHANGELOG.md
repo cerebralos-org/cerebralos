@@ -5,15 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.0.1] - 2026-06-14
+## [4.0.0] - 2026-10-20 — The Hub
 
-### Added
-- `cerebralos wake` now offers an optional startup review prompt — when there are pending cards on an interactive terminal, it asks whether to jump straight into the swipe UI (bare Enter starts, any other input defers).
-- `startup_review` config key (`"prompt"` default / `"off"` / `"auto"`) and `CEREBRALOS_NO_PROMPT` env var to control the behavior per install.
+CerebraLOS grows from a local memory into a shared workspace: a Cloudflare hub that
+your phone, ChatGPT, Grok Bot and every local agent read and write, a board that
+routes tasks to the right AI, and a live view of who is doing what.
 
-### Safety
-- The prompt never appears on non-TTY shells (scripts, SSH pipes, CI), so terminal startup is never blocked regardless of pending card count.
-- Existing configs without the key default to `"prompt"`, preserving prior behavior — no action required for current installs.
+### Hub (Cloudflare Worker + D1 + KV)
+- **cerebralos-hub**: dashboard behind Cloudflare Access (plus in-Worker JWT check); `cerebralos hub sync|push|pull|status` with a launchd job
+- **Remote MCP** (OAuth 2.1 + dynamic client registration) for ChatGPT, Grok / Grok Bot and other MCP clients: `context_pack`, `search`, `fetch`, `write_memory`, `board_post`, `my_tasks`, `task_results`, `task_artifact_put`, `skills_list`, activity and lock tools
+- ChatGPT Computer History intake (titles and descriptions only)
+- **Web Push / PWA**: approval-needed, done, failed, artifact and dream notifications, per-kind toggles; pull-to-refresh in the home-screen app
+- **Slack completion reports** via Incoming Webhook with mention, injection-safe escaping and masking of sensitive cards
+- **Run record** for every board card: timeline, full output, inline preview of artifacts (text, images, audio, video), evidence (duration, agent, machine, model, sources, raw final output) and a "needs review" badge
+
+### Board & dispatch
+- Board tasks are judged (route + approval) by local EmbeddingGemma / Gemma, with hard rules that always require approval for posting, sending, money, deletion, deploys, health/personal data and auth
+- Executors: Claude Code, Codex, Gemini (API), Grok (strict sandbox), ElevenLabs (narration, sound effects), Colab video (MiniMax H3), plus external agents ChatGPT and Grok Bot that pull their own tasks over MCP
+- Primary / fallback machines with leases, heartbeats, capability-aware claims and daily caps; outputs delivered to every Mac
+- **Implementation mode**: develop in a git worktree, then merge / revise / discard from the board
+- **Skill acquisition**: quarantine, static scan, review, holder assignment, approval
+- **Jev shadow judging** (TypeSafe AI) logged side by side with the local judge
+- Generated artifacts report remaining credits (ElevenLabs characters, Colab units)
+
+### Clips
+- Paste links; X / web pages are read by Grok (Claude fallback), YouTube by Gemini; summary, relevance and "how to use" are stored in `peripheral/clips/` and fed to the dream
+- Decide per clip: adopt (becomes a normal board card) / later / skip
+
+### Live sync between agents
+- **Activity board ("いま")** and **work locks** shared by Claude Code (hooks), Codex (rules), Grok (hooks), Antigravity (rules), ChatGPT / Grok Bot (MCP) and the dispatcher; `cerebralos now` and `cerebralos lock`
+
+### Memory
+- Staged recall (memory cards + `memory_read`), stale `now.md` detection, append-on-approve for existing knowledge notes
+- Dream input now includes phone, ChatGPT, dispatch, Antigravity and clip channels, capped and marked as external data
+- `cerebralos import antigravity`
 
 ## [3.0.0] - 2026-06-12 — The Integration
 

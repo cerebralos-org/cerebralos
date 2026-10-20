@@ -1,0 +1,16 @@
+{
+  "name": "cerebralos-hub",
+  "private": true,
+  "type": "module",
+  "version": "0.3.0",
+  "description": "CerebraLOS hub Worker (D1 + Access + remote MCP)",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@cfworker/json-schema": "^4.1.1",
+    "@cloudflare/workers-oauth-provider": "1.2.3",
+    "@modelcontextprotocol/sdk": "^1.27.1"
+  }
+}

@@ -18,6 +18,9 @@ import { showReviewQueue, approveEntry, approveAll, rejectEntry } from './review
 import { runWeeklyJob } from './weekly.js';
 import { runMonthlyJob } from './monthly.js';
 import { writeCommand } from './write.js';
+import { hubCommand } from './hub.js';
+import { dispatchCommand } from './dispatch/index.js';
+import { skillsCommand } from './dispatch/skills-cli.js';
 import { resolveBrainDir } from './brain-dir.js';
 import { t } from './messages.js';
 
@@ -103,11 +106,26 @@ program
   .action(installHook);
 
 program
-  .command('import')
-  .description('Import memories from ChatGPT, Obsidian, or any Markdown file')
+  .command('import [target]')
+  .description('Import memories from ChatGPT, Obsidian, or any Markdown file; `import antigravity` pulls Antigravity (IDE/CLI) conversations')
   .option('--from <path>', 'Source file or folder to import from')
   .option('--type <type>', 'Import type: markdown, ai_export, folder, chatgpt (default: auto)')
-  .action((options) => importMemory(options));
+  .option('--days <n>', 'antigravity: only conversations modified within N days (default 30)')
+  .option('--all', 'antigravity: ignore the --days window')
+  .option('--dry-run', 'antigravity: report what would be written, write nothing')
+  .option('--machine <name>', 'antigravity: machine name for file names (default: dispatch.json / hostname)')
+  .action(async (target, options) => {
+    if (target === 'antigravity') {
+      const { importAntigravityCommand } = await import('./import-antigravity.js');
+      return importAntigravityCommand(options);
+    }
+    if (target) {
+      console.error(`Unknown import target: ${target} (supported: antigravity, or use --from <path>)`);
+      process.exitCode = 2;
+      return;
+    }
+    return importMemory(options);
+  });
 
 program
   .command('write')
@@ -116,6 +134,7 @@ program
   .option('--brain <path>', 'Use a custom brain directory path')
   .requiredOption('--from <source>', 'Source identifier (e.g., claude-code, codex, manual)')
   .requiredOption('--topic <topic>', 'Short title for this memory')
+  .option('--summary <summary>', 'One-line summary (derived from body when omitted)')
   .option('--body <body>', 'Memory content')
   .option('--tags <tags>', 'Comma-separated tags')
   .option('--stdin', 'Read body from stdin')
@@ -124,6 +143,45 @@ program
     const brainDir = resolveBrainDir({ local: cmdOpts.local, brain: cmdOpts.brain });
     writeCommand(cmdOpts, brainDir);
   });
+
+program
+  .command('hub <action>')
+  .description('Sync with cerebralos-hub (Cloudflare): sync | push | pull | status')
+  .option('--dry-run', 'push: 収集と差分の確認だけ行い、送信しない')
+  .action((action, options) => hubCommand(action, options));
+
+program
+  .command('dispatch <action> [text]')
+  .description('Task auto-dispatch (board → route → run): run | doctor | status | route "<text>" | judge "<text>" | jev-report')
+  .option('--deep', 'doctor: claude / codex を 1 回だけ実際に非対話実行して認証を確認する')
+  .option('--no-exec', 'run: 判定とハートビートだけ行い実行しない')
+  .option('--no-judge', 'run: 判定しない')
+  .option('--days <n>', 'jev-report: 集計する期間（日数。既定 7）')
+  .action((action, text, options) => dispatchCommand(action, text, { deep: options.deep, noExec: options.exec === false, noJudge: options.judge === false, days: options.days ? Number(options.days) : undefined }));
+
+program
+  .command('skills <action>')
+  .description('External skill install flow (quarantine → review → holders): list | sync | inspect | acquire')
+  .option('--manifest <file>', 'inspect/acquire: skill-manifest.json')
+  .option('--card <id>', 'acquire: board card id')
+  .option('--summary <text>', 'acquire: card result summary')
+  .action((action, options) => skillsCommand(action, options));
+
+// 「いま」掲示板と「作業中の札」（src/live-cli.js）。通常は bin/cerebralos が直接実行する（起動を速くするため）。
+// ここは `node src/cli.js now ...` で呼ばれたときと --help 用
+program
+  .command('now [text...]')
+  .description('「いま」掲示板: now "テキスト" [--kind progress] [--project X] [--ref Y] | now --recent [N] [--format text|json|hook] | now --hook start|stop|end')
+  .allowUnknownOption(true)
+  .helpOption(false)
+  .action(async () => { const { runLiveCli } = await import('./live-cli.js'); process.exitCode = await runLiveCli(process.argv.slice(process.argv.indexOf('now'))); });
+
+program
+  .command('lock [args...]')
+  .description('作業中の札: lock acquire <key> [--ttl 30m] [--note ...]（使用中なら終了コード 3）| lock release <key> | lock heartbeat <key> | lock list')
+  .allowUnknownOption(true)
+  .helpOption(false)
+  .action(async () => { const { runLiveCli } = await import('./live-cli.js'); process.exitCode = await runLiveCli(process.argv.slice(process.argv.indexOf('lock'))); });
 
 // Daemon mode: cerebralos daemon — runs sleep job on cron schedule.
 // On macOS, prefer the launchd templates in scripts/ over this daemon mode.

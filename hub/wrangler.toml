@@ -1,0 +1,54 @@
+name = "cerebralos-hub"
+main = "src/index.js"
+compatibility_date = "2026-04-01"
+# nodejs_compat: MCP SDK / OAuth ライブラリ用。global_fetch_strictly_public: CIMD（ChatGPT の client_id URL）取得時の SSRF 対策
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
+workers_dev = true
+preview_urls = false
+
+# 静的アセットも必ず Worker を通す（認証してから ASSETS で配信する）
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "cerebralos-hub"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+migrations_dir = "migrations"
+
+# OAuth のクライアント・グラント・トークン（ChatGPT 用リモート MCP）。トークンはハッシュ、props は暗号化で保存される
+[[kv_namespaces]]
+binding = "OAUTH_KV"
+id = "REPLACE_WITH_YOUR_OAUTH_KV_ID"
+
+[vars]
+# Set the generated public key here; private scalar goes ONLY in wrangler secret.
+VAPID_PUBLIC_KEY = ""   # node scripts/generate-vapid.mjs → public key here
+VAPID_SUBJECT = "mailto:you@example.com"
+PUBLIC_URL = "https://cerebralos-hub.YOUR-SUBDOMAIN.workers.dev"
+ALLOWED_EMAILS = "you@example.com"   # comma-separated; only these Access identities can use the hub
+ACCESS_TEAM_DOMAIN = "YOUR-TEAM.cloudflareaccess.com"
+ACCESS_AUD = "REPLACE_WITH_YOUR_ACCESS_APPLICATION_AUD"
+# 片方でも未設定なら fail closed（/api/sync/* 以外は全拒否）。
+# クリップ（task_kind=clip）の 1 日の実行上限（一般タスクの DISPATCH_DAILY_CAP=既定20 とは別枠）
+DISPATCH_CLIP_DAILY_CAP = "50"
+# HUB_SYNC_TOKEN は `wrangler secret put HUB_SYNC_TOKEN`。
+# Slack 完了報告（SLACK.md）: 投稿先は secret SLACK_WEBHOOK_URL（`wrangler secret put SLACK_WEBHOOK_URL`。未設定なら何も送らない）。
+# SLACK_MENTION はメンションする Slack のユーザー ID（例 U0123ABC。英数字のみ）。空なら無メンション。
+SLACK_MENTION = ""
+
+# 成果物（D: 実行結果ファイル）の保管。R2 が有効化されていればバインドを足す（blobPut/blobGet が ARTIFACTS を優先）。
+# 現状は R2 未有効のため KV（1 ファイル 25MB まで。超過は「Mac にのみ保存」）を使う。
+[[kv_namespaces]]
+binding = "ARTIFACTS_KV"
+id = "REPLACE_WITH_YOUR_ARTIFACTS_KV_ID"
+
+# R2 を有効化したら（ダッシュボードで R2 を Enable → wrangler r2 bucket create cerebralos-hub-artifacts）次を有効にする:
+# [[r2_buckets]]
+# binding = "ARTIFACTS"
+# bucket_name = "cerebralos-hub-artifacts"
+
+[triggers]
+crons = ["*/5 * * * *"]

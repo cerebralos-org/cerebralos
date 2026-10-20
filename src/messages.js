@@ -47,8 +47,6 @@ const en = {
   wake_deadline_overdue: '{{days}}d overdue',
   wake_deadline_today: 'today',
   wake_deadline_tomorrow: 'tomorrow',
-  wake_startup_prompt: 'Triage now? [Enter = start / s = later] ',
-  wake_startup_deferred: 'Skipped for now. Run `cerebralos review` whenever you like.',
 
   // ---- review (queue triage / swipe UI) -------------------------------------
   review_queue_empty: 'Review queue is empty. ({{path}})',
@@ -69,6 +67,8 @@ const en = {
   review_approve_usage: 'Usage: cerebralos approve <number|RQ-id> | --all',
   review_approve_missing_fields: '{{id}}: cannot promote — target / body is missing',
   review_approve_invalid_target: '{{id}}: target must be under knowledge/ (got: {{target}})',
+  review_approve_failed_hint: '  ⚠ {{id}} could not be approved — it stays pending (fix the entry, then approve again)',
+  review_summary_failed: '  ⚠ {{failed}} entry/entries failed to approve and remain pending',
   review_approve_target_exists: 'Already exists: {{target}}',
   review_approve_done: '  💚 Approved → {{target}} (committed to the knowledge repo)',
   review_approve_commit_failed: '  Write succeeded, but git commit failed: {{error}}',
@@ -144,8 +144,6 @@ const ja = {
   wake_deadline_overdue: '期限超過 {{days}}日',
   wake_deadline_today: '今日',
   wake_deadline_tomorrow: '明日',
-  wake_startup_prompt: '今スワイプ判定する? [Enter=開始 / s=あとで] ',
-  wake_startup_deferred: 'あとで。`cerebralos review` でいつでも開始できます。',
 
   // ---- review (queue triage / swipe UI) -------------------------------------
   review_queue_empty: 'Review queue is empty. ({{path}})',
@@ -166,6 +164,8 @@ const ja = {
   review_approve_usage: 'Usage: cerebralos approve <番号|RQ-id> | --all',
   review_approve_missing_fields: '{{id}}: target / body が無いため昇格できません',
   review_approve_invalid_target: '{{id}}: target は knowledge/ 配下のみ許可（got: {{target}}）',
+  review_approve_failed_hint: '  ⚠ {{id}} は承認できませんでした（pending のまま。エントリを直して再承認してください）',
+  review_summary_failed: '  ⚠ {{failed}} 件が承認失敗のまま pending で残っています',
   review_approve_target_exists: '既に存在します: {{target}}',
   review_approve_done: '  💚 承認 → {{target}}（knowledge リポジトリにコミット済み）',
   review_approve_commit_failed: '  書き込み成功、git commit は失敗: {{error}}',

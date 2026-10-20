@@ -140,6 +140,7 @@ export async function showReviewQueue(options = {}) {
   let approved = 0;
   let rejected = 0;
   let skipped = 0;
+  let failed = 0;
 
   for (let i = 0; i < pending.length; i++) {
     const e = pending[i];
@@ -152,13 +153,20 @@ export async function showReviewQueue(options = {}) {
 
       if (KEY.quit.includes(key)) {
         console.log(chalk.gray('\n' + t('review_quit_remaining', { count: pending.length - i })));
-        printSummary(approved, rejected, skipped);
+        printSummary(approved, rejected, skipped, failed);
         return;
       }
       if (KEY.right.includes(key)) {
         await slideCard(lines, 'right');
-        await approveEntry(e.id);
-        approved += 1;
+        // A failed approve leaves the entry pending — never count it as approved,
+        // and say so, or the same card silently comes back every morning.
+        const ok = await approveEntry(e.id);
+        if (ok) {
+          approved += 1;
+        } else {
+          console.log(chalk.yellow(t('review_approve_failed_hint', { id: e.id })));
+          failed += 1;
+        }
         done = true;
       } else if (KEY.left.includes(key)) {
         await slideCard(lines, 'left');
@@ -179,14 +187,15 @@ export async function showReviewQueue(options = {}) {
       }
     }
   }
-  printSummary(approved, rejected, skipped);
+  printSummary(approved, rejected, skipped, failed);
 }
 
-function printSummary(approved, rejected, skipped) {
+function printSummary(approved, rejected, skipped, failed = 0) {
   console.log(
     chalk.green('\n' + t('review_summary_done') + ' ') +
       chalk.white(t('review_summary_counts', { approved, rejected, skipped }))
   );
+  if (failed > 0) console.log(chalk.yellow(t('review_summary_failed', { failed })));
 }
 
 // ---- approve / reject -------------------------------------------------------
@@ -209,35 +218,50 @@ export async function approveEntry(idOrNumber) {
   if (!entry) {
     console.log(chalk.red(t('review_not_found', { id: idOrNumber })));
     process.exitCode = 1;
-    return;
+    return false;
   }
   if (entry.status !== 'pending') {
     console.log(chalk.yellow(t('review_already_done', { id: entry.id, status: entry.status })));
-    return;
+    return false;
   }
 
   if (entry.type === 'knowledge-promotion') {
     if (!entry.target || !entry.body) {
       console.log(chalk.red(t('review_approve_missing_fields', { id: entry.id })));
       process.exitCode = 1;
-      return;
+      return false;
     }
     const repo = knowledgeRepo();
+    // The intelligence layer sometimes emits a target without the `knowledge/`
+    // prefix. Fill it in for plain relative paths; anything else still hits the
+    // guard below (a rejected approve used to leave the entry pending forever,
+    // so it resurfaced in every wake).
+    if (
+      !entry.target.startsWith('knowledge/') &&
+      !path.isAbsolute(entry.target) &&
+      !entry.target.split('/').includes('..')
+    ) {
+      entry.target = `knowledge/${entry.target}`;
+    }
     const targetPath = path.join(repo, entry.target);
     // Promotions may only land under <knowledge repo>/knowledge/.
     if (!targetPath.startsWith(path.join(repo, 'knowledge') + path.sep)) {
       console.log(chalk.red(t('review_approve_invalid_target', { id: entry.id, target: entry.target })));
       process.exitCode = 1;
-      return;
+      return false;
     }
-    if (fs.existsSync(targetPath)) {
-      console.log(chalk.red(t('review_approve_target_exists', { target: entry.target })));
-      process.exitCode = 1;
-      return;
+    // An existing target means the promotion extends approved knowledge
+    // (e.g. "追加実例"). Never overwrite: append it as a dated addendum so the
+    // original stays intact and git keeps the diff. Refusing here used to leave
+    // hub approvals retrying forever.
+    const isUpdate = fs.existsSync(targetPath);
+    if (isUpdate) {
+      fs.appendFileSync(targetPath, formatAddendum(entry));
+    } else {
+      fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+      fs.writeFileSync(targetPath, entry.body);
+      addToKnowledgeIndex(entry);
     }
-    fs.mkdirSync(path.dirname(targetPath), { recursive: true });
-    fs.writeFileSync(targetPath, entry.body);
-    addToKnowledgeIndex(entry);
 
     try {
       const git = simpleGit(repo);
@@ -246,7 +270,7 @@ export async function approveEntry(idOrNumber) {
       const indexPath = path.join(repo, 'knowledge/INDEX.md');
       const toAdd = fs.existsSync(indexPath) ? [targetPath, indexPath] : [targetPath];
       await git.add(toAdd);
-      await git.commit(`[wake] promote: ${entry.title || entry.target}`);
+      await git.commit(`[wake] ${isUpdate ? 'append' : 'promote'}: ${entry.title || entry.target}`);
       console.log(chalk.green(t('review_approve_done', { target: entry.target })));
     } catch (e) {
       console.log(chalk.yellow(t('review_approve_commit_failed', { error: e.message })));
@@ -257,6 +281,7 @@ export async function approveEntry(idOrNumber) {
 
   entry.status = 'approved';
   saveQueue(entries);
+  return true;
 }
 
 export function rejectEntry(idOrNumber, reason) {
@@ -280,6 +305,17 @@ export function rejectEntry(idOrNumber, reason) {
 
 // Append a row to the main table in knowledge/INDEX.md
 // (| topic | file | one-line description | status | review_after |).
+// Body of an approved promotion appended to an existing note: frontmatter is
+// dropped and headings are demoted one level under a dated "追記" heading.
+function formatAddendum(entry) {
+  const date = new Date().toISOString().slice(0, 10);
+  const body = String(entry.body)
+    .replace(/^---\n[\s\S]*?\n---\n?/, '')
+    .replace(/^(#{1,5}) /gm, '#$1 ')
+    .trim();
+  return `\n\n## 追記 ${date}: ${entry.title || entry.id}\n\n> evidence: ${entry.evidence || 'unknown'} / ${entry.id}\n\n${body}\n`;
+}
+
 function addToKnowledgeIndex(entry) {
   const indexPath = path.join(knowledgeRepo(), 'knowledge/INDEX.md');
   if (!fs.existsSync(indexPath)) return;

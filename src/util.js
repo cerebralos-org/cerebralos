@@ -6,7 +6,10 @@ import path from 'path';
 import os from 'os';
 import { t } from './messages.js';
 
-export const CEREBRALOS_DIR = path.join(os.homedir(), '.cerebralos');
+// CEREBRALOS_DIR 環境変数があればそれを優先（テスト・別ブレイン用）。
+export const CEREBRALOS_DIR = process.env.CEREBRALOS_DIR
+  ? path.resolve(process.env.CEREBRALOS_DIR)
+  : path.join(os.homedir(), '.cerebralos');
 export const STATE_DIR = path.join(CEREBRALOS_DIR, 'state');
 export const QUEUE_PATH = path.join(STATE_DIR, 'review-queue.md');
 
@@ -48,6 +51,10 @@ function expandTilde(p) {
 // otherwise defaults to ~/.cerebralos/knowledge so the brain is fully
 // self-contained out of the box.
 export function knowledgeRepo() {
+  // CEREBRALOS_KNOWLEDGE_REPO 環境変数は config より優先（テスト用）。
+  if (process.env.CEREBRALOS_KNOWLEDGE_REPO) {
+    return path.resolve(expandTilde(process.env.CEREBRALOS_KNOWLEDGE_REPO));
+  }
   const configured = loadConfig().knowledge_repo;
   if (typeof configured === 'string' && configured.trim() !== '') {
     return path.resolve(expandTilde(configured.trim()));

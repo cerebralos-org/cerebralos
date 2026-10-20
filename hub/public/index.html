@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex, nofollow">
+<title>CerebraLOS</title>
+<meta name="theme-color" content="#192c34">
+<link rel="manifest" href="/manifest.webmanifest" crossorigin="use-credentials">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<a class="skip" href="#main">本文へ移動</a>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9c3-4 6-4 9 0s6 4 9 0M3 15c3-4 6-4 9 0s6 4 9 0"/></svg>
+      <h1>CerebraLOS</h1>
+    </div>
+    <div id="sync" class="sync" role="status" aria-live="polite"><span class="dot"></span><span class="sync-text">確認中…</span></div>
+    <form id="search" class="search" role="search" autocomplete="off">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="記憶を検索（タイトル・要約・本文）" aria-label="記憶を検索" enterkeyhint="search">
+    </form>
+  </div>
+</header>
+
+<div class="layout">
+  <main id="main" class="main">
+    <div id="banner" class="banner" role="alert" hidden></div>
+
+    <section class="today" aria-labelledby="today-h">
+      <h2 id="today-h" class="sec-title">今日</h2>
+      <div class="today-grid">
+        <article id="dream-card" class="panel accent-dream">
+          <div class="skel-block"><span class="skel w60"></span><span class="skel w90"></span><span class="skel w80"></span></div>
+        </article>
+        <article id="focus-card" class="panel accent-focus">
+          <div class="skel-block"><span class="skel w40"></span><span class="skel w90"></span></div>
+        </article>
+      </div>
+    </section>
+
+    <nav class="tabs" role="tablist" aria-label="セクション">
+      <button class="tab" role="tab" id="tab-memory" data-tab="memory" aria-selected="true" aria-controls="panel-memory">記憶</button>
+      <button class="tab" role="tab" id="tab-board" data-tab="board" aria-selected="false" aria-controls="panel-board">ボード</button>
+      <button class="tab" role="tab" id="tab-live" data-tab="live" aria-selected="false" aria-controls="panel-live">いま<span id="live-badge" class="badge" hidden>0</span></button>
+      <button class="tab" role="tab" id="tab-clip" data-tab="clip" aria-selected="false" aria-controls="panel-clip">クリップ</button>
+      <button class="tab" role="tab" id="tab-reviews" data-tab="reviews" aria-selected="false" aria-controls="panel-reviews">承認待ち<span id="rv-badge" class="badge" hidden>0</span></button>
+      <button class="tab" role="tab" id="tab-memo" data-tab="memo" aria-selected="false" aria-controls="panel-memo">メモ</button>
+      <button class="tab" role="tab" id="tab-connect" data-tab="connect" aria-selected="false" aria-controls="panel-connect">接続</button>
+      <button class="tab" role="tab" id="tab-settings" data-tab="settings" aria-selected="false" aria-controls="panel-settings">設定</button>
+    </nav>
+
+    <section id="panel-memory" class="tabpanel" role="tabpanel" aria-labelledby="tab-memory"></section>
+    <section id="panel-board" class="tabpanel" role="tabpanel" aria-labelledby="tab-board" hidden></section>
+    <section id="panel-live" class="tabpanel" role="tabpanel" aria-labelledby="tab-live" hidden></section>
+    <section id="panel-clip" class="tabpanel" role="tabpanel" aria-labelledby="tab-clip" hidden>
+      <form id="clip-form" class="panel clip-panel" novalidate>
+        <label for="clip-text" class="memo-label">気になったリンクを貼る</label>
+        <textarea id="clip-text" rows="4" maxlength="40000" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="X・YouTube・記事の URL。改行やスペース区切りで何件でも（1 回 20 件まで）"></textarea>
+        <input id="clip-note" type="text" maxlength="500" placeholder="ひとことメモ（任意）例: ゼミで使えるかも" aria-label="ひとことメモ（任意）">
+        <div class="memo-foot">
+          <span id="clip-count" class="muted" aria-live="polite">リンク 0 件</span>
+          <button type="submit" id="clip-btn" class="btn primary">読んでもらう</button>
+        </div>
+        <p class="clip-hint">Mac が自動で読み、要約・今の仕事との関係・使い道を返して記憶に残します（読むだけなので承認なし）。</p>
+        <div id="clip-dups" class="clip-dups" hidden></div>
+      </form>
+      <div id="clip-list" class="clip-list" aria-live="polite"></div>
+    </section>
+    <section id="panel-reviews" class="tabpanel" role="tabpanel" aria-labelledby="tab-reviews" hidden></section>
+    <section id="panel-connect" class="tabpanel" role="tabpanel" aria-labelledby="tab-connect" hidden></section>
+    <section id="panel-settings" class="tabpanel panel" role="tabpanel" aria-labelledby="tab-settings" hidden>
+      <h2>この端末の通知</h2>
+      <p>iOS / iPadOS は 16.4 以上で、ホーム画面に追加した場合のみ通知できます。追加したアプリから hub にログインして有効にしてください。</p>
+      <p>ロック画面には通知の種類だけを表示します。設定は端末ごとに保存します。</p>
+      <p id="push-status" role="status" aria-live="polite">確認中…</p>
+      <button type="button" class="btn primary" id="push-enable" disabled>通知を有効にする</button>
+      <button type="button" class="btn" id="push-disable" disabled>この端末の通知を解除</button>
+      <form id="push-form">
+        <fieldset id="push-options" disabled>
+          <legend>通知する種類</legend>
+          <label><input type="checkbox" name="approval" checked> 承認待ち</label>
+          <label><input type="checkbox" name="done" checked> タスクの完了</label>
+          <label><input type="checkbox" name="failed" checked> タスクの失敗</label>
+          <label><input type="checkbox" name="artifact" checked> 成果物の到着</label>
+          <label><input type="checkbox" name="dream" checked> Dream の更新</label>
+          <button type="submit" class="btn">通知設定を保存</button>
+        </fieldset>
+      </form>
+    </section>
+    <section id="panel-memo" class="tabpanel" role="tabpanel" aria-labelledby="tab-memo" hidden>
+      <form id="memo-form" class="panel memo-panel">
+        <label for="memo-text" class="memo-label">思いついたことをそのまま</label>
+        <textarea id="memo-text" rows="7" maxlength="5000" placeholder="例: ゼミの導入事例、あの人の一言が刺さった、など。次回の同期で Mac の記憶に入ります"></textarea>
+        <div class="memo-foot">
+          <span id="memo-count" class="muted">0 / 5000</span>
+          <button type="submit" id="memo-btn" class="btn primary">送る</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <aside id="detail" class="detail" aria-label="本文" aria-hidden="true">
+    <div class="detail-head">
+      <div class="detail-title">
+        <h2 id="d-title">本文</h2>
+        <div id="d-meta" class="detail-meta"></div>
+      </div>
+      <button id="d-close" class="icon-btn" type="button" aria-label="閉じる"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div id="d-body" class="md detail-body"></div>
+    <div id="d-empty" class="detail-empty">
+      <svg class="ico big" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h10l4 4v12H5z"/><path d="M14 4v5h5M8 13h8M8 17h6"/></svg>
+      <p>カードを選ぶと、本文がここに表示されます</p>
+    </div>
+  </aside>
+</div>
+<div id="scrim" class="scrim" hidden></div>
+
+<dialog id="editor" class="editor" aria-labelledby="ed-title">
+  <form id="ed-form" method="dialog">
+    <div class="ed-head">
+      <h2 id="ed-title">今の焦点を編集</h2>
+      <button id="ed-x" type="button" class="icon-btn" aria-label="閉じる"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="ed-tabs" role="tablist">
+      <button type="button" class="ed-tab" data-ed="write" aria-selected="true">編集</button>
+      <button type="button" class="ed-tab" data-ed="preview" aria-selected="false">プレビュー</button>
+    </div>
+    <div class="ed-body">
+      <textarea id="ed-text" maxlength="20000" aria-label="焦点（Markdown）" spellcheck="false"></textarea>
+      <div id="ed-preview" class="md ed-preview"></div>
+    </div>
+    <div class="ed-foot">
+      <span id="ed-note" class="muted">保存すると次回の同期で Mac の focus.md に反映されます</span>
+      <div class="ed-actions">
+        <button type="button" id="ed-cancel" class="btn">キャンセル</button>
+        <button type="submit" id="ed-save" class="btn primary">保存</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="adopt" class="editor adopt" aria-labelledby="ad-title">
+  <form id="adopt-form" method="dialog"></form>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="/md.js"></script>
+<script src="/clip-ui.js"></script>
+<script src="/live-ui.js"></script>
+<script src="/record-ui.js"></script>
+<script src="/app.js"></script>
+<script src="/push-settings.js"></script>
+</body>
+</html>
