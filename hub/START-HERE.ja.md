@@ -11,6 +11,7 @@ CerebraLOS Hub は、**あなた自身の Cloudflare アカウント**の上に�
 - Cloudflare のアカウント（無料プランで始められます。[dash.cloudflare.com](https://dash.cloudflare.com) で作成）
 - Node.js 20 以上
 - Claude Code
+- ターミナルの基本操作（コマンドは AI が用意します。実行の許可を求められたら内容を読んで答えるだけで大丈夫です）
 - ふだん使うメールアドレス（ログインの許可に使います）
 
 ## 手順

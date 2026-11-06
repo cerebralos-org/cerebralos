@@ -57,9 +57,23 @@ Then propose the scope. **Default to the minimal scope** and add the rest later:
 
 Run and show: `node -v`, `npx wrangler --version`, `npx wrangler whoami`, `cerebralos --version`.
 If wrangler is not logged in, ask the user to run `npx wrangler login` themselves (in Claude Code: type
-`! npx wrangler login`). Confirm the account shown is the intended one (Rule 4). In `hub/`, run `npm install` if `node_modules` is missing.
+`! npx wrangler login`). Confirm the account shown is the intended one (Rule 4).
 
-Done when: Node ≥ 20, wrangler logged in to the right account.
+**Install the dependencies and the `cerebralos` command from this checkout.** The Mac-side command must be the
+same version as the hub you are about to deploy (an older published package does not know about workspaces
+or the ToDo board). Tell the user what this does (it installs packages and links a `cerebralos` command), then:
+
+```bash
+npm install                   # repository root
+npm install --prefix hub      # the hub's own dependencies
+npm link                      # makes `cerebralos` point at this checkout (use `sudo` only if the user's setup requires it)
+cerebralos --version
+```
+
+If `cerebralos init` has never been run on this Mac, run it now (`cerebralos init`); it creates the user's
+own empty brain in `~/.cerebralos`. If the user already has a brain there, leave it alone (Rule 5).
+
+Done when: Node ≥ 20, wrangler logged in to the right account, `cerebralos --version` works, `hub/node_modules` exists.
 
 ## Stage 2: Create storage
 
