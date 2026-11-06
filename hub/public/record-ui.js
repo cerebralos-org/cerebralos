@@ -5,14 +5,14 @@
 (function () {
   const { esc, render: mdRender } = window.MD;
   const AGENT = {
-    claude: 'Claude', codex: 'Codex', gemini: 'Gemini', grok: 'Grok', chatgpt: 'ChatGPT', grok_bot: 'Grok Bot', elevenlabs: 'ElevenLabs', colab_video: 'Colab 動画',
-    'grok-bot': 'Grok Bot', dispatch: 'dispatch', yanagi: 'やなぎ', gemma: 'Gemma', rule: 'ルール',
+    claude: 'Claude', codex: 'Codex', gemini: 'Gemini', grok: 'Grok', chatgpt: 'ChatGPT', grok_bot: 'Grok Bot', gemini_task: 'Gemini Task', elevenlabs: 'ElevenLabs', colab_video: 'Colab 動画',
+    'grok-bot': 'Grok Bot', dispatch: 'dispatch', get yanagi() { return typeof window.ownerLabel === 'function' ? window.ownerLabel() : 'オーナー'; }, gemma: 'Gemma', rule: 'ルール',
   };
   const STATUS = {
     needs_approval: ['要承認', 'need'], approved: ['実行待ち', 'auto'], running: ['実行中', 'run'], done: ['完了', 'done'], failed: ['失敗', 'fail'],
     rejected: ['却下', 'rej'], needs_setup: ['要セットアップ', 'need'], needs_info: ['質問あり', 'need'], implemented: ['取り込み待ち', 'impl'],
     needs_attention: ['要確認', 'need'], merged: ['取り込み済み', 'done'], discarded: ['破棄', 'rej'], merging: ['取り込み中', 'run'], discarding: ['破棄中', 'run'],
-    chatgpt_waiting: ['ChatGPT 待ち', 'gpt'], grok_bot_waiting: ['Grok Bot 待ち', 'gpt'], skill_proposal: ['導入提案', 'need'],
+    chatgpt_waiting: ['ChatGPT 待ち', 'gpt'], grok_bot_waiting: ['Grok Bot 待ち', 'gpt'], gemini_task_waiting: ['Gemini Task 待ち', 'gpt'], skill_proposal: ['導入提案', 'need'],
   };
   const TONE = { ok: 'ok', fail: 'fail', need: 'need', info: 'info' };
   const TEXT_EXT = ['md', 'txt', 'json', 'csv', 'log', 'yml', 'yaml', 'patch'];

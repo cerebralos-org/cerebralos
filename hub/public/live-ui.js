@@ -4,8 +4,8 @@
 (function () {
   const { esc } = window.MD;
   const AGENTS = {
-    claude: 'Claude', codex: 'Codex', chatgpt: 'ChatGPT', kohaku: 'こはく', gemini: 'Gemini', grok: 'Grok', 'grok-bot': 'Grok Bot',
-    elevenlabs: 'ElevenLabs', colab_video: 'Colab 動画', dispatch: 'dispatch', yanagi: 'やなぎ', cli: 'CLI',
+    claude: 'Claude', codex: 'Codex', chatgpt: 'ChatGPT', kohaku: '見張り役の AI', gemini: 'Gemini', grok: 'Grok', 'grok-bot': 'Grok Bot',
+    elevenlabs: 'ElevenLabs', colab_video: 'Colab 動画', dispatch: 'dispatch', get yanagi() { return typeof window.ownerLabel === 'function' ? window.ownerLabel() : 'オーナー'; }, cli: 'CLI',
   };
   // 色クラス: 既知の担当は固有色、その他は灰色
   const agentClass = (a) => (Object.prototype.hasOwnProperty.call(AGENTS, a) ? a : 'other');
@@ -82,7 +82,7 @@
         `<button type="button" class="chip${filter === id ? ' on' : ''}" data-act="live-filter" data-agent="${esc(id)}" aria-pressed="${filter === id}">${esc(label)}</button>`).join('') + '</div>';
     if (st.error) h += `<p class="live-warn" role="status">${esc(st.error)}</p>`;
     h += shown.length ? `<ol class="live-list" aria-label="直近の出来事">${shown.map((a) => itemHtml(a, nowMs)).join('')}</ol>` : '<div class="empty"><p>まだ動きはありません。</p></div>';
-    h += '<p class="muted live-foot">Claude Code・Codex・ChatGPT・こはく・Gemini・dispatch が書く「いま」。直近 7 日だけ残ります。</p>';
+    h += '<p class="muted live-foot">Claude Code・Codex・ChatGPT・見張り役の AI・Gemini・dispatch が書く「いま」。直近 7 日だけ残ります。</p>';
     return h;
   }
 

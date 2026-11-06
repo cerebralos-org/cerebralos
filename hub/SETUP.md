@@ -7,6 +7,10 @@ Grok / Grok Bot and other MCP clients.
 
 Everything runs in **your own** Cloudflare account. Nothing is shared with anyone else.
 
+> **Prefer to be guided?** Open this repository in Claude Code and say "set up the hub"
+> (日本語: 「ハブをセットアップして」). The `setup-hub` skill (`.claude/skills/setup-hub/SKILL.md`)
+> asks you a few questions and walks through every step below with checks. Japanese quick start: [START-HERE.ja.md](START-HERE.ja.md).
+
 ## 0. Prerequisites
 
 - A Cloudflare account (the free plan is enough to start; Workers Paid is recommended for cron and D1 limits)
@@ -48,6 +52,12 @@ npx wrangler secret put SLACK_WEBHOOK_URL
 ```
 
 Set `VAPID_SUBJECT` to a mailto: you control and `PUBLIC_URL` to your Worker URL.
+Web Push (the VAPID keys) is optional: without it the hub works and only phone notifications are off.
+
+Also set, in `[vars]`:
+
+- `OWNER_NAME` — the name the dashboard and your AI agents use for you (default "オーナー").
+- `NAVI_ENABLED` — leave `"0"`. It switches on an optional companion screen that is off by default.
 
 ## 4. Database and deploy
 

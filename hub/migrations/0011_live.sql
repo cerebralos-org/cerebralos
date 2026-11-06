@@ -1,4 +1,4 @@
--- 「いま」掲示板（activity）と「作業中の札」（locks）: 複数の AI（Claude Code / Codex / ChatGPT / こはく / Gemini / Grok / dispatch）が
+-- 「いま」掲示板（activity）と「作業中の札」（locks）: 複数の AI（Claude Code / Codex / ChatGPT / 見張り役の AI / Gemini / Grok / dispatch）が
 -- 互いの作業をリアルタイムに知り、同じ資源（Colab の VM・リポジトリ・カード）を二重に使わないための共有の場。
 --
 -- activity: 直近 7 日だけ保持（cron の purgeLive が古い行を消す）。text は保存前に機微マスク済み（hub/src/live.js）。

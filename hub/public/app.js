@@ -55,7 +55,12 @@ const S = {
   boardEdit: null,
   boardDel: null,
   busy: new Set(),
+  ownerName: 'オーナー', // /api/state の owner_name（未提供の古いサーバーではこの既定値）
+  naviEnabled: false, // /api/state の navi_enabled（案内役機能。未提供なら無効）
 };
+// 画面に出す持ち主の呼び名。内部ID 'yanagi' は互換のため変えず、表示だけここで解決する
+const ownerLabel = () => S.ownerName || 'オーナー';
+window.ownerLabel = ownerLabel;
 
 // ---------------- utils ----------------
 function toast(msg, isErr) {
@@ -142,7 +147,7 @@ function writerBadge(c) {
 function authorBadge(a) {
   const key = String(a || '').toLowerCase();
   const cls = key === 'yanagi' || key === 'hub' ? 'hub' : ['claude-code', 'codex', 'chatgpt'].includes(key) ? key : 'other';
-  const label = key === 'yanagi' ? 'やなぎ' : key === 'hub' ? 'スマホ' : cls === 'other' ? a || '?' : WRITER_LABEL[cls];
+  const label = key === 'yanagi' ? ownerLabel() : key === 'hub' ? 'スマホ' : cls === 'other' ? a || '?' : WRITER_LABEL[cls];
   return `<span class="wbadge w-${cls}">${esc(label)}</span>`;
 }
 
@@ -242,12 +247,56 @@ function renderFocus() {
   el.innerHTML = html;
 }
 
+
+// ---------------- workspace（ワークスペース / プロジェクトの分類）----------------
+// 定義と対応表は /api/state の workspaces（docs.workspaces の写し）。各カードの ws は hub が計算した実効ワークスペース。
+// 色は利用者が決めるので、CSP（style-src 'self'）に合わせて style 属性ではなく data-wscolor から CSSOM で --ws を付ける。
+const WS_PREF = 'cerebralos.ws';
+const WS_NONE = '_none';
+const HEX6 = /^#[0-9a-f]{6}$/i;
+S.ws = (() => { try { return localStorage.getItem(WS_PREF) || 'all'; } catch { return 'all'; } })();
+S.wsDraft = null; // 設定タブで編集中の下書き（null = 編集していない＝サーバーの値を表示）
+const wsDefs = () => (S.data && S.data.workspaces && S.data.workspaces.workspaces) || [];
+const wsById = (id) => wsDefs().find((w) => w.id === id) || null;
+const wsCur = () => (S.ws === 'all' || S.ws === WS_NONE || wsById(S.ws) ? S.ws : 'all'); // 定義から消えた id は「すべて」に戻す
+const wsMatch = (ws) => { const c = wsCur(); return c === 'all' || (c === WS_NONE ? !wsById(ws) : ws === c); };
+function wsChip(id) {
+  const w = wsById(id);
+  return w ? `<span class="wschip" data-wscolor="${esc(w.color)}">${esc(w.label)}</span>` : '';
+}
+function paintWs(root) {
+  for (const n of root.querySelectorAll('[data-wscolor]')) if (HEX6.test(n.dataset.wscolor)) n.style.setProperty('--ws', n.dataset.wscolor);
+}
+function wsBarHtml(rows) {
+  const defs = wsDefs();
+  if (!defs.length) return '';
+  const cur = wsCur();
+  const cnt = { all: rows.length, [WS_NONE]: 0 };
+  for (const r of rows) { const k = wsById(r.ws) ? r.ws : WS_NONE; cnt[k] = (cnt[k] || 0) + 1; }
+  const btn = (v, label, color) =>
+    `<button type="button" class="chip wsc" data-act="ws" data-v="${esc(v)}" aria-pressed="${cur === v}"${color ? ` data-wscolor="${esc(color)}"` : ''}>${esc(label)}<span class="cnt">${cnt[v] || 0}</span></button>`;
+  return '<div class="chips wsbar" role="group" aria-label="ワークスペースで絞り込み">' + btn('all', 'すべて') +
+    defs.map((w) => btn(w.id, w.label, w.color)).join('') + btn(WS_NONE, '未分類') + '</div>';
+}
+// カードの編集欄: ワークスペース select + プロジェクト入力
+function wsFieldsHtml(workspace, project, fallback) {
+  const defs = wsDefs();
+  const sel = workspace || fallback || '';
+  const known = !workspace || defs.some((w) => w.id === workspace);
+  return '<div class="ws-fields">' +
+    `<select data-f="workspace" aria-label="ワークスペース"><option value="">ワークスペース: 指定なし</option>` +
+    defs.map((w) => `<option value="${esc(w.id)}"${w.id === sel ? ' selected' : ''}>${esc(w.label)}</option>`).join('') +
+    (known ? '' : `<option value="${esc(workspace)}" selected>${esc(workspace)}（未定義）</option>`) + '</select>' +
+    `<input type="text" data-f="project" maxlength="64" list="ws-project-list" placeholder="プロジェクト（任意）" aria-label="プロジェクト" value="${esc(project || '')}"></div>`;
+}
+
 // ---------------- memory ----------------
 function filteredCards() {
   const all = S.data.cards;
   return all.filter((c) => {
     if (S.writer !== 'all' && writerKey(c) !== S.writer) return false;
     if (S.project && c.project !== S.project) return false;
+    if (!wsMatch(c.ws)) return false;
     return true;
   });
 }
@@ -272,7 +321,7 @@ function cardHtml(c) {
   const hl = c.highlights || [];
   const na = c.next_action || [];
   const thin = !hl.length && !na.length; // 中身の記録が無いセッション記録は、薄い1行カードにする
-  const proj = c.project ? `<span class="pchip" title="${esc(c.project)}">${esc(c.project)}</span>` : '';
+  const proj = wsChip(c.ws) + (c.project ? `<span class="pchip" title="${esc(c.project)}">${esc(c.project)}</span>` : '');
   const list = hl.length ? `<ul class="hl">${hl.map((h) => `<li>${esc(h)}</li>`).join('')}</ul>` : '';
   const act = na.length
     ? `<div class="nextact">${icon('arrowR')}<div class="nextact-list">${na.map((a) => `<span>${esc(a)}</span>`).join('')}</div></div>`
@@ -283,7 +332,7 @@ function cardHtml(c) {
     <div class="mcard-title">${esc(c.title || '(無題)')}</div>${list}${act}
   </button></li>`;
 }
-function renderMemory() { keepHScroll($('panel-memory'), renderMemoryInner); }
+function renderMemory() { keepHScroll($('panel-memory'), () => { renderMemoryInner(); paintWs($('panel-memory')); }); }
 function renderMemoryInner() {
   const el = $('panel-memory');
   if (!S.data) {
@@ -308,7 +357,7 @@ function renderMemoryInner() {
   const projCount = {};
   for (const c of all) if (c.project) projCount[c.project] = (projCount[c.project] || 0) + 1;
   const projects = Object.entries(projCount).sort((a, b) => b[1] - a[1]).slice(0, 10);
-  let h = '<div class="filters"><div class="chips" role="group" aria-label="書き手で絞り込み">' +
+  let h = '<div class="filters">' + wsBarHtml(all) + '<div class="chips" role="group" aria-label="書き手で絞り込み">' +
     writers.filter(([k]) => k === 'all' || counts[k]).map(([k, label]) =>
       `<button type="button" class="chip" data-act="writer" data-v="${k}" aria-pressed="${S.writer === k}">${esc(label)}<span class="cnt">${counts[k] || 0}</span></button>`).join('') +
     '</div>';
@@ -479,11 +528,13 @@ function renderReviews() {
   const el = $('panel-reviews');
   if (!S.data) { el.innerHTML = '<div class="skel tall"></div>'; return; }
   const list = S.data.reviews;
-  if (!list.length) {
-    el.innerHTML = `<div class="empty">${icon('check', 'big')}<p>承認待ちはありません。夜の処理で候補が溜まるとここに出ます。</p></div>`;
+  const waits = boardApprovals();
+  const log = S.data.approvals || [];
+  if (!list.length && !waits.length) {
+    el.innerHTML = `<div class="empty">${icon('check', 'big')}<p>承認待ちはありません。夜の処理で候補が溜まるとここに出ます。</p></div>` + approvalLogHtml(log);
     return;
   }
-  el.innerHTML = '<div class="cards">' + list.map((r) => {
+  el.innerHTML = boardApprovalsHtml(waits) + (list.length ? '<h2 class="rv-h">ナレッジの承認待ち</h2>' : '') + '<div class="cards">' + list.map((r) => {
     const sc = r.scheduled;
     let action;
     if (sc) {
@@ -500,7 +551,35 @@ function renderReviews() {
       (r.target ? `<div><span class="target">${esc(r.target)}</span></div>` : '') +
       (r.body ? `<details><summary>内容を見る</summary><div class="md">${mdRender(r.body)}</div></details>` : '') +
       action + '</article>';
+  }).join('') + '</div>' + approvalLogHtml(log);
+}
+// ボードのカードのうち、承認を待っているもの（ターミナル版 hub からも承認・却下できる。ハードルールのものは Web だけ）
+// 完了に移したカードは、印が要承認のままでも数えない（オーナーが手で閉じたもの）
+const boardApprovals = () => (S.data.board || []).filter((b) => b.status === 'needs_approval' && b.lane !== 'done');
+function boardApprovalsHtml(waits) {
+  if (!waits.length) return '';
+  return '<h2 class="rv-h">ボードの承認待ち</h2><div class="cards">' + waits.map((b) => {
+    const dis = S.busy.has('d:' + b.id) ? ' disabled' : '';
+    const title = String(b.text || '').replace(/\[ws:[A-Za-z0-9_-]+\]/g, '').trim().split('\n')[0];
+    return `<article class="rcard"><div><h3>${esc(title || b.id)}</h3></div>` +
+      (b.approval_reason ? `<div><span class="target">${esc(b.approval_reason)}</span></div>` : '') +
+      `<details><summary>内容を見る</summary><div class="md">${mdRender(b.text || '')}</div></details>` +
+      `<div class="r-actions"><button type="button" class="btn ok" data-act="d-approve" data-id="${esc(b.id)}"${dis}>${icon('check', 'sm')}承認</button>` +
+      `<button type="button" class="btn danger" data-act="d-reject" data-id="${esc(b.id)}"${dis}>${icon('x', 'sm')}却下</button></div></article>`;
   }).join('') + '</div>';
+}
+// 承認の記録（追記だけ）: いつ・どの方法で・誰が・何を。本文の指紋（SHA-256）の先頭も出す
+const APPROVAL_METHOD = { web: 'Web（本人ログイン）', cli: 'ターミナル' };
+function approvalLogHtml(log) {
+  if (!log.length) return '';
+  const rows = log.map((a) => {
+    const card = (S.data.board || []).find((b) => b.id === a.card_id);
+    const title = card ? String(card.text || '').replace(/\[ws:[A-Za-z0-9_-]+\]/g, '').trim().split('\n')[0] : a.card_id;
+    const who = [APPROVAL_METHOD[a.method] || a.method, a.actor, a.machine].filter(Boolean).join(' · ');
+    return `<li><span class="dbadge ${a.decision === 'approve' ? 'auto' : 'need'}">${a.decision === 'approve' ? '承認' : '却下'}</span> ${esc(title)}` +
+      `<span class="sub">${esc(ago(a.at))} · ${esc(who)}${a.reason ? ' · ' + esc(a.reason) : ''} · <code title="判断したときの本文の SHA-256">${esc(String(a.text_sha256 || '').slice(0, 12))}</code></span></li>`;
+  }).join('');
+  return `<details class="ap-log"><summary>承認の記録（直近 ${log.length} 件）</summary><ul>${rows}</ul></details>`;
 }
 
 // ---------------- board ----------------
@@ -511,6 +590,7 @@ const AGENTS = [
   { id: 'grok', label: 'Grok' },
   { id: 'chatgpt', label: 'ChatGPT' },
   { id: 'grok_bot', label: 'Grok Bot' },
+  { id: 'gemini_task', label: 'Gemini Task' },
   { id: 'elevenlabs', label: 'ElevenLabs' },
   { id: 'colab_video', label: 'Colab 動画' },
 ];
@@ -524,7 +604,7 @@ S.preview = {};
 
 const fmtSize = (n) => (n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : n >= 1024 ? Math.round(n / 1024) + ' KB' : n + ' B');
 const extOf = (p) => (String(p).split('.').pop() || '').toLowerCase();
-const isActiveStatus = (st) => st === 'running' || st === 'approved' || st === 'chatgpt_waiting' || st === 'grok_bot_waiting' || st === 'skill_installing' || st === 'merging' || st === 'discarding';
+const isActiveStatus = (st) => st === 'running' || st === 'approved' || st === 'chatgpt_waiting' || st === 'grok_bot_waiting' || st === 'gemini_task_waiting' || st === 'skill_installing' || st === 'merging' || st === 'discarding';
 const parseImpl = (r) => { try { const o = typeof r.impl === 'string' ? JSON.parse(r.impl) : r.impl; return o && typeof o === 'object' ? o : null; } catch { return null; } };
 const isImpl = (r) => r.task_kind === 'implement';
 
@@ -545,9 +625,10 @@ function statusBlock(r) {
   const btn = (act, label, cls = '', ic = '') => `<button type="button" class="btn sm ${cls}" data-act="${act}" data-id="${esc(r.id)}"${dis}>${ic ? icon(ic, 'sm') : ''}${label}</button>`;
   let h = '<div class="dstate">';
   if (st === 'needs_info') h += `<span class="dbadge need">質問があります</span></div>${infoBlock(r)}`;
+  else if (st === 'needs_approval' && r.lane === 'done') h += '<span class="dbadge">承認せずに完了へ移しました</span></div>';
   else if (st === 'needs_approval') h += `<span class="dbadge need">要承認</span>${isImpl(r) ? `<span class="dbadge impl">実装モード${r.repo ? '・' + esc(r.repo) : ''}</span>` : ''}</div>${reason}<div class="dactions">${btn('d-approve', isImpl(r) ? '承認して実装を開始' : 'OK・実行', 'primary', 'check')}${btn('d-route', '担当を変更', '')}${btn('d-reject', '却下', 'danger', 'x')}</div>`;
   else if (st === 'approved') h += `<span class="dbadge auto">${r.decided_by === 'yanagi' ? '承認済み' : '自動'}</span><span class="dtext">${impl && impl.revise ? `修正の実行待ち（${esc(impl.machine || '')}）` : '実行待ち'}</span></div>${impl && impl.revise ? `<p class="dreason">修正依頼: ${esc(impl.revise.comment)}</p>` : ''}${r.decided_by === 'yanagi' ? '' : reason}<div class="dactions">${btn('d-route', '担当を変更', '')}${btn('d-reject', '却下', 'danger', 'x')}</div>`;
-  else if (st === 'chatgpt_waiting' || st === 'grok_bot_waiting') h += `<span class="dbadge auto">${r.decided_by === 'yanagi' ? '承認済み' : '自動'}</span><span class="dbadge gpt">${st === 'grok_bot_waiting' ? 'Grok Bot' : 'ChatGPT'}${r.claimed_by && r.lease_until && Date.parse(r.lease_until) > Date.now() ? ' が作業中' : '待ち'}</span></div><div class="dactions">${btn('d-route', '担当を変更', '')}${btn('d-reject', '却下', 'danger', 'x')}</div>`;
+  else if (st === 'chatgpt_waiting' || st === 'grok_bot_waiting' || st === 'gemini_task_waiting') h += `<span class="dbadge auto">${r.decided_by === 'yanagi' ? '承認済み' : '自動'}</span><span class="dbadge gpt">${st === 'grok_bot_waiting' ? 'Grok Bot' : st === 'gemini_task_waiting' ? 'Gemini Task' : 'ChatGPT'}${r.claimed_by && r.lease_until && Date.parse(r.lease_until) > Date.now() ? ' が作業中' : '待ち'}</span></div><div class="dactions">${btn('d-route', '担当を変更', '')}${btn('d-reject', '却下', 'danger', 'x')}</div>`;
   else if (st === 'needs_setup') h += `<span class="dbadge need">要セットアップ</span></div>${r.result ? `<p class="dreason">${esc(r.result)}</p>` : ''}<div class="dactions">${btn('d-route', '担当を変更', 'primary')}${btn('d-reject', '却下', 'danger', 'x')}</div>`;
   else if (st === 'running') h += `<span class="dbadge run"><span class="spin" aria-hidden="true"></span>実行中</span>${machine}</div>`;
   else if (st === 'failed') h += `<span class="dbadge fail">失敗</span>${machine}</div><div class="dactions">${btn('d-approve', '再実行', '', 'refresh')}${btn('d-route', '担当を変更', '')}${impl && impl.branch ? btn('i-discard', '作業コピーを破棄', 'danger', 'x') : btn('d-reject', '却下', 'danger', 'x')}</div>`;
@@ -697,34 +778,43 @@ function keepHScroll(el, fn) {
     requestAnimationFrame(() => { n.style.scrollSnapType = prevSnap; });
   }
 }
-function renderBoard() { keepHScroll($('panel-board'), renderBoardInner); }
+// 表示上の列: エージェントがオーナーの返事・承認を待っているカード（データ上は「やりたい」）は「待ち」に出す。
+// データ（board.lane）は動かさない。dispatch の判定・承認は lane='want' を前提にしているため。ターミナルの ws-board も同じ規則
+const YOUR_TURN = ['needs_approval', 'needs_info'];
+const viewLane = (r) => (r.lane === 'want' && YOUR_TURN.includes(r.status) ? 'waiting' : r.lane);
+function renderBoard() { keepHScroll($('panel-board'), () => { renderBoardInner(); paintWs($('panel-board')); }); }
 function renderBoardInner() {
   const el = $('panel-board');
   if (!S.data) { el.innerHTML = '<div class="skel tall"></div>'; return; }
-  const items = S.data.board.filter((i) => i.task_kind !== 'clip'); // クリップは専用タブに出す
-  el.innerHTML = executorBar() + '<div class="board">' + LANES.map((ln, li) => {
-    const rows = items.filter((i) => i.lane === ln.id);
+  const allItems = S.data.board.filter((i) => i.task_kind !== 'clip' && !i.owner); // クリップと ToDo（owner あり）は専用タブに出す
+  const items = allItems.filter((i) => wsMatch(i.ws));
+  el.innerHTML = executorBar() + wsBarHtml(allItems) + '<div class="board">' + LANES.map((ln, li) => {
+    const rows = items.filter((i) => viewLane(i) === ln.id);
     let h = `<section class="lane" data-lane="${ln.id}" aria-label="${ln.label}"><div class="lane-head"><h3>${ln.label}<span class="cnt">${rows.length}</span></h3>` +
       `<button type="button" class="icon-btn" data-act="b-add" data-lane="${ln.id}" aria-label="${ln.label}にカードを追加">${icon('plus')}</button></div>`;
     if (S.boardAdd === ln.id) {
       h += `<form class="binput" data-form="b-new" data-lane="${ln.id}"><textarea rows="3" maxlength="2000" placeholder="やること・気づきを一言で" aria-label="新しいカード"></textarea>` +
+        wsFieldsHtml('', '', wsById(wsCur()) ? wsCur() : '') +
         `<div class="binput-actions"><button type="button" class="btn sm" data-act="b-cancel">キャンセル</button><button type="submit" class="btn sm primary">追加</button></div></form>`;
     }
     if (!rows.length && S.boardAdd !== ln.id) h += '<p class="lane-empty">カードはありません</p>';
     for (const r of rows) {
       if (S.boardEdit === r.id) {
         h += `<form class="binput" data-form="b-edit" data-id="${esc(r.id)}"><textarea rows="4" maxlength="2000" aria-label="カードを編集">${esc(r.text)}</textarea>` +
+          wsFieldsHtml(r.workspace, r.project, '') +
           `<div class="binput-actions"><button type="button" class="btn sm" data-act="b-cancel">キャンセル</button><button type="submit" class="btn sm primary">保存</button></div></form>`;
         continue;
       }
-      const prev = LANES[li - 1], next = LANES[li + 1];
-      h += `<article class="bcard${ln.id === 'done' ? ' done' : ''}${r.status === 'running' ? ' running' : ''}${S.cardFlash === r.id ? ' flash' : ''}" id="bcard-${esc(r.id)}" data-status="${esc(r.status || '')}"><button type="button" class="bcard-text bcard-open" data-act="b-record" data-id="${esc(r.id)}" aria-label="実行記録を開く: ${esc(String(r.text).split('\n')[0].slice(0, 60))}">${esc(r.text)}</button>` +
-        `<div class="bcard-foot">${authorBadge(r.author)}${agentChip(r)}${RU.reviewBadgeHtml(r.review)}${CU.fromClipHtml(r)}<span>${esc(ago(r.updated_at))}</span><div class="bcard-tools">` +
+      // 返事・承認待ちで「待ち」に寄せて見せているカードは、レーンの手動移動を出さない（承認・返事で進める）
+      const shifted = viewLane(r) !== r.lane;
+      const prev = shifted ? null : LANES[li - 1], next = shifted ? null : LANES[li + 1];
+      h += `<article class="bcard${ln.id === 'done' ? ' done' : ''}${r.status === 'running' ? ' running' : ''}${S.cardFlash === r.id ? ' flash' : ''}" id="bcard-${esc(r.id)}" data-status="${esc(r.status || '')}"><button type="button" class="bcard-text bcard-open" data-act="c-view" data-id="${esc(r.id)}" aria-label="開く: ${esc(cardTitle(r.text).slice(0, 60))}">${cardSummaryHtml(r.text)}</button>` +
+        `<div class="bcard-foot">${authorBadge(r.author)}${agentChip(r)}${RU.reviewBadgeHtml(r.review)}${CU.fromClipHtml(r)}${wsChip(r.ws)}${r.project ? `<span class="pchip" title="${esc(r.project)}">${esc(r.project)}</span>` : ''}<span>${esc(ago(r.updated_at))}</span><div class="bcard-tools">` +
         (prev ? `<button type="button" class="icon-btn" data-act="b-move" data-id="${esc(r.id)}" data-lane="${prev.id}" aria-label="「${prev.label}」へ戻す">${icon('chevL')}</button>` : '') +
         (next ? `<button type="button" class="icon-btn" data-act="b-move" data-id="${esc(r.id)}" data-lane="${next.id}" aria-label="「${next.label}」へ進める">${icon('chevR')}</button>` : '') +
         `<button type="button" class="icon-btn" data-act="b-edit" data-id="${esc(r.id)}" aria-label="編集">${icon('edit')}</button>` +
         `<button type="button" class="icon-btn" data-act="b-del" data-id="${esc(r.id)}" aria-label="削除">${icon('trash')}</button></div></div>` +
-        statusBlock(r) + proposalBlock(r) + resultBlock(r) +
+        statusChip(r) +
         (S.boardDel === r.id ? `<div class="confirm-del"><span>削除しますか？</span><span><button type="button" class="btn sm" data-act="b-cancel">やめる</button> <button type="button" class="btn sm danger" data-act="b-del-yes" data-id="${esc(r.id)}">削除</button></span></div>` : '') +
         '</article>';
     }
@@ -737,6 +827,247 @@ function renderBoardInner() {
     if (n) n.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
     S.cardFlash = null;
   }
+}
+
+
+// ---------------- カードの要約と、押したときの詳細の窓（ボード・ToDo 共通）----------------
+// カードには題名（1 行目）と 2 行までの要約だけを出し、押すと画面いっぱいの窓で本文・状態・操作を見せる
+const cardTitle = (text) => String(text || '').replace(/\[ws:[A-Za-z0-9_-]+\]/g, '').trim().split('\n')[0];
+function cardSummaryHtml(text) {
+  const lines = String(text || '').replace(/\[ws:[A-Za-z0-9_-]+\]/g, '').trim().split('\n');
+  const rest = lines.slice(1).map((x) => x.trim()).filter(Boolean).join(' ');
+  return `<span class="bcard-title">${esc(lines[0] || '')}</span>${rest ? `<span class="bcard-sum">${esc(rest)}</span>` : ''}`;
+}
+const STATUS_CHIP = {
+  needs_approval: ['要承認', 'need'], needs_info: ['質問あり', 'need'], approved: ['実行待ち', 'auto'], running: ['実行中', 'auto'], done: ['完了', 'auto'],
+  failed: ['失敗', 'fail'], rejected: ['却下', ''], needs_setup: ['要セットアップ', 'need'], needs_attention: ['要対応', 'fail'], implemented: ['実装済み・要確認', 'need'],
+  merged: ['取り込み済み', 'auto'], discarded: ['破棄', ''], skill_proposal: ['導入提案', 'need'],
+  chatgpt_waiting: ['ChatGPT 待ち', 'gpt'], grok_bot_waiting: ['Grok Bot 待ち', 'gpt'], gemini_task_waiting: ['Gemini Task 待ち', 'gpt'],
+};
+function statusChip(r) {
+  const c = STATUS_CHIP[r.status];
+  if (!c) return !r.status && r.lane === 'want' && !r.owner ? '<div class="bcard-st"><span class="dbadge">判定中…</span></div>' : '';
+  return `<div class="bcard-st"><span class="dbadge ${c[1]}">${c[0]}</span>${r.result ? '<span class="bcard-st-note">結果あり</span>' : ''}</div>`;
+}
+S.view = null;
+S.sort = false;
+// 新しく拾ったやること（持ち主＝候補）。案内役の「仕分ける」と同じ一覧（ToDo タブの全ワークスペース）
+const sortItems = () => (S.data ? S.data.board.filter((r) => r.owner === 'candidate' && r.lane !== 'done') : []);
+const sortCount = () => sortItems().length;
+const SRC_JA = { gmail: 'メール', slack: 'Slack', 'computer-history': '作業の記録', manual: '手で追加' };
+function renderSortView() {
+  const dlg = $('cardview');
+  const list = sortItems();
+  const rows = list.map((r) => {
+    const lines = String(r.text || '').split('\n');
+    const rest = lines.slice(1).map((x) => x.trim()).filter(Boolean).join(' ');
+    const sug = OWNER_JA[r.suggested_owner] || '';
+    return `<article class="sort-row"><div class="sort-head">${wsChip(r.ws)}<span class="pchip">${esc(SRC_JA[r.source] || r.source || '?')}</span>${sug ? `<span class="todo-sug">見立て: ${esc(sug)}</span>` : ''}</div>` +
+      `<h3>${esc(cardTitle(r.text))}</h3>${rest ? `<p class="sort-rest">${esc(rest.slice(0, 220))}</p>` : ''}${r.owner_reason ? `<p class="todo-why">${esc(r.owner_reason)}</p>` : ''}` +
+      `<div class="todo-acts">${[['yanagi', '自分でやる', ' primary'], ['ai', 'AI に任せる', ''], ['both', '一緒に', ''], ['done', '済んでた・やらない', '']]
+        .map(([o, l, c]) => `<button type="button" class="btn sm${c}" data-act="todo-own" data-id="${esc(r.id)}" data-owner="${o}">${l}</button>`).join('')}` +
+      `<button type="button" class="btn sm" data-act="c-view" data-id="${esc(r.id)}">くわしく</button></div></article>`;
+  }).join('');
+  dlg.innerHTML = `<div class="cv-wrap"><div class="cv-head"><h2 id="cv-title">新しく拾ったやること（${list.length} 件）</h2>` +
+    `<button type="button" class="icon-btn" data-act="sort-close" aria-label="閉じる">${icon('x')}</button></div>` +
+    `<div class="cv-meta"><span class="muted">メール・Slack・作業の記録から拾ったもの。誰がやるかを決めると一覧から消えます（ターミナルの案内役とも同じ一覧）</span></div>` +
+    `<div class="cv-body">${rows || '<p class="lane-empty">仕分けるものはありません</p>'}</div>` +
+    `<div class="cv-foot"><button type="button" class="btn sm" data-act="sort-close">閉じる</button></div></div>`;
+  paintWs(dlg);
+  if (!dlg.open) dlg.showModal();
+}
+function renderCardView() {
+  const dlg = $('cardview');
+  if (dlg && S.sort && !S.view) return renderSortView();
+  if (!dlg || !S.view) return;
+  const r = S.data && S.data.board.find((x) => x.id === S.view);
+  if (!r) { S.view = null; if (dlg.open) dlg.close(); return; }
+  const lane = (LANES.find((l) => l.id === (r.owner ? (r.lane === 'done' ? 'done' : r.lane) : viewLane(r))) || {}).label || r.lane;
+  const head = `<div class="cv-meta"><span class="pchip">${esc(r.owner ? 'ToDo' : lane)}</span>${wsChip(r.ws)}${r.project ? `<span class="pchip">${esc(r.project)}</span>` : ''}` +
+    `${r.owner ? '' : agentChip(r)}<span class="muted">${esc(r.id)} · ${esc(ago(r.updated_at))}</span></div>`;
+  const body = r.owner ? todoDetailHtml(r) : statusBlock(r) + proposalBlock(r) + resultBlock(r);
+  dlg.innerHTML = `<div class="cv-wrap"><div class="cv-head"><h2 id="cv-title">${esc(cardTitle(r.text))}</h2>` +
+    `<button type="button" class="icon-btn" data-act="c-close" aria-label="閉じる">${icon('x')}</button></div>${head}` +
+    `<div class="cv-body"><div class="cv-text">${esc(r.text)}</div>${body}</div>` +
+    `<div class="cv-foot">${r.owner ? '' : `<button type="button" class="btn sm" data-act="b-record" data-id="${esc(r.id)}">実行記録を開く</button>`}<button type="button" class="btn sm" data-act="c-close">閉じる</button></div></div>`;
+  paintWs(dlg);
+  if (!dlg.open) dlg.showModal();
+}
+function todoDetailHtml(r) {
+  const k = todoCol(r);
+  const sug = OWNER_JA[r.suggested_owner] ? OWNER_JA[r.suggested_owner] + (r.suggested_owner === 'ai' && r.suggested_route ? `（${esc(r.suggested_route)}）` : '') : '';
+  const src = /^https?:\/\//.test(r.source_ref || '') ? `<a href="${esc(r.source_ref)}" target="_blank" rel="noopener noreferrer">元を開く</a>` : '';
+  return (sug && k !== 'done' ? `<div class="todo-sug">見立て: ${sug}</div>` : '') +
+        (r.owner_reason && k !== 'done' ? `<div class="todo-why">${esc(r.owner_reason)}</div>` : '') +
+        (r.waiting_on ? `<div class="todo-wait">待っている相手: ${esc(r.waiting_on)}</div>` : '') +
+        `<div class="bcard-foot">${wsChip(r.ws)}${r.source ? `<span class="pchip">${esc(r.source)}</span>` : ''}${r.due ? `<span class="todo-due">期限 ${esc(String(r.due).slice(0, 10))}</span>` : ''}${src}</div>` +
+        // 判定・実行されるのは AI の持ち分だけ。候補・オーナー・一緒に・相手待ちに「判定中…」は出さない
+        (r.owner === 'ai' || r.status ? statusBlock(r) : '') + resultBlock(r) +
+        // 「決めた」: 決めたことを書くと、カードへの追記・完了・記憶（決定のメモ）・続きのカードまで済む
+        (S.decideFor === r.id
+          ? `<form class="binput todo-decide" data-form="todo-decide" data-id="${esc(r.id)}"><label>決めたこと<textarea rows="3" maxlength="1000" placeholder="例: X は API で投稿する。常駐 PC 案で進める" aria-label="決めたこと"></textarea></label>` +
+            `<label>続きのカード（任意・AI に振る仕事があれば）<textarea data-f="next" rows="2" maxlength="2000" placeholder="例: 常駐 PC の投稿スクリプトを設計する" aria-label="続きのカード"></textarea></label>` +
+            `<p class="todo-decide-note">カードに「決定」として追記して完了にし、記憶にも残します。</p>` +
+            `<div class="binput-actions"><button type="button" class="btn sm" data-act="todo-decide-cancel">キャンセル</button><button type="submit" class="btn sm primary">決めた</button></div></form>`
+          : '') +
+        `<div class="todo-acts">${k !== 'done' && S.decideFor !== r.id ? `<button type="button" class="btn sm primary" data-act="todo-decide" data-id="${esc(r.id)}">決めた</button>` : ''}${TODO_ACTS.filter(([o]) => !(o === 'done' && k === 'done')).map(([o, l]) => `<button type="button" class="btn sm${o === 'yanagi' ? ' primary' : ''}" data-act="todo-own" data-id="${esc(r.id)}" data-owner="${o}" aria-pressed="${o === r.owner && k !== 'done'}">${l}</button>`).join('')}${k === 'done' ? `<button type="button" class="btn sm" data-act="todo-own" data-id="${esc(r.id)}" data-owner="want">完了から戻す</button>` : ''}</div>`;
+}
+
+// ---------------- 案内役（任意機能・S.naviEnabled が真のときだけ動く）----------------
+// 「今これ・次・セリフ・表情」は常駐の計算役（src/navi/publish.py）が docs.navi に置いたものを表示するだけ。
+// 操作は既存の窓口（ToDo の持ち主・承認）と、案内役の記録の窓口 /api/navi-op（あとで・ログ・台帳の申告）。押したものはその場で外し、次を出す
+S.naviDone = new Set();
+S.naviSay = null;
+S.naviMood = null;
+S.naviCannot = false;
+S.naviPanel = null; // 'menu' | 'log' | 'stale'
+const naviData = () => { try { return JSON.parse(S.data.docs.navi.body); } catch { return null; } };
+const naviState = () => { try { return JSON.parse(S.data.docs.navi_state.body); } catch { return {}; } };
+const NAVI_KIND = { todo: 'ToDo', approve: '承認待ち', answer: '質問あり', ledger: '台帳', sweep: '棚卸し', intake: '受付' };
+function naviList(n) { return (n.menu || []).filter((x) => !S.naviDone.has(x.key)); }
+function naviTemplate(it) {
+  if (!it) return `いま、${ownerLabel()}の番のものはありません。`;
+  const head = { todo: `「${it.title}」に取りかかりましょう。`, approve: `「${it.title}」の承認をご確認ください。`, answer: `「${it.title}」について、AI から質問が届いています。`,
+    ledger: `台帳の「${it.title}」を、そろそろ片付けましょう。`, sweep: '台帳に古い記録が溜まっています。まとめて確認しましょう。', intake: `新しいやることを拾いました。${it.title}の担当を決めましょう。` }[it.kind] || it.title;
+  return head + (it.why && !['sweep', 'intake'].includes(it.kind) ? `${it.why}。` : '');
+}
+async function naviOp(body) {
+  if (!S.naviEnabled) return false;
+  try { await api('/api/navi-op', { method: 'POST', body: JSON.stringify(body) }); return true; } catch (e) { toast(e.message, true); return false; }
+}
+function naviReact(it, say, mood = 'smile') {
+  S.naviDone.add(it.key);
+  S.naviSay = say; S.naviMood = mood; S.naviCannot = false;
+  renderNavi();
+  clearTimeout(naviReact.t);
+  naviReact.t = setTimeout(() => { S.naviSay = null; S.naviMood = null; renderNavi(); }, 6000);
+}
+function naviButtons(it) {
+  if (!it) return '';
+  const b = (act, label, cls = '') => `<button type="button" class="btn${cls ? ' ' + cls : ''}" data-act="navi" data-do="${act}" data-key="${esc(it.key)}">${label}</button>`;
+  if (S.naviCannot) {
+    return (it.kind === 'todo' ? b('to-ai', 'AI に回す') + b('to-both', '一緒にやる') : '') + b('skip', '今日は外す') + b('cancel', 'やめる');
+  }
+  if (it.kind === 'todo') return b('done', '終わった', 'primary') + b('decide', '決めた') + b('later', 'あとで') + b('cannot', '今は無理');
+  if (it.kind === 'approve') return (it.hard ? '' : b('approve', '承認する', 'primary')) + b('view', it.hard ? '中身を見て承認・却下' : 'くわしく・却下') + b('later', 'あとで');
+  if (it.kind === 'answer') return b('view', '返事を書く', 'primary') + b('later', 'あとで');
+  if (it.kind === 'ledger') return b('ledger-done', '終わった', 'primary') + b('later', 'あとで') + b('cannot', '今は無理');
+  if (it.kind === 'sweep') return b('stale', '棚卸しする', 'primary') + b('later', 'あとで');
+  if (it.kind === 'intake') return b('sort', '仕分ける', 'primary') + b('later', 'あとで');
+  return '';
+}
+function naviPanelHtml(n) {
+  if (S.naviPanel === 'menu') {
+    return `<div class="navi-panel"><h3>ぜんぶ（上から順に案内）</h3><ol>${naviList(n).map((x) => `<li><span class="pchip">${esc(x.ws || '-')}</span> ${esc(x.title)}${x.due ? ` <span class="todo-due">期限 ${esc(x.due)}</span>` : ''}${x.why ? `<span class="muted"> — ${esc(x.why)}</span>` : ''}</li>`).join('')}</ol></div>`;
+  }
+  if (S.naviPanel === 'log') {
+    const JA = { done: '完了', decide: '決めた', later: 'あとで', skip: '今日は外す', approve: '承認', reject: '却下', answer: '返事', drop: 'やらない', 'to-ai': 'AI に回した', 'to-both': '一緒に' };
+    const log = naviState().log || [];
+    return `<div class="navi-panel"><h3>今日のログ（${log.length} 件）</h3><ul>${log.slice().reverse().map((e) => `<li>${esc(e.at)} <b>${esc(JA[e.action] || e.action)}</b> ${esc(e.title)}</li>`).join('') || '<li class="muted">まだありません</li>'}</ul></div>`;
+  }
+  if (S.naviPanel === 'stale') {
+    const rows = (n.stale || []).filter((x) => !S.naviDone.has(x.key));
+    return `<div class="navi-panel"><h3>古いタスクの棚卸し（${rows.length} 件）</h3>${rows.map((x) => `<article class="sort-row"><div class="sort-head"><span class="pchip">${esc(x.ws || '-')}</span><span class="muted">${esc(x.as_of || '?')} 時点</span></div><h3>${esc(x.title)}</h3>${x.reason ? `<p class="sort-rest">${esc(x.reason.slice(0, 160))}</p>` : ''}` +
+      `<div class="todo-acts">${[['st-done', '済んでた', ' primary'], ['st-keep', 'まだやる', ''], ['st-drop', 'やらない', '']].map(([a, l, c]) => `<button type="button" class="btn sm${c}" data-act="navi" data-do="${a}" data-key="${esc(x.key)}">${l}</button>`).join('')}</div></article>`).join('') || '<p class="muted">ありません</p>'}</div>`;
+  }
+  return '';
+}
+function renderNavi() {
+  if (!S.naviEnabled) return;
+  const el = $('panel-navi');
+  if (!el || S.tab !== 'navi') return;
+  if (!S.data) { el.innerHTML = '<div class="skel tall"></div>'; return; }
+  const n = naviData();
+  if (!n) { el.innerHTML = '<div class="empty"><p>まだ案内がありません。常駐の計算役（src/navi/publish.py）が動くと出ます。</p></div>'; return; }
+  const list = naviList(n);
+  const top = list[0] || null;
+  const mood = S.naviMood || (top && n.top && top.key === n.top.key ? n.mood : 'normal');
+  const line = S.naviSay || (top && n.top && top.key === n.top.key ? n.line : naviTemplate(top));
+  const where = top ? [...new Set([top.ws, NAVI_KIND[top.kind]].filter(Boolean))].join(' · ') : '';
+  const next = list.slice(1, 4);
+  el.innerHTML = `<div class="navi">` +
+    `<div class="navi-box"><div class="navi-name"><span>案内役</span>${where ? `<small>${esc(where)}</small>` : ''}</div><p class="navi-line">${esc(line)}</p></div>` +
+    `<div class="navi-choices">${naviButtons(top)}</div>` +
+    (next.length ? `<p class="navi-next"><b>次:</b> ${next.map((x) => esc(x.title)).join(' → ')}</p>` : '') +
+    `<p class="navi-meta">残り ${list.length} 件 · 今日終わらせた ${(naviState().log || []).filter((e) => ['done', 'decide'].includes(e.action)).length} 件 · 更新 ${esc(ago(n.published_at))}</p>` +
+    `<div class="navi-sys">${top && top.id && !['sweep', 'intake'].includes(top.kind) && top.src === 'board' ? `<button type="button" class="btn sm" data-act="c-view" data-id="${esc(top.id)}">出どころ・くわしく</button>` : ''}` +
+    `<button type="button" class="btn sm" data-act="navi" data-do="menu">MENU</button><button type="button" class="btn sm" data-act="navi" data-do="log">LOG</button></div>` +
+    naviPanelHtml(n) + '</div>';
+}
+async function naviAction(t) {
+  if (!S.naviEnabled) return;
+  const n = naviData();
+  if (!n) return;
+  const d = t.dataset.do, key = t.dataset.key;
+  if (d === 'menu' || d === 'log' || d === 'stale') { S.naviPanel = S.naviPanel === d ? null : d; return renderNavi(); }
+  const it = [...(n.menu || []), ...(n.stale || [])].find((x) => x.key === key);
+  if (!it) return;
+  const log = (action, note = '') => naviOp({ op: 'log', key: it.key, title: it.title, action, note });
+  if (d === 'cannot') { S.naviCannot = true; return renderNavi(); }
+  if (d === 'cancel') { S.naviCannot = false; return renderNavi(); }
+  if (d === 'sort') { S.sort = true; S.view = null; return renderSortView(); }
+  if (d === 'view' || d === 'decide') { S.view = it.id; if (d === 'decide') S.decideFor = it.id; return renderCardView(); }
+  if (d === 'later') { if (await naviOp({ op: 'snooze', key: it.key })) { await log('later'); naviReact(it, `了解しました。「${it.title}」はあとで出します。`, 'normal'); } return; }
+  if (d === 'skip') { if (await naviOp({ op: 'snooze', key: it.key, n: 2 })) { await log('skip'); naviReact(it, `「${it.title}」は今日は外しておきます。`, 'normal'); } return; }
+  if (d === 'done') {
+    if (await boardCall('PATCH', '/api/board/' + encodeURIComponent(it.id), { lane: 'done' })) { await log('done'); naviReact(it, `お疲れさまです。「${it.title}」を完了にしました。`); load(true); }
+    return;
+  }
+  if (d === 'to-ai' || d === 'to-both') {
+    const owner = d === 'to-ai' ? 'ai' : 'both';
+    if (await boardCall('PATCH', '/api/board/' + encodeURIComponent(it.id), { owner })) { await log(d); naviReact(it, owner === 'ai' ? 'AI に回しました。下調べと下書きができたらお知らせします。' : '下準備は AI に任せます。仕上げだけお願いします。', 'proud'); load(true); }
+    return;
+  }
+  if (d === 'approve') {
+    if (await boardCall('POST', '/api/board/' + encodeURIComponent(it.id) + '/approve')) { await log('approve'); naviReact(it, '承認しました。あとは AI が進めます。記録にも残しています。'); load(true); }
+    return;
+  }
+  if (d === 'ledger-done' || d === 'st-done' || d === 'st-drop') {
+    if (await naviOp({ op: 'ledger_done', key: it.key })) {
+      await log(d === 'st-drop' ? 'drop' : 'done');
+      S.naviDone.add(it.key);
+      if (d === 'ledger-done') naviReact(it, `お疲れさまです。「${it.title}」は完了として記録しました。台帳は夜に照合します。`); else renderNavi();
+    }
+    return;
+  }
+  if (d === 'st-keep') { if (await naviOp({ op: 'revive', key: it.key })) { S.naviDone.add(it.key); renderNavi(); } }
+}
+
+// ---------------- ToDo（見張り役が書き、オーナーと AI で取り合う）----------------
+// owner が入っているカードが ToDo。列は持ち主、完了は lane='done'。持ち主の変更は PATCH /api/board/<id> {owner}（取り合いのルールは hub の todo.js）
+// 列キーの 'yanagi' は互換のための内部ID。見出しは描画時に ownerLabel() で解決する
+const todoCols = () => [['candidate', '候補'], ['yanagi', ownerLabel()], ['ai', 'AI'], ['both', '一緒に'], ['others', '相手待ち'], ['done', '完了']];
+const OWNER_JA = { get yanagi() { return ownerLabel() + '向き'; }, ai: 'AI 向き', both: '一緒に', others: '相手待ち' };
+const TODO_ACTS = [['yanagi', '取る'], ['ai', 'AI に任せる'], ['both', '一緒に'], ['others', '相手待ち'], ['candidate', '候補へ'], ['done', '完了']];
+const todoCol = (r) => (r.lane === 'done' ? 'done' : r.owner || 'candidate');
+function renderTodo() {
+  const el = $('panel-todo');
+  if (!el) return;
+  if (!S.data) { el.innerHTML = '<div class="skel tall"></div>'; return; }
+  const items = S.data.board.filter((i) => i.owner && wsMatch(i.ws));
+  const by = Object.fromEntries(todoCols().map(([k]) => [k, []]));
+  for (const r of [...items].sort((a, b) => String(a.due || '9999').localeCompare(String(b.due || '9999')) || String(a.created_at).localeCompare(String(b.created_at)))) by[todoCol(r)].push(r);
+  let h = '<p class="todo-intro">メール・Slack から見張り役の AI が書いた ToDo。振り分け役の AI が「誰がやるか」を見立て、AI 向きは 2 時間たつと AI が取って動きます。送信は誰が取っても下書きまで。</p>';
+  h += S.todoAdd
+    ? `<form class="binput" data-form="todo-new"><textarea rows="3" maxlength="2000" placeholder="やること（候補に置くと振り分け役の AI が見立てます）" aria-label="新しい ToDo"></textarea>${wsFieldsHtml('', '', wsById(wsCur()) ? wsCur() : '')}<div class="binput-actions"><button type="button" class="btn sm" data-act="todo-cancel">キャンセル</button><button type="submit" class="btn sm primary">候補に置く</button></div></form>`
+    : `<p class="todo-top"><button type="button" class="btn sm primary" data-act="todo-add">＋ ToDo</button>${sortCount() ? `<button type="button" class="btn sm" data-act="sort-open">新しく拾ったやることを仕分ける（${sortCount()} 件）</button>` : ''}</p>`;
+  h += wsBarHtml(S.data.board.filter((i) => i.owner)) + '<div class="board">' + todoCols().map(([k, label]) => {
+    let s = `<section class="lane" data-lane="t-${k}" aria-label="${label}"><div class="lane-head"><h3>${label}<span class="cnt">${by[k].length}</span></h3></div>`;
+    if (!by[k].length) s += '<p class="lane-empty">ありません</p>';
+    for (const r of by[k]) {
+      const sug = OWNER_JA[r.suggested_owner] ? OWNER_JA[r.suggested_owner] + (r.suggested_owner === 'ai' && r.suggested_route ? `（${esc(r.suggested_route)}）` : '') : '';
+      const src = /^https?:\/\//.test(r.source_ref || '') ? `<a href="${esc(r.source_ref)}" target="_blank" rel="noopener noreferrer">元を開く</a>` : '';
+      s += `<article class="bcard${k === 'done' ? ' done' : ''}" id="tcard-${esc(r.id)}"><button type="button" class="bcard-text bcard-open" data-act="c-view" data-id="${esc(r.id)}" aria-label="開く: ${esc(cardTitle(r.text).slice(0, 60))}">${cardSummaryHtml(r.text)}</button>` +
+        (sug && k !== 'done' ? `<div class="todo-sug">見立て: ${sug}</div>` : '') +
+        `<div class="bcard-foot">${wsChip(r.ws)}${r.source ? `<span class="pchip">${esc(r.source)}</span>` : ''}${r.due ? `<span class="todo-due">期限 ${esc(String(r.due).slice(0, 10))}</span>` : ''}</div>` +
+        (r.owner === 'ai' || r.status ? statusChip(r) : '') + '</article>';
+    }
+    return s + '</section>';
+  }).join('') + '</div>';
+  el.innerHTML = h;
+  paintWs(el);
+  const ta = el.querySelector('form textarea');
+  if (ta && S.todoAdd) ta.focus();
 }
 
 // ---------------- clip（リンクを貼る → Mac が読んで要約）----------------
@@ -894,12 +1225,22 @@ async function loadLive() {
 
 // ---------------- render all ----------------
 function renderBadge() {
-  const n = S.data ? S.data.reviews.length : 0;
+  const n = S.data ? S.data.reviews.length + boardApprovals().length : 0;
   $('rv-badge').hidden = !n;
   $('rv-badge').textContent = n;
 }
-const TABS = ['memory', 'board', 'live', 'clip', 'reviews', 'memo', 'connect', 'settings'];
+const TABS = ['memory', 'board', 'navi', 'todo', 'live', 'clip', 'reviews', 'memo', 'connect', 'settings'];
+// 案内役のタブとパネルは navi_enabled が真のときだけ出す
+function applyNaviVisibility() {
+  const tb = $('tab-navi'), pn = $('panel-navi');
+  if (tb) tb.hidden = !S.naviEnabled;
+  if (!S.naviEnabled) {
+    if (pn) pn.hidden = true;
+    if (S.tab === 'navi') setTab('memory', false);
+  }
+}
 function setTab(tab, push = true) {
+  if (tab === 'navi' && !S.naviEnabled) tab = 'memory';
   S.tab = tab;
   document.querySelector('.layout').dataset.tab = tab;
   for (const b of document.querySelectorAll('.tab')) b.setAttribute('aria-selected', String(b.dataset.tab === tab));
@@ -907,29 +1248,37 @@ function setTab(tab, push = true) {
   if (tab !== 'memory' && !(tab === 'board' && S.rec.id)) closeDetail();
   if (tab === 'connect') loadConnections();
   if (tab === 'live') { renderLive(); loadLive(); }
+  if (tab === 'navi') renderNavi();
   if (push) { try { history.replaceState(null, '', '#' + tab); } catch { /* ignore */ } }
 }
 function renderAll() {
+  applyNaviVisibility();
   renderSync();
   renderBadge();
   renderDream();
   renderFocus();
   renderMemory();
   renderBoard();
+  renderTodo();
+  renderNavi();
   renderClip();
   renderReviews();
+  renderCardView();
+  if (!S.wsDraft) renderWsSettings();
   const b = $('banner');
   b.hidden = !S.error;
   if (S.error) b.innerHTML = `<span>${esc(S.error)}</span><button type="button" class="btn sm" data-act="reload">${icon('refresh', 'sm')}再読み込み</button>`;
 }
 const isBusy = () =>
-  $('editor').open || $('adopt').open || S.boardAdd || S.boardEdit || S.boardDel || S.reviseFor || S.clipDel ||
+  $('editor').open || $('adopt').open || S.decideFor || ($('ws-settings') && $('ws-settings').contains(document.activeElement)) || S.boardAdd || S.boardEdit || S.boardDel || S.reviseFor || S.clipDel ||
   (document.activeElement && document.activeElement.tagName === 'TEXTAREA' && !['memo-text', 'clip-text'].includes(document.activeElement.id));
 
 async function load(quiet) {
   try {
     const d = await api('/api/state');
     S.data = d;
+    S.ownerName = (d && typeof d.owner_name === 'string' && d.owner_name.trim()) || 'オーナー';
+    S.naviEnabled = !!(d && d.navi_enabled === true);
     S.error = null;
     if (S.writer === 'pc' && S.hist.items.length <= 40) loadHistory(false); // 先頭ページだけ定期更新
   } catch (e) {
@@ -939,6 +1288,104 @@ async function load(quiet) {
   if (quiet && isBusy()) { renderSync(); renderBadge(); return; }
   renderAll();
 }
+
+
+// ---------------- workspace 設定（設定タブ）----------------
+// 行の追加・削除と保存は、DOM の値を下書き（S.wsDraft）に取り込んでから描き直す。入力中は定期更新で上書きしない
+function wsDraftFromData() {
+  const w = (S.data && S.data.workspaces) || { workspaces: [], projects: {}, repos: {} };
+  return { workspaces: w.workspaces.map((x) => ({ ...x })), projects: Object.entries(w.projects), repos: Object.entries(w.repos) };
+}
+function wsCollect() {
+  const root = $('ws-settings');
+  const f = (row, name) => { const n = row.querySelector(`[data-f="${name}"]`); return n ? n.value : ''; };
+  const pairs = (kind) => [...root.querySelectorAll(`.ws-row[data-r="${kind}"]`)].map((r) => [f(r, 'key'), f(r, 'ws')]);
+  return {
+    workspaces: [...root.querySelectorAll('.ws-row[data-r="ws"]')].map((r) => ({ id: f(r, 'id'), label: f(r, 'label'), color: f(r, 'color') || '#888888' })),
+    projects: pairs('project'),
+    repos: pairs('repo'),
+  };
+}
+function renderWsSettings() {
+  const root = $('ws-settings');
+  if (!root) return;
+  if (!S.data) { root.innerHTML = '<p class="muted">読み込み中…</p>'; return; }
+  const d = S.wsDraft || wsDraftFromData();
+  const ids = d.workspaces.map((w) => w.id).filter(Boolean);
+  const opts = (cur) => '<option value="">（選択）</option>' + ids.map((i) => `<option value="${esc(i)}"${i === cur ? ' selected' : ''}>${esc(i)}</option>`).join('') +
+    (cur && !ids.includes(cur) ? `<option value="${esc(cur)}" selected>${esc(cur)}（未定義）</option>` : '');
+  const mapRows = (kind, rows, ph) => rows.map(([k, v], i) =>
+    `<div class="ws-row map" data-r="${kind}"><input type="text" data-f="key" maxlength="64" list="ws-${kind}-list" placeholder="${ph}" aria-label="${ph}" value="${esc(k)}">` +
+    `<select data-f="ws" aria-label="ワークスペース">${opts(v)}</select>` +
+    `<button type="button" class="icon-btn" data-act="ws-del" data-r="${kind}" data-i="${i}" aria-label="この行を削除">${icon('trash')}</button></div>`).join('');
+  const projs = new Set(), repos = new Set();
+  for (const c of S.data.cards || []) if (c.project) projs.add(c.project);
+  for (const b of S.data.board || []) { if (b.project) projs.add(b.project); if (b.repo) repos.add(b.repo); }
+  for (const e of S.data.executors || []) for (const r of e.repos || []) repos.add(r);
+  root.innerHTML =
+    '<h3 class="ws-sub">ワークスペースの定義</h3>' +
+    d.workspaces.map((w, i) =>
+      `<div class="ws-row def" data-r="ws"><input type="color" data-f="color" value="${HEX6.test(w.color) ? esc(w.color) : '#888888'}" aria-label="色">` +
+      `<input type="text" data-f="id" maxlength="32" placeholder="id（英小文字・数字・-_）" aria-label="ワークスペース id" value="${esc(w.id)}">` +
+      `<input type="text" data-f="label" maxlength="40" placeholder="表示名" aria-label="表示名" value="${esc(w.label)}">` +
+      `<button type="button" class="icon-btn" data-act="ws-del" data-r="ws" data-i="${i}" aria-label="この行を削除">${icon('trash')}</button></div>`).join('') +
+    '<button type="button" class="btn sm" data-act="ws-add" data-r="ws">ワークスペースを追加</button>' +
+    '<h3 class="ws-sub">プロジェクト → ワークスペース</h3>' + mapRows('project', d.projects, 'プロジェクト名') +
+    '<button type="button" class="btn sm" data-act="ws-add" data-r="project">行を追加</button>' +
+    '<h3 class="ws-sub">リポジトリ → ワークスペース</h3>' + mapRows('repo', d.repos, 'リポジトリ名') +
+    '<button type="button" class="btn sm" data-act="ws-add" data-r="repo">行を追加</button>' +
+    `<datalist id="ws-project-list">${[...projs].sort().map((x) => `<option value="${esc(x)}">`).join('')}</datalist>` +
+    `<datalist id="ws-repo-list">${[...repos].sort().map((x) => `<option value="${esc(x)}">`).join('')}</datalist>` +
+    '<div class="ws-actions"><button type="button" class="btn" data-act="ws-reset">元に戻す</button><button type="button" class="btn primary" id="ws-save" data-act="ws-save">保存</button></div>';
+}
+async function wsSave() {
+  const d = wsCollect();
+  const obj = (pairs) => Object.fromEntries(pairs.map(([k, v]) => [k.trim(), v]).filter(([k]) => k));
+  const body = { workspaces: d.workspaces.filter((w) => w.id.trim() || w.label.trim()).map((w) => ({ id: w.id.trim(), label: w.label.trim(), color: w.color })), projects: obj(d.projects), repos: obj(d.repos) };
+  const btn = $('ws-save');
+  btn.disabled = true;
+  try {
+    const res = await fetch('/api/workspaces', { method: 'PUT', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    let data = null;
+    try { data = await res.json(); } catch { /* json 以外 */ }
+    if (!res.ok) throw new Error(data && data.error ? `保存できませんでした（${data.error}）` : `エラーが発生しました（${res.status}）`);
+    S.wsDraft = null;
+    toast('ワークスペースを保存しました');
+    await load();
+    return;
+  } catch (e) { toast(e.message, true); }
+  btn.disabled = false;
+}
+document.addEventListener('click', (ev) => {
+  const t = ev.target.closest('[data-act]');
+  if (!t || !t.dataset.act.startsWith('ws')) return;
+  const a = t.dataset.act;
+  if (a === 'ws') { // 切り替え（記憶とボードで共通。選択は保存する）
+    S.ws = t.dataset.v;
+    try { localStorage.setItem(WS_PREF, S.ws); } catch { /* 保存できなくても切り替えは動く */ }
+    S.shown = PAGE;
+    renderMemory();
+    return renderBoard();
+  }
+  if (!$('ws-settings').contains(t)) return;
+  if (a === 'ws-save') return wsSave();
+  if (a === 'ws-reset') { S.wsDraft = null; return renderWsSettings(); }
+  const d = wsCollect();
+  if (a === 'ws-add') {
+    if (t.dataset.r === 'ws') d.workspaces.push({ id: '', label: '', color: '#888888' });
+    else d[t.dataset.r === 'project' ? 'projects' : 'repos'].push(['', '']);
+  } else if (a === 'ws-del') {
+    const list = t.dataset.r === 'ws' ? d.workspaces : d[t.dataset.r === 'project' ? 'projects' : 'repos'];
+    list.splice(Number(t.dataset.i), 1);
+  }
+  S.wsDraft = d;
+  renderWsSettings();
+});
+// 入力したら下書きに取り込む（以後の定期更新で上書きしない）。id を変えたときは対応表の選択肢も更新する
+$('ws-settings').addEventListener('input', () => { S.wsDraft = wsCollect(); });
+$('ws-settings').addEventListener('change', (ev) => {
+  if (ev.target.dataset && ev.target.dataset.f === 'id') { S.wsDraft = wsCollect(); renderWsSettings(); }
+});
 
 // ---------------- events ----------------
 async function decide(id, decision, btn) {
@@ -966,7 +1413,7 @@ document.addEventListener('click', async (ev) => {
   if (!t) return;
   const a = t.dataset.act;
   if (a === 'open') return openCard(t.dataset.ref);
-  if (a === 'b-record') return openRecord(t.dataset.id);
+  if (a === 'b-record') { if (S.view || S.sort) { S.view = null; S.sort = false; $('cardview').close(); } return openRecord(t.dataset.id); }
   if (a === 'r-prev') {
     const R = S.rec, id = t.dataset.id;
     if (!R.id) return;
@@ -1126,6 +1573,21 @@ document.addEventListener('click', async (ev) => {
     if (await boardCall('DELETE', '/api/board/' + encodeURIComponent(t.dataset.id))) toast('削除しました');
     return load();
   }
+  if (a === 'todo-add') { S.todoAdd = true; return renderTodo(); }
+  if (a === 'todo-cancel') { S.todoAdd = false; return renderTodo(); }
+  if (a === 'c-view') { S.view = t.dataset.id; return renderCardView(); }
+  if (a === 'c-close') { S.view = null; S.decideFor = null; if (S.sort) return renderSortView(); $('cardview').close(); return; }
+  if (a === 'navi') return naviAction(t);
+  if (a === 'sort-open') { S.sort = true; S.view = null; return renderSortView(); }
+  if (a === 'sort-close') { S.sort = false; $('cardview').close(); return; }
+  if (a === 'todo-decide') { S.decideFor = t.dataset.id; renderTodo(); renderCardView(); const ta = document.querySelector('.todo-decide textarea'); if (ta) ta.focus(); return; }
+  if (a === 'todo-decide-cancel') { S.decideFor = null; renderTodo(); return renderCardView(); }
+  if (a === 'todo-own') {
+    const o = t.dataset.owner;
+    const body = ['done', 'want'].includes(o) ? { lane: o } : { owner: o };
+    if (await boardCall('PATCH', '/api/board/' + encodeURIComponent(t.dataset.id), body)) toast({ yanagi: ownerLabel() + 'の ToDo にしました', ai: 'AI に任せました', both: '「一緒に」にしました', others: '相手待ちにしました', candidate: '候補に戻しました', done: '完了にしました', want: '完了から戻しました' }[o]);
+    return load();
+  }
   if (a === 'b-move') {
     const item = S.data.board.find((i) => i.id === t.dataset.id);
     if (item) { item.lane = t.dataset.lane; renderBoard(); } // 先に画面を動かす
@@ -1142,14 +1604,33 @@ document.addEventListener('submit', async (ev) => {
   if (!text) return;
   const btn = f.querySelector('button[type=submit]');
   btn.disabled = true;
-  if (f.dataset.form === 'b-new') {
-    if (await boardCall('POST', '/api/board', { text, lane: f.dataset.lane })) { S.boardAdd = null; toast('追加しました'); }
+  if (f.dataset.form === 'todo-decide') {
+    const nx = f.querySelector('[data-f="next"]');
+    const body = { decision: text, ...(nx && nx.value.trim() ? { next: nx.value.trim() } : {}) };
+    if (await boardCall('POST', '/api/board/' + encodeURIComponent(f.dataset.id) + '/decision', body)) { S.decideFor = null; toast(body.next ? '決定を残して完了にしました。続きのカードも置きました' : '決定を残して完了にしました'); }
+  } else if (f.dataset.form === 'todo-new') {
+    const body = { text, lane: 'want', todo: true, source: 'manual' };
+    const nw = f.querySelector('[data-f="workspace"]');
+    if (nw && nw.value) body.workspace = nw.value;
+    if (await boardCall('POST', '/api/board', body)) { S.todoAdd = false; toast('ToDo を候補に置きました'); }
+  } else if (f.dataset.form === 'b-new') {
+    const body = { text, lane: f.dataset.lane };
+    const nw = f.querySelector('[data-f="workspace"]'), np = f.querySelector('[data-f="project"]');
+    if (nw && nw.value) body.workspace = nw.value;
+    if (np && np.value.trim()) body.project = np.value.trim();
+    if (await boardCall('POST', '/api/board', body)) { S.boardAdd = null; toast('追加しました'); }
   } else if (f.dataset.form === 'd-answer') {
     if (await boardCall('POST', '/api/board/' + encodeURIComponent(f.dataset.id) + '/answer', { answer: text })) toast('回答しました。判定し直します');
   } else if (f.dataset.form === 'd-revise') {
     if (await boardCall('POST', '/api/board/' + encodeURIComponent(f.dataset.id) + '/revise', { comment: text })) { S.reviseFor = null; toast('修正を依頼しました。同じ作業コピーで再実行します'); }
   } else if (f.dataset.form === 'b-edit') {
-    if (await boardCall('PATCH', '/api/board/' + encodeURIComponent(f.dataset.id), { text })) { S.boardEdit = null; toast('保存しました'); }
+    // 分類（workspace / project）は変えたときだけ送る。分類だけの変更では判定・承認は戻らない
+    const body = { text };
+    const cur = S.data.board.find((i) => i.id === f.dataset.id) || {};
+    const ew = f.querySelector('[data-f="workspace"]'), ep = f.querySelector('[data-f="project"]');
+    if (ew && ew.value !== (cur.workspace || '')) body.workspace = ew.value;
+    if (ep && ep.value.trim() !== (cur.project || '')) body.project = ep.value.trim();
+    if (await boardCall('PATCH', '/api/board/' + encodeURIComponent(f.dataset.id), body)) { S.boardEdit = null; toast('保存しました'); }
   }
   btn.disabled = false;
   await load();
@@ -1317,7 +1798,7 @@ window.addEventListener('resize', syncTopHeight);
 
 // boot
 const startTab = (location.hash || '').slice(1);
-setTab(TABS.includes(startTab) ? startTab : 'memory', false);
+setTab(TABS.includes(startTab) && startTab !== 'navi' ? startTab : 'memory', false);
 // Notification clicks may navigate an already-open client by fragment only.
 window.addEventListener('hashchange', () => {
   const tab = location.hash.slice(1);
@@ -1337,9 +1818,13 @@ function openBoardCard(hash) {
   if (S.rec.id !== id) closeDetail();
   setTab('board');
   if (S.data) renderBoard();
-  openRecord(id); // Slack の完了報告などから: そのカードの実行記録を開く
+  // Slack の完了報告・ターミナルの「hub で開く」などから: そのカードの詳細の窓を開く（実行記録は窓の中のボタンから）
+  S.view = id;
+  if (S.data) renderCardView();
 }
 if (startTab.startsWith('bcard=')) openBoardCard(startTab);
+// /#sort: 新しく拾ったやることの仕分けを開く（ターミナルの案内役や通知からのリンク用）
+if (startTab === 'sort') { S.sort = true; setTab('todo'); }
 window.addEventListener('hashchange', () => {
   if (location.hash.startsWith('#bcard=')) openBoardCard(location.hash.slice(1));
   // 「いま」の ref リンク（記憶カード）: /#card=<ref>

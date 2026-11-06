@@ -50,6 +50,8 @@
     <nav class="tabs" role="tablist" aria-label="セクション">
       <button class="tab" role="tab" id="tab-memory" data-tab="memory" aria-selected="true" aria-controls="panel-memory">記憶</button>
       <button class="tab" role="tab" id="tab-board" data-tab="board" aria-selected="false" aria-controls="panel-board">ボード</button>
+      <button class="tab" role="tab" id="tab-navi" data-tab="navi" aria-selected="false" aria-controls="panel-navi" hidden>案内役</button>
+      <button class="tab" role="tab" id="tab-todo" data-tab="todo" aria-selected="false" aria-controls="panel-todo">ToDo</button>
       <button class="tab" role="tab" id="tab-live" data-tab="live" aria-selected="false" aria-controls="panel-live">いま<span id="live-badge" class="badge" hidden>0</span></button>
       <button class="tab" role="tab" id="tab-clip" data-tab="clip" aria-selected="false" aria-controls="panel-clip">クリップ</button>
       <button class="tab" role="tab" id="tab-reviews" data-tab="reviews" aria-selected="false" aria-controls="panel-reviews">承認待ち<span id="rv-badge" class="badge" hidden>0</span></button>
@@ -60,12 +62,14 @@
 
     <section id="panel-memory" class="tabpanel" role="tabpanel" aria-labelledby="tab-memory"></section>
     <section id="panel-board" class="tabpanel" role="tabpanel" aria-labelledby="tab-board" hidden></section>
+    <section id="panel-navi" class="tabpanel" role="tabpanel" aria-labelledby="tab-navi" hidden></section>
+    <section id="panel-todo" class="tabpanel" role="tabpanel" aria-labelledby="tab-todo" hidden></section>
     <section id="panel-live" class="tabpanel" role="tabpanel" aria-labelledby="tab-live" hidden></section>
     <section id="panel-clip" class="tabpanel" role="tabpanel" aria-labelledby="tab-clip" hidden>
       <form id="clip-form" class="panel clip-panel" novalidate>
         <label for="clip-text" class="memo-label">気になったリンクを貼る</label>
         <textarea id="clip-text" rows="4" maxlength="40000" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="X・YouTube・記事の URL。改行やスペース区切りで何件でも（1 回 20 件まで）"></textarea>
-        <input id="clip-note" type="text" maxlength="500" placeholder="ひとことメモ（任意）例: ゼミで使えるかも" aria-label="ひとことメモ（任意）">
+        <input id="clip-note" type="text" maxlength="500" placeholder="ひとことメモ（任意）例: あとで読む" aria-label="ひとことメモ（任意）">
         <div class="memo-foot">
           <span id="clip-count" class="muted" aria-live="polite">リンク 0 件</span>
           <button type="submit" id="clip-btn" class="btn primary">読んでもらう</button>
@@ -95,11 +99,14 @@
           <button type="submit" class="btn">通知設定を保存</button>
         </fieldset>
       </form>
+      <h2 class="ws-h">ワークスペース</h2>
+      <p>記憶・ボードを 仕事 / 個人 などに分けて見るための定義です。カードに指定が無いときは、プロジェクト → リポジトリの対応表で振り分けます。</p>
+      <div id="ws-settings" class="ws-settings"></div>
     </section>
     <section id="panel-memo" class="tabpanel" role="tabpanel" aria-labelledby="tab-memo" hidden>
       <form id="memo-form" class="panel memo-panel">
         <label for="memo-text" class="memo-label">思いついたことをそのまま</label>
-        <textarea id="memo-text" rows="7" maxlength="5000" placeholder="例: ゼミの導入事例、あの人の一言が刺さった、など。次回の同期で Mac の記憶に入ります"></textarea>
+        <textarea id="memo-text" rows="7" maxlength="5000" placeholder="例: 事例メモ、あの人の一言が刺さった、など。次回の同期で Mac の記憶に入ります"></textarea>
         <div class="memo-foot">
           <span id="memo-count" class="muted">0 / 5000</span>
           <button type="submit" id="memo-btn" class="btn primary">送る</button>
@@ -148,6 +155,9 @@
     </div>
   </form>
 </dialog>
+
+<!-- カードの詳細（押すと画面いっぱいに本文・状態・操作を出す。中身は app.js の renderCardView） -->
+<dialog id="cardview" class="editor cardview" aria-labelledby="cv-title"></dialog>
 
 <dialog id="adopt" class="editor adopt" aria-labelledby="ad-title">
   <form id="adopt-form" method="dialog"></form>
