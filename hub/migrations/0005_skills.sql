@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS skill_proposals (
   source_repo TEXT NOT NULL,
   risk TEXT NOT NULL,                 -- low / medium / high
   state TEXT NOT NULL,
-  holders TEXT NOT NULL DEFAULT '[]', -- 今の配属（承認時にやなぎが確定する）JSON 配列
+  holders TEXT NOT NULL DEFAULT '[]', -- 今の配属（承認時にオーナーが確定する）JSON 配列
   suggested TEXT,                     -- 配属案の詳細（JSON: holder / confidence / reason / embed_score）
   data TEXT,                          -- 説明・レビュー・検査結果などの JSON
   note TEXT,

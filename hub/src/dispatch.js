@@ -5,14 +5,16 @@
 //   approve / reject / route（Access JWT の本人）
 //   claim / renew / finish（bearer）  : approved → running → done|failed
 // 自動OKに上げられるのは judge だけ。しかも hard rule（src/dispatch/rules.js）にここでも当てて、当たれば要承認に倒す。
+import { RUNNABLE_SQL } from './todo.js';
 import { hardRuleHit, isAcquire } from '../../src/dispatch/rules.js';
 import { GEN_ROUTES } from '../../src/dispatch/gen-routes.js';
 import { EXTERNAL_AGENT, EXTERNAL_LEASE_MIN, EXTERNAL_ROUTES, WAITING_STATUS, WAITING_STATUSES, isExternalRoute } from '../../src/dispatch/external-routes.js';
 import { CLIP_DUP_DAYS, CLIP_FALLBACK, CLIP_NOTE_MAX, CLIP_ROUTES, clipCardText, clipRoute, extractUrls } from '../../src/dispatch/clip-url.js';
 import { RAW_OUTPUT_PATH, buildTimeline, extractSourceUrls, noteLines, reviewFlags, runEvidence } from '../../src/dispatch/run-record.js';
 import { sensitiveCategory } from '../../src/dispatch/sensitive.js';
+import { createWorkspace, withWs } from './workspace.js';
 
-export const ROUTES = ['claude', 'codex', 'gemini', 'grok', 'chatgpt', 'grok_bot', 'elevenlabs', 'colab_video'];
+export const ROUTES = ['claude', 'codex', 'gemini', 'grok', 'chatgpt', 'grok_bot', 'elevenlabs', 'colab_video', 'antigravity', 'gemini_task'];
 export { GEN_ROUTES, EXTERNAL_ROUTES, WAITING_STATUS };
 // SQL 用（定数だけから作る。外部入力は入らない）
 const EXT_SQL = EXTERNAL_ROUTES.map((r) => `'${r}'`).join(',');
@@ -31,7 +33,7 @@ export const CLIP_RELEVANCE = ['高', '中', '低', '不明'];
 export const CLIP_READ = ['full', 'partial', 'none'];
 
 export const DISPATCH_COLS =
-  'id, lane, text, author, created_at, updated_at, route, route_confidence, route_by, needs_approval, approval_reason, status, result, decided_by, judged_at, claimed_by, lease_until, attempts, started_at, finished_at, note, output_dir, legacy, task_kind, repo, question, impl, clip_url, clip_note, clip, retry_after, clip_decision, clip_decided_at, clip_adopt_card, from_clip, run_meta, evidence, approved_at, claimed_at';
+  'id, lane, text, author, created_at, updated_at, route, route_confidence, route_by, needs_approval, approval_reason, status, result, decided_by, judged_at, claimed_by, lease_until, attempts, started_at, finished_at, note, output_dir, legacy, task_kind, repo, question, impl, clip_url, clip_note, clip, retry_after, clip_decision, clip_decided_at, clip_adopt_card, from_clip, run_meta, evidence, approved_at, claimed_at, workspace, project, prev_result, prev_output_dir, owner, suggested_owner, owner_reason, source, source_ref, due, owner_at, suggested_route, waiting_on, triaged_at';
 
 const TEXT_EXT = new Set(['md', 'txt', 'json', 'csv', 'tsv', 'log', 'yml', 'yaml', 'html', 'xml', 'js', 'ts', 'py', 'sh', 'css', 'toml']);
 const INLINE_TYPES = {
@@ -84,6 +86,7 @@ const sha256Hex = async (buf) =>
   [...new Uint8Array(await crypto.subtle.digest('SHA-256', buf))].map((b) => b.toString(16).padStart(2, '0')).join('');
 
 export function createDispatch({ HttpError, readJson, now, json, live = null }) {
+  const W = createWorkspace({ HttpError, now });
   const clip = (s, n) => (s == null ? null : String(s).slice(0, n));
   // 「いま」への自動記録（hub/src/live.js）。記録の失敗で dispatch を止めない
   const event = async (env, id, ev, machine, note, agent = null) => {
@@ -216,10 +219,10 @@ export function createDispatch({ HttpError, readJson, now, json, live = null }) 
   async function queue(env) {
     const sw = await sweep(env);
     const un = await env.DB.prepare(
-      "SELECT id, text, route, route_by, legacy FROM board WHERE deleted = 0 AND lane = 'want' AND judged_at IS NULL AND status IS NULL ORDER BY created_at LIMIT 10"
+      `SELECT id, text, route, route_by, legacy FROM board WHERE deleted = 0 AND lane = 'want' AND judged_at IS NULL AND status IS NULL AND ${RUNNABLE_SQL} ORDER BY created_at LIMIT 10`
     ).all();
     const run = await env.DB.prepare(
-      `SELECT COUNT(*) AS n FROM board WHERE deleted = 0 AND lane = 'want' AND status = 'approved' AND route NOT IN (${EXT_SQL})`
+      `SELECT COUNT(*) AS n FROM board WHERE deleted = 0 AND lane = 'want' AND status = 'approved' AND route NOT IN (${EXT_SQL}) AND ${RUNNABLE_SQL}`
     ).first();
     return { unjudged: un.results, runnable: run ? run.n : 0, swept: sw };
   }
@@ -230,7 +233,7 @@ export function createDispatch({ HttpError, readJson, now, json, live = null }) 
     if (typeof b.text !== 'string') throw new HttpError(400, 'text required');
     if (!ROUTES.includes(b.route)) throw new HttpError(400, 'bad route');
     const conf = Math.max(0, Math.min(1, Number(b.route_confidence) || 0));
-    const cur = await env.DB.prepare("SELECT route, route_by, legacy FROM board WHERE id = ? AND deleted = 0 AND lane = 'want' AND judged_at IS NULL AND status IS NULL AND text = ?")
+    const cur = await env.DB.prepare(`SELECT route, route_by, legacy FROM board WHERE id = ? AND deleted = 0 AND lane = 'want' AND judged_at IS NULL AND status IS NULL AND ${RUNNABLE_SQL} AND text = ?`)
       .bind(id, b.text)
       .first();
     if (!cur) return { ok: false, reason: 'changed' }; // 本文が変わった・既に判定済み・移動済み
@@ -245,8 +248,10 @@ export function createDispatch({ HttpError, readJson, now, json, live = null }) 
       needs = true;
       reason = '既存カードのため自動実行の対象外（承認すれば実行します）';
     }
-    let route = cur.route_by === 'yanagi' && ROUTES.includes(cur.route) ? cur.route : b.route;
-    const routeBy = cur.route_by === 'yanagi' ? 'yanagi' : 'auto';
+    // 担当: オーナーが決めたもの、または振り分け役の AI が ToDo に付けたおすすめ（route_by='jev'）を優先する
+    const keep = ['yanagi', 'jev'].includes(cur.route_by) && ROUTES.includes(cur.route);
+    let route = keep ? cur.route : b.route;
+    const routeBy = keep ? cur.route_by : 'auto';
     // スキル導入（task_kind=acquire）: Mac の申告 または Worker 側のルールで判定。常に要承認
     let taskKind = b.task_kind === 'acquire' || isAcquire(b.text) ? 'acquire' : null;
     if (taskKind) needs = true;
@@ -265,7 +270,7 @@ export function createDispatch({ HttpError, readJson, now, json, live = null }) 
     const t = now();
     const r = await env.DB.prepare(
       `UPDATE board SET route=?1, route_confidence=?2, route_by=?3, needs_approval=?4, approval_reason=?5, status=?6, decided_by=?7, judged_at=?8, task_kind=?11, repo=?12, question=?13
-       WHERE id=?9 AND text=?10 AND deleted=0 AND lane='want' AND judged_at IS NULL AND status IS NULL`
+       WHERE id=?9 AND text=?10 AND deleted=0 AND lane='want' AND judged_at IS NULL AND status IS NULL AND ${RUNNABLE_SQL}`
     )
       .bind(route, conf, routeBy, question || needs ? 1 : 0, reason, status, needs || question ? null : 'auto', t, id, b.text, taskKind, repo, question)
       .run();
@@ -288,7 +293,7 @@ export function createDispatch({ HttpError, readJson, now, json, live = null }) 
     const candidates = b.id
       ? [{ id: needId(b.id) }]
       : (await env.DB.prepare(
-          `SELECT id, route, task_kind, repo, impl FROM board WHERE deleted = 0 AND lane = 'want' AND status = 'approved' AND route NOT IN (${EXT_SQL}) AND (retry_after IS NULL OR retry_after <= ?1) ORDER BY updated_at LIMIT 30`
+          `SELECT id, route, task_kind, repo, impl FROM board WHERE deleted = 0 AND lane = 'want' AND status = 'approved' AND route NOT IN (${EXT_SQL}) AND ${RUNNABLE_SQL} AND (retry_after IS NULL OR retry_after <= ?1) ORDER BY updated_at LIMIT 30`
         ).bind(now()).all()).results.filter((c) => eligibleForClaim(c, ctx));
     if (me && me.role === 'fallback' && !candidates.length && mine.filter((r) => !others.primary.has(r)).length === 0) {
       const p = await primaryActiveOtherThan(env, machine);
@@ -346,7 +351,7 @@ export function createDispatch({ HttpError, readJson, now, json, live = null }) 
       // 原子的に 1 台だけ成功する: 承認済み & 未 claim（or リース切れ）& 他に実行中が無い & 再試行時刻を過ぎている & 日次上限内（クリップは別枠）
       const r = await env.DB.prepare(
         `UPDATE board SET claimed_by=?1, lease_until=?2, status='running', lane='doing', attempts=attempts+1, started_at=?3, claimed_at=?3, updated_at=?3, finished_at=NULL, retry_after=NULL
-         WHERE id=?4 AND deleted=0 AND lane='want' AND status='approved' AND route NOT IN (${EXT_SQL})
+         WHERE id=?4 AND deleted=0 AND lane='want' AND status='approved' AND route NOT IN (${EXT_SQL}) AND ${RUNNABLE_SQL}
            AND (claimed_by IS NULL OR lease_until < ?3)
            AND (retry_after IS NULL OR retry_after <= ?3)
            AND NOT EXISTS (SELECT 1 FROM board b2 WHERE b2.status='running' AND b2.id != ?4 AND b2.lease_until >= ?3 AND b2.deleted=0)
@@ -359,7 +364,7 @@ export function createDispatch({ HttpError, readJson, now, json, live = null }) 
       if (r.meta.changes) {
         const item = await env.DB.prepare(`SELECT ${DISPATCH_COLS} FROM board WHERE id = ?`).bind(id).first();
         await event(env, id, 'start', machine);
-        return { ok: true, item, lease_until: lease };
+        return { ok: true, item: withWs(item, await W.load(env)), lease_until: lease };
       }
     }
     return { ok: false, reason: ids.length ? 'lost' : 'none' };
@@ -863,7 +868,7 @@ export function createDispatch({ HttpError, readJson, now, json, live = null }) 
     const review = card.task_kind === 'clip' ? { flag: false, reasons: [] } : reviewFlags(card, { sources });
     const artifacts = arts.map(({ urls, ...a }) => a);
     return {
-      card: { ...card, impl: parseJson(card.impl), clip: parseJson(card.clip), run_meta: undefined, evidence: undefined },
+      card: { ...withWs(card, await W.load(env)), impl: parseJson(card.impl), clip: parseJson(card.clip), run_meta: undefined, evidence: undefined },
       timeline: buildTimeline(card, acts),
       artifacts,
       evidence: runEvidence(card, { sources, artifacts }),
@@ -936,11 +941,12 @@ export function createDispatch({ HttpError, readJson, now, json, live = null }) 
     if (!isExternalRoute(route)) return { tasks: [], remaining: 0 };
     const t = now();
     const n = Math.max(1, Math.min(20, Math.floor(Number(limit) || 1)));
-    const avail = `deleted = 0 AND route = ?1 AND status = ?2 AND (claimed_by IS NULL OR lease_until IS NULL OR lease_until < ?3)`;
+    const avail = `deleted = 0 AND route = ?1 AND status = ?2 AND ${RUNNABLE_SQL} AND (claimed_by IS NULL OR lease_until IS NULL OR lease_until < ?3)`;
     const cand = (await env.DB.prepare(
-      `SELECT id, text, approval_reason, decided_by, created_at FROM board WHERE ${avail} ORDER BY created_at LIMIT 40`
+      `SELECT id, text, approval_reason, decided_by, created_at, workspace, project, repo FROM board WHERE ${avail} ORDER BY created_at LIMIT 40`
     ).bind(route, WAITING_STATUS[route], t).all()).results;
-    if (!claim) return { tasks: cand.slice(0, n), remaining: Math.max(0, cand.length - n) };
+    const wsMap = await W.load(env);
+    if (!claim) return { tasks: cand.slice(0, n).map((c) => withWs(c, wsMap)), remaining: Math.max(0, cand.length - n) };
     const lease = new Date(Date.now() + EXTERNAL_LEASE_MIN * 60000).toISOString();
     const got = [];
     for (const c of cand) {
@@ -950,7 +956,7 @@ export function createDispatch({ HttpError, readJson, now, json, live = null }) 
         `UPDATE board SET lane='doing', claimed_by=?1, lease_until=?4, attempts=attempts+1, updated_at=?3, claimed_at=?3
          WHERE id=?5 AND ${avail}`
       ).bind(route, WAITING_STATUS[route], t, lease, c.id).run();
-      if (r.meta.changes) got.push({ ...c, lease_until: lease });
+      if (r.meta.changes) got.push(withWs({ ...c, lease_until: lease }, wsMap));
     }
     const left = await env.DB.prepare(`SELECT COUNT(*) AS n FROM board WHERE ${avail}`).bind(route, WAITING_STATUS[route], t).first();
     return { tasks: got, remaining: left ? left.n : 0 };
@@ -958,10 +964,11 @@ export function createDispatch({ HttpError, readJson, now, json, live = null }) 
 
   async function taskResults(env) {
     const r = await env.DB.prepare(
-      "SELECT id, text, route, status, result, claimed_by, finished_at FROM board WHERE deleted = 0 AND status IN ('done','failed') AND route IS NOT NULL ORDER BY finished_at DESC LIMIT 10"
+      "SELECT id, text, route, status, result, claimed_by, finished_at, workspace, project, repo FROM board WHERE deleted = 0 AND status IN ('done','failed') AND route IS NOT NULL ORDER BY finished_at DESC LIMIT 10"
     ).all();
     const arts = await artifactsByCard(env);
-    return r.results.map((c) => ({ ...c, artifacts: arts[c.id] || [] }));
+    const wsMap = await W.load(env);
+    return r.results.map(({ repo, ...c }) => ({ ...withWs({ ...c, repo }, wsMap), repo: undefined, artifacts: arts[c.id] || [] }));
   }
 
   // ---------- クリップ（画面から。Access JWT の本人のみ）----------
@@ -974,6 +981,10 @@ export function createDispatch({ HttpError, readJson, now, json, live = null }) 
     const note = typeof b.note === 'string' ? b.note.replace(/\r\n/g, '\n').trim().slice(0, CLIP_NOTE_MAX) : '';
     const { urls, invalid, truncated } = extractUrls(raw);
     if (!urls.length) throw new HttpError(400, 'http/https のリンクが見つかりません');
+    // 任意: 作るクリップのワークスペース / プロジェクト（不正なら 400。未指定は未分類）
+    const wsMap = await W.load(env);
+    const workspace = W.cleanWorkspaceId(b.workspace, wsMap) ?? null;
+    const project = W.cleanProject(b.project) ?? null;
     const since = new Date(Date.now() - CLIP_DUP_DAYS * 86400000).toISOString();
     const created = [], duplicates = [];
     for (const url of urls) {
@@ -986,9 +997,9 @@ export function createDispatch({ HttpError, readJson, now, json, live = null }) 
       const route = clipRoute(url);
       await env.DB.prepare(
         `INSERT INTO board (id, lane, text, author, created_at, updated_at, deleted, route, route_confidence, route_by, needs_approval, approval_reason, status,
-           decided_by, judged_at, attempts, legacy, task_kind, clip_url, clip_note)
-         VALUES (?1, 'want', ?2, 'yanagi', ?3, ?3, 0, ?4, 1, 'rule', 0, ?5, 'approved', 'auto', ?3, 0, 0, 'clip', ?6, ?7)`
-      ).bind(id, clipCardText(url, note), t, route, 'クリップ（読むだけ）のため自動実行', url, note || null).run();
+           decided_by, judged_at, attempts, legacy, task_kind, clip_url, clip_note, workspace, project)
+         VALUES (?1, 'want', ?2, 'yanagi', ?3, ?3, 0, ?4, 1, 'rule', 0, ?5, 'approved', 'auto', ?3, 0, 0, 'clip', ?6, ?7, ?8, ?9)`
+      ).bind(id, clipCardText(url, note), t, route, 'クリップ（読むだけ）のため自動実行', url, note || null, workspace, project).run();
       created.push({ id, url, route });
     }
     return { ok: true, created, duplicates, invalid, truncated };

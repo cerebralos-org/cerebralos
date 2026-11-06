@@ -1,6 +1,6 @@
 # hub Slack 完了報告
 
-ボードの依頼カード（クリップ以外）が **完了 / 失敗 / 取り込み待ち（実装済み）/ 要確認**（status: done / failed / implemented / needs_attention）になったら、Slack の非公開チャンネル（#cerebralos-done）へ投稿する。チャンネルにいる Dots（こはく）がメンションで気づき、やなぎに知らせて続きを手伝う運用。
+ボードの依頼カード（クリップ以外）が **完了 / 失敗 / 取り込み待ち（実装済み）/ 要確認**（status: done / failed / implemented / needs_attention）になったら、Slack の非公開チャンネル（#cerebralos-done）へ投稿する。チャンネルにいる見張り役の AI がメンションで気づき、オーナーに知らせて続きを手伝う運用。
 
 ## 本人が行う導入手順（今回未実施）
 
@@ -36,4 +36,4 @@ Webhook URL はログ・エラーに出さない。Slack の拒否理由（`chan
 
 ## 検証
 
-`node --test test/slack.test.mjs`（実際の migration で発火条件・clip 除外・重複なし・既存データ非投稿、エスケープ・メンション注入防止、機微カードの伏せ、URL 検証、リトライ・破棄、未設定時の無動作、ログに URL が出ないこと）。transport を差し替えており、実際の Slack へは送っていない。実ワークスペースでの表示・Dots の反応・Worker のバンドルは未検証。
+`node --test test/slack.test.mjs`（実際の migration で発火条件・clip 除外・重複なし・既存データ非投稿、エスケープ・メンション注入防止、機微カードの伏せ、URL 検証、リトライ・破棄、未設定時の無動作、ログに URL が出ないこと）。transport を差し替えており、実際の Slack へは送っていない。実ワークスペースでの表示・見張り役の AI の反応・Worker のバンドルは未検証。

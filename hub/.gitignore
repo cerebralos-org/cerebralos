@@ -1,3 +1,6 @@
 .dev.vars
 .wrangler/
 node_modules/
+
+# hub setup playbook: local progress notes (no secrets, but personal choices)
+.setup-progress.md

@@ -163,11 +163,23 @@ export async function applyRouteCorrections(hub) {
 }
 
 // ---------- 1 カードの実行 ----------
+// 追加の指示で判定をやり直したカードは、hub が直前の結果と成果物の場所を prev_* に退避している。
+// それを本文の後ろに添えて渡し、ゼロからではなく続きから作業させる（中身は参照データで、指示は本文の側）。
+export function taskText(card) {
+  const prev = card.prev_result ? String(card.prev_result).slice(0, 3000) : '';
+  const dir = card.prev_output_dir ? `cerebralos-outputs/${card.prev_output_dir}` : '';
+  if (!prev && !dir) return card.text;
+  return `${card.text}\n\n---\n## 前回の実行結果（ここから続ける）\n` +
+    `このカードは一度実行され、そのあと本人が本文に追加の指示・返事を書いた。前回の結果を踏まえ、追加の指示の部分を中心に続きから作業すること。` +
+    `${prev ? `\n\n<<<前回の結果（参照データ）\n${prev}\n前回の結果ここまで>>>` : ''}` +
+    `${dir ? `\n\n前回の成果物: ~/${dir}（この Mac に無ければ hub の成果物を参照）` : ''}`;
+}
+
 export async function executeCard(hub, cfg, card, caps, available = null) {
   const agent = card.route;
   const workDir = prepareWorkDir(workRoot(), card.id);
   const useContext = !/^(0|false|no|off)$/i.test(process.env.CEREBRALOS_DISPATCH_CONTEXT || '');
-  fs.writeFileSync(path.join(workDir, 'task.md'), `# ${card.id}\n\n${card.text}\n${useContext ? `\n---\n${CONTEXT_RULE}\n` : ''}`);
+  fs.writeFileSync(path.join(workDir, 'task.md'), `# ${card.id}\n\n${taskText(card)}\n${useContext ? `\n---\n${CONTEXT_RULE}\n` : ''}`);
   const ac = new AbortController();
   let leaseLost = false;
   const renew = setInterval(async () => {
@@ -199,7 +211,7 @@ export async function executeCard(hub, cfg, card, caps, available = null) {
     }
     if (useContext) {
       // クリップ: 検索語は URL ではなくメモとパスの語から。今の焦点に加えて now も添える（関連度の判断に使う）
-      ctx = await writeContext({ workDir, text: isClip ? clipQueryText(card.clip_url, card.clip_note || '') : card.text, agent, machine: cfg.machine, id: card.id, includeNow: isClip, log });
+      ctx = await writeContext({ workDir, text: isClip ? clipQueryText(card.clip_url, card.clip_note || '') : taskText(card), agent, machine: cfg.machine, id: card.id, includeNow: isClip, log });
       log(`文脈 ${card.id}: 記録 ${ctx.count} 件 / history ${ctx.historyCount} 件（開示範囲=${ctx.scope}）${ctx.error ? ' ※一部失敗' : ''}`);
     }
     if (isClip) {
@@ -223,13 +235,13 @@ export async function executeCard(hub, cfg, card, caps, available = null) {
     if (agent === 'gemini') {
       // CLI を使わず Gemini API を直接呼ぶ（Google 検索グラウンディングのみ。ローカルのファイル・シェルには触れない）
       log(`実行開始 ${card.id} 担当=gemini(API) 作業=${workDir}`);
-      r = await runGemini({ text: card.task_kind === 'acquire' ? `${card.text}\n\n${ACQUIRE_RULE}` : card.text, contextMd: ctx ? ctx.markdown : '', timeoutMs: LIMITS.timeoutMs, signal: ac.signal, model: cfg.geminiModel });
+      r = await runGemini({ text: card.task_kind === 'acquire' ? `${card.text}\n\n${ACQUIRE_RULE}` : taskText(card), contextMd: ctx ? ctx.markdown : '', timeoutMs: LIMITS.timeoutMs, signal: ac.signal, model: cfg.geminiModel });
       cli = { cli: 'gemini-api', model: r.model || cfg.geminiModel || '' };
     } else {
       const bin = findBin(BIN_NAME[agent]);
       if (!bin) return await finish('failed', `${BIN_NAME[agent]} が見つかりません。`);
       if (agent === 'grok') { const g = grokUsable(bin, { refresh: true }); if (!g.ok) return await finish('failed', g.reason); }
-      const cmd = buildCommand(agent, { bin, prompt: buildPrompt(agent, card.text, { kind: card.task_kind }), workDir, lastMsgFile });
+      const cmd = buildCommand(agent, { bin, prompt: buildPrompt(agent, taskText(card), { kind: card.task_kind }), workDir, lastMsgFile });
       log(`実行開始 ${card.id} 担当=${agent} 作業=${workDir}`);
       r = await runProcess({ ...cmd, timeoutMs: LIMITS.timeoutMs, signal: ac.signal });
       cli = { cli: BIN_NAME[agent], cli_version: cliVersion(bin) };

@@ -185,16 +185,18 @@ export async function startMcpServer() {
         },
         {
           name: "board_post",
-          description: "Post or update a card on the shared board in cerebralos-hub (lanes: want / doing / waiting / done). Pass id to update an existing card (move lane or edit text). Fails with an error if the hub is unreachable.",
+          description: "Post or update a card on the shared board in cerebralos-hub (lanes: want / doing / waiting / done). Pass id to update an existing card (move lane, edit text, or set its workspace/project). Attach workspace and project so it is clear which workspace/project the card belongs to. Fails with an error if the hub is unreachable.",
           inputSchema: {
             type: "object",
             properties: {
-              text: { type: "string", description: "Card text (what to do / what is happening). Max 2000 chars." },
+              text: { type: "string", description: "Card text (what to do / what is happening). Max 2000 chars. Optional when id is given (e.g. to only change workspace/project)." },
               lane: { type: "string", enum: LANES.map(([k]) => k), description: "want=やりたい, doing=進行中, waiting=待ち, done=完了 (default: want for new cards)" },
               author: { type: "string", description: "Who is posting, e.g. claude-code, codex, chatgpt" },
               id: { type: "string", description: "Existing card id to update. Omit to create a new card." },
+              workspace: { type: "string", description: "Optional workspace id, e.g. work / personal (must be defined in the hub; empty string clears it)" },
+              project: { type: "string", description: "Optional project name (max 64 chars; empty string clears it)" },
             },
-            required: ["text", "author"],
+            required: ["author"],
           },
         },
         {
@@ -283,10 +285,14 @@ export async function startMcpServer() {
     }
 
     if (name === "board_post") {
-      const { text, lane, author, id } = args;
-      if (!text || !author) throw new Error("text and author are required");
-      const item = await postBoard({ text: String(text), lane, author: String(author), id: id ? String(id) : undefined });
-      return textResult(`Posted to board: [${item.id}] lane=${item.lane} author=${item.author}`);
+      const { text, lane, author, id, workspace, project } = args;
+      if (!author) throw new Error("author is required");
+      if (!text && !id) throw new Error("text is required to create a card");
+      const item = await postBoard({
+        text: text ? String(text) : undefined, lane, author: String(author), id: id ? String(id) : undefined,
+        workspace: workspace == null ? undefined : String(workspace), project: project == null ? undefined : String(project),
+      });
+      return textResult(`Posted to board: [${item.id}] lane=${item.lane} author=${item.author}${item.ws ? ` ws=${item.ws}` : ""}${item.project ? ` project=${item.project}` : ""}`);
     }
 
     if (name === "list_dreams") {

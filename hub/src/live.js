@@ -1,6 +1,6 @@
 // hub/src/live.js — 「いま」掲示板（activity）と「作業中の札」（locks）
 //
-// 複数の AI（Claude Code / Codex / ChatGPT / こはく / Gemini / Grok / dispatch）が「誰が今なにをしているか」を共有し、
+// 複数の AI（Claude Code / Codex / ChatGPT / 見張り役の AI / Gemini / Grok / dispatch）が「誰が今なにをしているか」を共有し、
 // 同じ資源（Colab の VM・リポジトリ・ボードのカード）を二重に使わないための仕組み。
 //   - activity: 直近 7 日だけ保持（cron の purge）。text は保存前に機微マスク（sensitive.js）して 280 字に切る
 //   - locks   : key ごとに 1 行。取得は INSERT ... ON CONFLICT DO UPDATE ... WHERE（期限切れ or 同じ holder_session）で原子的に行う

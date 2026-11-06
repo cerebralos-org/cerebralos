@@ -334,6 +334,19 @@ a { color: var(--link); text-underline-offset: 3px; }
 .lane[data-lane="doing"] { --lane: var(--l-doing); --lane-tint: var(--l-doing-tint); --lane-ink: var(--l-doing-ink); }
 .lane[data-lane="waiting"] { --lane: var(--l-waiting); --lane-tint: var(--l-waiting-tint); --lane-ink: var(--l-waiting-ink); }
 .lane[data-lane="done"] { --lane: var(--l-done); --lane-tint: var(--l-done-tint); --lane-ink: var(--l-done-ink); }
+/* ToDo ボードの列（持ち主）。色はボードのレーンを使い回し、相手待ちは灰色 */
+.lane[data-lane="t-candidate"] { --lane: var(--line); --lane-tint: var(--surface-2); --lane-ink: var(--ink, inherit); }
+.lane[data-lane="t-yanagi"] { --lane: var(--l-waiting); --lane-tint: var(--l-waiting-tint); --lane-ink: var(--l-waiting-ink); }
+.lane[data-lane="t-ai"] { --lane: var(--l-doing); --lane-tint: var(--l-doing-tint); --lane-ink: var(--l-doing-ink); }
+.lane[data-lane="t-both"] { --lane: var(--l-want); --lane-tint: var(--l-want-tint); --lane-ink: var(--l-want-ink); }
+.lane[data-lane="t-others"] { --lane: var(--muted); --lane-tint: var(--surface-2); --lane-ink: var(--muted); }
+.lane[data-lane="t-done"] { --lane: var(--l-done); --lane-tint: var(--l-done-tint); --lane-ink: var(--l-done-ink); }
+.todo-sug { font-size: 13px; font-weight: 600; }
+.todo-why, .todo-wait { font-size: 12px; color: var(--muted); }
+.todo-due { font-size: 12px; font-weight: 700; color: var(--danger, #b91c1c); }
+.todo-acts { display: flex; flex-wrap: wrap; gap: 6px; }
+.todo-acts .btn[aria-pressed="true"] { opacity: .5; pointer-events: none; }
+.todo-intro { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
 .lane-head { display: flex; align-items: center; gap: 8px; }
 .lane-head h3 { font-size: 15px; font-weight: 700; color: var(--lane-ink); flex: 1; display: flex; align-items: center; gap: 8px; }
 .lane-head .cnt { font-size: 12px; background: var(--surface); border-radius: 999px; padding: 0 8px; line-height: 20px; color: var(--muted); border: 1px solid var(--line); }
@@ -481,6 +494,7 @@ a { color: var(--link); text-underline-offset: 3px; }
 .a-gemini { background: var(--w-gemini); color: var(--w-gemini-ink); } .a-gemini .adot { background: var(--w-gemini-dot); }
 .a-grok { background: var(--w-grok); color: var(--w-grok-ink); } .a-grok .adot { background: var(--w-grok-dot); }
 .a-grok_bot { background: var(--w-grok); color: var(--w-grok-ink); } .a-grok_bot .adot { background: var(--w-grok-dot); border-radius: 2px; }
+.a-gemini_task { background: var(--w-gemini); color: var(--w-gemini-ink); } .a-gemini_task .adot { background: var(--w-gemini-dot); border-radius: 2px; }
 .a-elevenlabs { background: var(--w-pc); color: var(--w-pc-ink); } .a-elevenlabs .adot { background: var(--w-pc-dot); }
 .a-colab_video { background: var(--w-hub); color: var(--w-hub-ink); } .a-colab_video .adot { background: var(--w-hub-dot); }
 .a-chatgpt { background: var(--w-chatgpt); color: var(--w-chatgpt-ink); } .a-chatgpt .adot { background: var(--w-chatgpt-dot); }
@@ -696,3 +710,93 @@ video.art-media { background: #000; max-height: 60dvh; }
   .layout[data-tab="board"].rec-open { grid-template-columns: minmax(0, 1fr) 480px; }
   .layout[data-tab="board"].rec-open .detail { display: flex; }
 }
+
+/* ---------- workspace（分類の色は JS が --ws を付ける。CSP により style 属性は使えない）---------- */
+.wschip, .chip.wsc { --ws: var(--w-other-dot); }
+.wschip {
+  display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px; border-radius: 999px; font-size: 12px; font-weight: 700; line-height: 1;
+  background: color-mix(in srgb, var(--ws) 16%, var(--surface)); color: var(--text); border: 1px solid color-mix(in srgb, var(--ws) 45%, transparent); white-space: nowrap;
+}
+.wschip::before, .chip.wsc[data-wscolor]::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ws); flex: none; }
+.wsbar { padding-bottom: 8px; }
+.ws-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+.ws-fields select, .ws-fields input, .ws-row input[type="text"], .ws-row select {
+  width: 100%; min-width: 0; min-height: 40px; border: 1px solid var(--line-strong); border-radius: 10px; padding: 0 12px; background: var(--surface); font-size: 14px;
+}
+.ws-fields select:focus, .ws-fields input:focus, .ws-row input:focus, .ws-row select:focus { outline: none; border-color: var(--focus-ring); box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-ring) 25%, transparent); }
+#panel-settings .ws-h { margin-top: 2rem; }
+.ws-settings { display: grid; gap: 8px; margin-top: 1rem; }
+.ws-sub { font-size: 14px; font-weight: 700; color: var(--muted); margin-top: 1rem; }
+.ws-row { display: grid; gap: 8px; align-items: center; }
+.ws-row.def { grid-template-columns: 44px minmax(0, 1fr) minmax(0, 1.2fr) 40px; }
+.ws-row.map { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 40px; }
+.ws-row input[type="color"] { width: 44px; height: 40px; padding: 2px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); }
+.ws-settings .btn.sm { justify-self: start; }
+.ws-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1rem; }
+@media (max-width: 560px) {
+  .ws-fields { grid-template-columns: 1fr; }
+}
+
+/* 承認待ちタブ: ボードの承認待ち・承認の記録 */
+.rv-h { font-size: 14px; font-weight: 700; color: var(--muted); margin: 18px 0 8px; }
+.rv-h:first-child { margin-top: 0; }
+.ap-log { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 12px; }
+.ap-log summary { cursor: pointer; font-weight: 700; color: var(--muted); }
+.ap-log ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 10px; }
+.ap-log li { line-height: 1.5; overflow-wrap: anywhere; }
+.ap-log .sub { display: block; font-size: 12px; color: var(--muted); }
+.ap-log code { font-family: var(--mono); font-size: 11px; }
+
+/* ToDo の「決めた」 */
+.todo-decide label { display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin-top: 8px; }
+.todo-decide textarea { margin-top: 4px; }
+.todo-decide-note { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+
+/* カードの要約（題名＋ 2 行まで）と詳細の窓 */
+.bcard-title { display: block; font-weight: 700; }
+.bcard-sum { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: var(--muted); font-size: 13px; margin-top: 2px; }
+.bcard-open { text-align: left; cursor: pointer; }
+.bcard-st { display: flex; gap: 8px; align-items: center; }
+.bcard-st-note { font-size: 12px; color: var(--muted); }
+.editor.cardview { width: min(1000px, calc(100vw - 32px)); height: calc(100dvh - 48px); }
+.cv-wrap { display: flex; flex-direction: column; width: 100%; max-height: calc(100dvh - 48px); }
+.cv-head { display: flex; align-items: flex-start; gap: 12px; padding: 20px 24px 8px; }
+.cv-head h2 { flex: 1; font-size: 20px; line-height: 1.5; margin: 0; overflow-wrap: anywhere; }
+.cv-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 0 24px 12px; font-size: 12px; border-bottom: 1px solid var(--line); }
+.cv-body { flex: 1; overflow-y: auto; padding: 16px 24px; display: grid; gap: 12px; align-content: start; }
+.cv-text { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; line-height: 1.8; }
+.cv-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 24px; border-top: 1px solid var(--line); }
+@media (max-width: 640px) {
+  .editor.cardview { width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh; margin: 0; border-radius: 0; }
+  .cv-wrap { max-height: 100dvh; }
+  .cv-head, .cv-meta, .cv-body, .cv-foot { padding-left: 16px; padding-right: 16px; }
+}
+
+/* 新しく拾ったやることの仕分け（ToDo タブ → 仕分ける） */
+.todo-top { display: flex; gap: 8px; flex-wrap: wrap; }
+.sort-row { border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; display: grid; gap: 6px; }
+.sort-row h3 { font-size: 15px; margin: 0; line-height: 1.5; }
+.sort-head { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 12px; }
+.sort-rest { margin: 0; color: var(--muted); font-size: 13px; }
+
+/* 案内役（任意機能）: メッセージ窓と選択肢 */
+.navi { max-width: 720px; margin: 0 auto; display: grid; gap: 12px; min-width: 0; overflow-x: clip; }
+.navi > * { min-width: 0; }
+.navi-box { position: relative; margin-top: 14px; margin-inline: 8px; padding: 22px 18px 14px; border-radius: 16px; background: color-mix(in srgb, #1e2a44 82%, transparent); color: #fff; border: 1px solid rgb(122 167 255 / 60%); box-shadow: 0 8px 24px rgb(0 0 0 / 25%); }
+.navi-name { position: absolute; top: -14px; left: 16px; display: flex; gap: 8px; align-items: baseline; }
+.navi-name span { background: #b4637a; color: #fff; font-weight: 700; padding: 2px 16px; border-radius: 8px; }
+.navi-name small { color: #e6e8ec; font-size: 12px; background: rgb(0 0 0 / 35%); padding: 1px 8px; border-radius: 6px; }
+.navi-line { margin: 0; font-size: 16px; line-height: 1.8; min-height: 3.6em; }
+.navi-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+.navi-choices .btn { min-height: 48px; font-size: 15px; justify-content: center; }
+.navi-next { margin: 0; font-size: 13px; color: var(--muted); }
+.navi-meta { margin: 0; font-size: 12px; color: var(--muted); }
+.navi-sys { display: flex; gap: 8px; flex-wrap: wrap; }
+.navi-panel { border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 8px; }
+.navi-panel h3 { margin: 0; font-size: 15px; }
+.navi-panel ol, .navi-panel ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: 14px; }
+@media (max-width: 640px) {
+    .navi-box { margin-inline: 0; }
+}
+/* 案内役のタブでは「今日」（Dream・今の焦点）を隠す */
+.layout[data-tab="navi"] .today { display: none; }

@@ -55,7 +55,7 @@
       h += '<p class="clip-note">このクリップには使い道の提案がありません。下にどう導入したいかを書いてください。</p>';
     }
     h += `<label class="memo-label" for="ad-how">どう導入したいか（任意）</label>` +
-      `<textarea id="ad-how" name="how" rows="4" maxlength="${HOW_MAX}" placeholder="例: ゼミの第 3 回の題材にする / hub に同じ仕組みを入れたい"></textarea>` +
+      `<textarea id="ad-how" name="how" rows="4" maxlength="${HOW_MAX}" placeholder="例: チームの勉強会の題材にする / hub に同じ仕組みを入れたい"></textarea>` +
       '<p class="clip-hint">ボードの「やりたい」に新しいカードを作ります。担当と承認の要否はいつもどおり判定されます（このクリップの自動承認は引き継ぎません）。</p></div>';
     h += '<div class="ed-foot"><span class="muted"></span><div class="ed-actions">' +
       '<button type="button" class="btn" data-act="ad-close">キャンセル</button>' +

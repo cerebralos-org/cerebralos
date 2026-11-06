@@ -13,7 +13,7 @@
 import { sensitiveCategory } from '../../src/dispatch/sensitive.js';
 
 export const SLACK_STATUSES = { done: '完了', failed: '失敗', implemented: '取り込み待ち（実装済み）', needs_attention: '要確認' };
-const AGENT_LABEL = { claude: 'Claude', codex: 'Codex', gemini: 'Gemini', grok: 'Grok', chatgpt: 'ChatGPT', grok_bot: 'Grok Bot', elevenlabs: 'ElevenLabs', colab_video: 'Colab 動画' };
+const AGENT_LABEL = { claude: 'Claude', codex: 'Codex', gemini: 'Gemini', grok: 'Grok', chatgpt: 'ChatGPT', grok_bot: 'Grok Bot', gemini_task: 'Gemini Task', elevenlabs: 'ElevenLabs', colab_video: 'Colab 動画' };
 export const SENSITIVE_NOTE = '（機微な内容のため hub で確認してください）';
 const TITLE_MAX = 80, SUMMARY_LINES = 3, SUMMARY_MAX = 300, ARTIFACTS_MAX = 5;
 const MAX_ATTEMPTS = 5, MAX_AGE = 86400, BATCH = 10;

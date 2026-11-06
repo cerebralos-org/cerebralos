@@ -24,6 +24,8 @@ binding = "OAUTH_KV"
 id = "REPLACE_WITH_YOUR_OAUTH_KV_ID"
 
 [vars]
+OWNER_NAME = "Your Name"   # 画面とAIに表示される、あなたの呼び名
+NAVI_ENABLED = "0"   # "1" にすると案内役（オプション機能）を有効化。既定は無効
 # Set the generated public key here; private scalar goes ONLY in wrangler secret.
 VAPID_PUBLIC_KEY = ""   # node scripts/generate-vapid.mjs → public key here
 VAPID_SUBJECT = "mailto:you@example.com"
